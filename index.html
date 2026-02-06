@@ -26,6 +26,19 @@
         .money-negative { color: #ef4444; }
         .slide-in { animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .mobile-stack { flex-direction: column !important; }
+            .mobile-grid-1 { grid-template-columns: 1fr !important; }
+            .mobile-grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
+            .mobile-p-2 { padding: 0.5rem !important; }
+            .mobile-text-sm { font-size: 0.875rem !important; }
+            .mobile-hidden { display: none !important; }
+            .mobile-full { width: 100% !important; }
+            .mobile-scroll { overflow-x: auto; white-space: nowrap; }
+            .mobile-wrap { white-space: normal !important; }
+        }
     </style>
 </head>
 <body class="text-gray-100 min-h-screen">
@@ -193,39 +206,39 @@
             return (
                 <div className="slide-in">
                     {/* Overview Stats */}
-                    <div className="grid grid-cols-4 gap-4 mb-8">
-                        <div className="glass rounded-xl p-5">
-                            <div className="text-3xl font-bold text-indigo-400">{businessTasks.length}</div>
-                            <div className="text-sm text-gray-400 mt-1">Business Tasks</div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+                        <div className="glass rounded-xl p-3 md:p-5">
+                            <div className="text-2xl md:text-3xl font-bold text-indigo-400">{businessTasks.length}</div>
+                            <div className="text-xs md:text-sm text-gray-400 mt-1">Business Tasks</div>
                         </div>
-                        <div className="glass rounded-xl p-5">
-                            <div className="text-3xl font-bold text-amber-400">{personalTasks.length}</div>
-                            <div className="text-sm text-gray-400 mt-1">Personal Tasks</div>
+                        <div className="glass rounded-xl p-3 md:p-5">
+                            <div className="text-2xl md:text-3xl font-bold text-amber-400">{personalTasks.length}</div>
+                            <div className="text-xs md:text-sm text-gray-400 mt-1">Personal Tasks</div>
                         </div>
-                        <div className="glass rounded-xl p-5">
-                            <div className="text-3xl font-bold money-positive">${(totalRevenue/1000).toFixed(0)}k</div>
-                            <div className="text-sm text-gray-400 mt-1">Total Revenue</div>
+                        <div className="glass rounded-xl p-3 md:p-5">
+                            <div className="text-2xl md:text-3xl font-bold money-positive">${(totalRevenue/1000).toFixed(0)}k</div>
+                            <div className="text-xs md:text-sm text-gray-400 mt-1">Total Revenue</div>
                         </div>
-                        <div className="glass rounded-xl p-5">
-                            <div className="text-3xl font-bold money-positive">${(totalProfit/1000).toFixed(0)}k</div>
-                            <div className="text-sm text-gray-400 mt-1">Total Profit</div>
+                        <div className="glass rounded-xl p-3 md:p-5">
+                            <div className="text-2xl md:text-3xl font-bold money-positive">${(totalProfit/1000).toFixed(0)}k</div>
+                            <div className="text-xs md:text-sm text-gray-400 mt-1">Total Profit</div>
                         </div>
                     </div>
                     
                     {/* Roles & Clients Cards */}
-                    <h2 className="text-xl font-semibold mb-4">Your Roles & Clients</h2>
-                    <div className="grid grid-cols-3 gap-4 mb-8">
+                    <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Your Roles & Clients</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
                         {Object.entries(clientsData).map(([key, client]) => {
                             const clientTasks = businessTasks.filter(t => t.category === key);
                             return (
                                 <div 
                                     key={key}
                                     onClick={() => onSelectClient(key)}
-                                    className="client-card glass rounded-xl p-5 cursor-pointer"
+                                    className="client-card glass rounded-xl p-3 md:p-5 cursor-pointer"
                                     style={{ borderTop: `3px solid ${client.color}` }}
                                 >
-                                    <div className="flex items-center justify-between mb-3">
-                                        <h3 className="font-semibold text-lg">{client.name}</h3>
+                                    <div className="flex items-center justify-between mb-2 md:mb-3">
+                                        <h3 className="font-semibold text-base md:text-lg">{client.name}</h3>
                                         {client.isInternal ? (
                                             <div className="text-xs bg-pink-900/50 text-pink-400 px-2 py-1 rounded">Internal</div>
                                         ) : (
@@ -332,7 +345,7 @@
                         </div>
                     </div>
                     
-                    <div className="grid grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                         {/* Info Panel */}
                         <div className="col-span-1 space-y-4">
                             {client.isJob ? (
@@ -544,26 +557,26 @@
             };
             
             return (
-                <div className="max-w-7xl mx-auto p-6">
+                <div className="max-w-7xl mx-auto p-3 md:p-6">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-8 gap-3">
                         <div>
-                            <h1 className="text-4xl font-bold gradient-text">OV Consulting</h1>
-                            <p className="text-gray-400">Command Center</p>
+                            <h1 className="text-2xl md:text-4xl font-bold gradient-text">OV Consulting</h1>
+                            <p className="text-sm md:text-base text-gray-400">Command Center</p>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="glass px-4 py-2 rounded-full flex items-center gap-2">
+                            <div className="glass px-3 py-1.5 md:px-4 md:py-2 rounded-full flex items-center gap-2 text-xs md:text-sm">
                                 <div className="w-2 h-2 bg-green-500 rounded-full pulse-dot"></div>
-                                <span className="text-sm text-gray-300">Aiden Active</span>
+                                <span className="text-gray-300">Aiden Active</span>
                             </div>
                         </div>
                     </div>
                     
                     {/* Navigation */}
-                    <div className="flex gap-2 mb-8">
+                    <div className="flex gap-2 mb-6 md:mb-8 overflow-x-auto pb-2 scrollbar-hide">
                         <button 
                             onClick={() => setView("dashboard")}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                            className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition whitespace-nowrap ${
                                 view === "dashboard" ? "tab-active text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
                             }`}
                         >
@@ -573,7 +586,7 @@
                             <button 
                                 key={key}
                                 onClick={() => handleSelectClient(key)}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition whitespace-nowrap ${
                                     view === "client" && selectedClient === key 
                                         ? "tab-active text-white" 
                                         : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -584,7 +597,7 @@
                         ))}
                         <button 
                             onClick={() => setView("personal")}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                            className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition whitespace-nowrap ${
                                 view === "personal" ? "tab-active text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
                             }`}
                         >
