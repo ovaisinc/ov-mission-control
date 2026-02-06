@@ -572,37 +572,41 @@
                         </div>
                     </div>
                     
-                    {/* Navigation */}
-                    <div className="flex gap-2 mb-6 md:mb-8 overflow-x-auto pb-2 scrollbar-hide">
-                        <button 
-                            onClick={() => setView("dashboard")}
-                            className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition whitespace-nowrap ${
-                                view === "dashboard" ? "tab-active text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                            }`}
+                    {/* Navigation Dropdown */}
+                    <div className="mb-6 md:mb-8">
+                        <select 
+                            value={view === "client" ? selectedClient : view}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === "dashboard") {
+                                    setView("dashboard");
+                                    setSelectedClient(null);
+                                } else if (val === "personal") {
+                                    setView("personal");
+                                    setSelectedClient(null);
+                                } else {
+                                    handleSelectClient(val);
+                                }
+                            }}
+                            className="w-full md:w-auto bg-gray-800 text-white px-4 py-3 rounded-lg border border-gray-700 focus:outline-none focus:border-indigo-500 text-sm md:text-base"
                         >
-                            Dashboard
-                        </button>
-                        {Object.keys(clientsData).map(key => (
-                            <button 
-                                key={key}
-                                onClick={() => handleSelectClient(key)}
-                                className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition whitespace-nowrap ${
-                                    view === "client" && selectedClient === key 
-                                        ? "tab-active text-white" 
-                                        : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                                }`}
-                            >
-                                {clientsData[key].name}
-                            </button>
-                        ))}
-                        <button 
-                            onClick={() => setView("personal")}
-                            className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition whitespace-nowrap ${
-                                view === "personal" ? "tab-active text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                            }`}
-                        >
-                            Personal
-                        </button>
+                            <option value="dashboard">📊 Dashboard - Overview</option>
+                            <optgroup label="💼 Consulting Clients">
+                                <option value="FACE">FACE Amusement ($3,700/mo)</option>
+                                <option value="Adtime">Adtime Marketing ($1,600/mo)</option>
+                                <option value="AFT">Almost Free Teeth ($3,100/mo)</option>
+                            </optgroup>
+                            <optgroup label="🏢 Your Business">
+                                <option value="Chohan">Chohan (AI Audits & Agents)</option>
+                            </optgroup>
+                            <optgroup label="💻 Employment">
+                                <option value="AbbVie">AbbVie (Job)</option>
+                            </optgroup>
+                            <optgroup label="🤝 Community">
+                                <option value="Jamaat">Chicago Jamaat (Motamid)</option>
+                            </optgroup>
+                            <option value="personal">🏠 Personal Life</option>
+                        </select>
                     </div>
                     
                     {/* Content */}
