@@ -38,6 +38,27 @@
             .mobile-full { width: 100% !important; }
             .mobile-scroll { overflow-x: auto; white-space: nowrap; }
             .mobile-wrap { white-space: normal !important; }
+            
+            /* iOS Select Fix */
+            select {
+                -webkit-appearance: menulist !important;
+                appearance: menulist !important;
+                background-color: #1f2937 !important;
+                color: white !important;
+                font-size: 16px !important; /* Prevents iOS zoom */
+            }
+            
+            optgroup {
+                background-color: #111827 !important;
+                color: #9ca3af !important;
+                font-weight: 600 !important;
+            }
+            
+            option {
+                background-color: #1f2937 !important;
+                color: white !important;
+                padding: 12px !important;
+            }
         }
     </style>
 </head>
