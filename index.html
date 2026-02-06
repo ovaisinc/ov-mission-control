@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OV Consulting Command Center</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; }
+        .glass { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+        .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .pulse-dot { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .client-card { transition: all 0.2s; }
+        .client-card:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2); }
+        .priority-high { border-left: 3px solid #ef4444; }
+        .priority-medium { border-left: 3px solid #f59e0b; }
+        .priority-low { border-left: 3px solid #10b981; }
+        .tab-active { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
+        .money-positive { color: #10b981; }
+        .money-negative { color: #ef4444; }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen">
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // CLIENT DATA
+        const clientsData = {
+            FACE: {
+                name: "FACE Amusement",
+                color: "#6366f1",
+                monthlyRevenue: 3700,
+                revenue: 44400,
+                costs: 12000,
+                profit: 32400,
+                agents: 11,
+                contacts: [
+                    { name: "Tom", role: "CTO", email: "tom@face.com" },
+                    { name: "Cash", role: "Operations", email: "cash@face.com" }
+                ],
+                research: [
+                    { title: "Sphere platform capabilities", date: "2026-02-05", summary: "AI-powered business intelligence platform" },
+                    { title: "Power BI dashboard best practices", date: "2026-02-04", summary: "Real-time KPI tracking for amusement venues" }
+                ]
+            },
+            Adtime: {
+                name: "Adtime Marketing",
+                color: "#f59e0b",
+                monthlyRevenue: 1600,
+                revenue: 19200,
+                costs: 5000,
+                profit: 14200,
+                agents: 0,
+                contacts: [
+                    { name: "Client Rep", role: "Primary", email: "client@adtime.com" }
+                ],
+                research: [
+                    { title: "Invoice matching algorithms", date: "2026-02-05", summary: "OCR + automated reconciliation" },
+                    { title: "Billboard software APIs", date: "2026-02-03", summary: "Integration options for outdoor advertising" }
+                ]
+            },
+            AFT: {
+                name: "Almost Free Teeth",
+                color: "#06b6d4",
+                monthlyRevenue: 3100,
+                revenue: 37200,
+                costs: 8000,
+                profit: 29200,
+                agents: 0,
+                contacts: [
+                    { name: "Kristal", role: "Dedicated Sleep POC", email: "kristal@dedicatedsleep.com" },
+                    { name: "Isac", role: "Team Lead", email: "isac@almostfreeteeth.com" }
+                ],
+                research: [
+                    { title: "HIPAA compliance checklist", date: "2026-02-05", summary: "Audit requirements for dental software" },
+                    { title: "AI messaging for healthcare", date: "2026-02-04", summary: "Patient communication automation" }
+                ]
+            },
+            Chohan: {
+                name: "Chohan",
+                color: "#ec4899",
+                revenue: 0,
+                costs: 0,
+                profit: 0,
+                isInternal: true,
+                agents: 0,
+                contacts: [
+                    { name: "OV", role: "Founder", email: "ov@chohan.com" }
+                ],
+                research: [
+                    { title: "AI Audit service offerings", date: "2026-02-05", summary: "Service tiers and pricing for AI audits" },
+                    { title: "Agent development best practices", date: "2026-02-04", summary: "Framework for building client agents" }
+                ]
+            },
+            AbbVie: {
+                name: "AbbVie",
+                color: "#059669",
+                isJob: true,
+                agents: 0,
+                contacts: [
+                    { name: "Manager", role: "Direct Report", email: "manager@abbvie.com" }
+                ],
+                research: [
+                    { title: "LBE Process Documentation", date: "2026-02-05", summary: "Leadership Business Excellence framework" }
+                ]
+            },
+            Jamaat: {
+                name: "Chicago Jamaat",
+                color: "#d97706",
+                isCommunity: true,
+                role: "Motamid",
+                agents: 0,
+                contacts: [
+                    { name: "Jamaat President", role: "Leadership", email: "president@chicagojamaat.org" }
+                ],
+                research: [
+                    { title: "Event Planning Checklist", date: "2026-02-05", summary: "Venue, catering, logistics for jamaat events" }
+                ]
+            }
+        };
+        
+        // ALL TASKS
+        const allTasks = [
+            // FACE Tasks
+            { id: 1, title: "Send Tom the agent workflow", category: "FACE", priority: "high", status: "pending", due: "Today", type: "business" },
+            { id: 2, title: "Play with Sphere access (Tom gave access)", category: "FACE", priority: "high", status: "pending", due: "Today", type: "business" },
+            { id: 3, title: "Send Power BI updates to Upwork dev", category: "FACE", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 4, title: "Meeting with Cash - new power dashboard", category: "FACE", priority: "high", status: "pending", due: "Upcoming", type: "business" },
+            // Adtime Tasks
+            { id: 5, title: "Finish invoice match system", category: "Adtime", priority: "high", status: "pending", due: "Today", type: "business" },
+            { id: 6, title: "Integrate invoice match + billboard software to portal", category: "Adtime", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 7, title: "Refinish MyBody website", category: "Adtime", priority: "medium", status: "pending", due: "This week", type: "business" },
+            { id: 8, title: "Refinish List Home Flat Fee website", category: "Adtime", priority: "medium", status: "pending", due: "This week", type: "business" },
+            { id: 9, title: "Deposit $550,000 check from Adtime", category: "Adtime", priority: "high", status: "pending", due: "Today", type: "business" },
+            { id: 10, title: "Meeting at 5:30 with Adtime's client", category: "Adtime", priority: "high", status: "pending", due: "Today 5:30 PM", type: "business" },
+            // AFT Tasks
+            { id: 11, title: "Debug entire software process", category: "AFT", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 12, title: "Finish AI messaging portion", category: "AFT", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 13, title: "Follow up with Kristal - get demo done for Dedicated Sleep", category: "AFT", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 14, title: "Fix benefits verification", category: "AFT", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 15, title: "Reach out to Isac - ensure his team is using it", category: "AFT", priority: "medium", status: "pending", due: "This week", type: "business" },
+            { id: 16, title: "Get HIPAA audit done", category: "AFT", priority: "high", status: "pending", due: "This week", type: "business" },
+            // CHO (Chohan) Admin Tasks
+            { id: 20, title: "Update Chohan website - add portfolio section", category: "Chohan", priority: "medium", status: "pending", due: "This week", type: "business" },
+            { id: 21, title: "Add team photos to Chohan website", category: "Chohan", priority: "medium", status: "pending", due: "This week", type: "business" },
+            { id: 22, title: "Write About Me section for Chohan", category: "Chohan", priority: "medium", status: "pending", due: "This week", type: "business" },
+            { id: 23, title: "Create AI Audit service page", category: "Chohan", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 24, title: "Update Chohan branding and messaging", category: "Chohan", priority: "medium", status: "pending", due: "This month", type: "business" },
+            // AbbVie Job Tasks
+            { id: 30, title: "Finish LBE for Monday meeting", category: "AbbVie", priority: "high", status: "pending", due: "Monday", type: "business" },
+            { id: 31, title: "Resubmit Ross for H26-142", category: "AbbVie", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 32, title: "Submit Ross for M23-055", category: "AbbVie", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 33, title: "Submit Ross for M25-631", category: "AbbVie", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 34, title: "Submit Ross for M24-741", category: "AbbVie", priority: "high", status: "pending", due: "This week", type: "business" },
+            { id: 35, title: "Do costings that Khris sent", category: "AbbVie", priority: "medium", status: "pending", due: "This week", type: "business" },
+            { id: 36, title: "Power BI changes - CCC vs AMP comments from Excel", category: "AbbVie", priority: "medium", status: "pending", due: "This week", type: "business" },
+            { id: 37, title: "Respond to Elissa and Susan via Teams - M21-558 (2015-701-008)", category: "AbbVie", priority: "high", status: "pending", due: "Today", type: "business" },
+            // Jamaat (Motamid) Tasks
+            { id: 40, title: "Submit Motamid report - TONIGHT", category: "Jamaat", priority: "high", status: "pending", due: "Tonight", type: "business" },
+            { id: 41, title: "Follow up with Jazib - submit his report", category: "Jamaat", priority: "high", status: "pending", due: "Tonight", type: "business" },
+            { id: 42, title: "Follow up with Fahad - submit his report", category: "Jamaat", priority: "high", status: "pending", due: "Tonight", type: "business" },
+            { id: 43, title: "Organize upcoming jamaat event", category: "Jamaat", priority: "medium", status: "pending", due: "This week", type: "business" },
+            { id: 44, title: "Maintenance scheduling for jamaat center", category: "Jamaat", priority: "medium", status: "pending", due: "This week", type: "business" },
+            { id: 45, title: "Create efficient Motamid workflow/system", category: "Jamaat", priority: "medium", status: "pending", due: "This week", type: "business" },
+            // PERSONAL TASKS
+            { id: 101, title: "Pay parking ticket", category: "Personal", priority: "medium", status: "pending", due: "This week", type: "personal" },
+            { id: 102, title: "Email village HOA about fence issue", category: "Personal", priority: "low", status: "pending", due: "Soon", type: "personal" },
+            { id: 103, title: "Schedule dentist appointment", category: "Personal", priority: "medium", status: "pending", due: "This month", type: "personal" },
+            { id: 104, title: "Buy groceries for weekend", category: "Personal", priority: "low", status: "pending", due: "Saturday", type: "personal" },
+            { id: 105, title: "Pick up Adderall and steroids from Target", category: "Personal", priority: "high", status: "pending", due: "Today", type: "personal" },
+            { id: 106, title: "Email Kris from the village back", category: "Personal", priority: "medium", status: "pending", due: "This week", type: "personal" },
+            { id: 107, title: "Reminder: ABT coming tomorrow for stove", category: "Personal", priority: "high", status: "pending", due: "Tomorrow", type: "personal" },
+        ];
+        
+        // COMPONENTS
+        function Dashboard({ onSelectClient, tasks, onToggleTask }) {
+            const businessTasks = tasks.filter(t => t.type === "business" && t.status === "pending");
+            const personalTasks = tasks.filter(t => t.type === "personal" && t.status === "pending");
+            const externalClients = Object.values(clientsData).filter(c => !c.isInternal && !c.isJob && !c.isCommunity);
+            const totalRevenue = externalClients.reduce((sum, c) => sum + (c.revenue || 0), 0);
+            const totalProfit = externalClients.reduce((sum, c) => sum + (c.profit || 0), 0);
+            
+            return (
+                <div className="slide-in">
+                    {/* Overview Stats */}
+                    <div className="grid grid-cols-4 gap-4 mb-8">
+                        <div className="glass rounded-xl p-5">
+                            <div className="text-3xl font-bold text-indigo-400">{businessTasks.length}</div>
+                            <div className="text-sm text-gray-400 mt-1">Business Tasks</div>
+                        </div>
+                        <div className="glass rounded-xl p-5">
+                            <div className="text-3xl font-bold text-amber-400">{personalTasks.length}</div>
+                            <div className="text-sm text-gray-400 mt-1">Personal Tasks</div>
+                        </div>
+                        <div className="glass rounded-xl p-5">
+                            <div className="text-3xl font-bold money-positive">${(totalRevenue/1000).toFixed(0)}k</div>
+                            <div className="text-sm text-gray-400 mt-1">Total Revenue</div>
+                        </div>
+                        <div className="glass rounded-xl p-5">
+                            <div className="text-3xl font-bold money-positive">${(totalProfit/1000).toFixed(0)}k</div>
+                            <div className="text-sm text-gray-400 mt-1">Total Profit</div>
+                        </div>
+                    </div>
+                    
+                    {/* Roles & Clients Cards */}
+                    <h2 className="text-xl font-semibold mb-4">Your Roles & Clients</h2>
+                    <div className="grid grid-cols-3 gap-4 mb-8">
+                        {Object.entries(clientsData).map(([key, client]) => {
+                            const clientTasks = businessTasks.filter(t => t.category === key);
+                            return (
+                                <div 
+                                    key={key}
+                                    onClick={() => onSelectClient(key)}
+                                    className="client-card glass rounded-xl p-5 cursor-pointer"
+                                    style={{ borderTop: `3px solid ${client.color}` }}
+                                >
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="font-semibold text-lg">{client.name}</h3>
+                                        {client.isInternal ? (
+                                            <div className="text-xs bg-pink-900/50 text-pink-400 px-2 py-1 rounded">Internal</div>
+                                        ) : (
+                                            <div className="text-xs bg-gray-800 px-2 py-1 rounded">{clientTasks.length} tasks</div>
+                                        )}
+                                    </div>
+                                    {client.isInternal ? (
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Type</span>
+                                                <span className="text-pink-400">Your Company</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Admin Tasks</span>
+                                                <span className="text-white">{clientTasks.length}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Services</span>
+                                                <span className="text-gray-300">AI Audits, Agents</span>
+                                            </div>
+                                        </div>
+                                    ) : client.isJob ? (
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Type</span>
+                                                <span className="text-green-400">Employment</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Work Tasks</span>
+                                                <span className="text-white">{clientTasks.length}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Company</span>
+                                                <span className="text-gray-300">Pharma/Biotech</span>
+                                            </div>
+                                        </div>
+                                    ) : client.isCommunity ? (
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Type</span>
+                                                <span className="text-amber-400">Community Role</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Your Role</span>
+                                                <span className="text-white">{client.role}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Tasks</span>
+                                                <span className="text-gray-300">{clientTasks.length}</span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Monthly</span>
+                                                <span className="money-positive">${client.monthlyRevenue.toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Annual</span>
+                                                <span className="text-gray-300">${client.revenue.toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Profit</span>
+                                                <span className="money-positive">${client.profit.toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                    
+                    {/* Today's Priorities */}
+                    <h2 className="text-xl font-semibold mb-4">Due Today</h2>
+                    <div className="glass rounded-xl divide-y divide-gray-800">
+                        {businessTasks.filter(t => t.due.includes("Today")).map(task => (
+                            <TaskItem key={task.id} task={task} onToggle={() => onToggleTask(task.id)} />
+                        ))}
+                        {businessTasks.filter(t => t.due.includes("Today")).length === 0 && (
+                            <div className="p-4 text-gray-500">Nothing due today</div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+        
+        function ClientDetail({ clientKey, onBack, tasks, onToggleTask }) {
+            const client = clientsData[clientKey];
+            const clientTasks = tasks.filter(t => t.category === clientKey && t.status === "pending");
+            
+            return (
+                <div className="slide-in">
+                    <button onClick={onBack} className="mb-4 text-gray-400 hover:text-white flex items-center gap-2">
+                        ← Back to Dashboard
+                    </button>
+                    
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-3 h-12 rounded" style={{ background: client.color }}></div>
+                        <div>
+                            <h1 className="text-3xl font-bold">{client.name}</h1>
+                            <p className="text-gray-400">
+                                {client.isJob ? "Employment" : client.isCommunity ? `Community Role - ${client.role}` : client.isInternal ? "Your Company" : "Client"} • {clientTasks.length} tasks
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-6">
+                        {/* Info Panel */}
+                        <div className="col-span-1 space-y-4">
+                            {client.isJob ? (
+                                <div className="glass rounded-xl p-5">
+                                    <h3 className="font-semibold mb-4 text-gray-300">Employment</h3>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Company</span>
+                                            <span className="font-semibold">{client.name}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Industry</span>
+                                            <span className="text-gray-300">Pharma/Biotech</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Active Tasks</span>
+                                            <span className="text-green-400">{clientTasks.length}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : client.isCommunity ? (
+                                <div className="glass rounded-xl p-5">
+                                    <h3 className="font-semibold mb-4 text-gray-300">Community Service</h3>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Organization</span>
+                                            <span className="font-semibold">{client.name}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Your Role</span>
+                                            <span className="text-amber-400">{client.role}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Active Tasks</span>
+                                            <span className="text-white">{clientTasks.length}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : client.isInternal ? (
+                                <div className="glass rounded-xl p-5">
+                                    <h3 className="font-semibold mb-4 text-gray-300">Your Company</h3>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Name</span>
+                                            <span className="font-semibold">{client.name}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Services</span>
+                                            <span className="text-pink-400">AI Audits, Agents</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Admin Tasks</span>
+                                            <span className="text-white">{clientTasks.length}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="glass rounded-xl p-5">
+                                    <h3 className="font-semibold mb-4 text-gray-300">Financials</h3>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Revenue</span>
+                                            <span className="font-semibold">${client.revenue.toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Costs</span>
+                                            <span className="money-negative">-${client.costs.toLocaleString()}</span>
+                                        </div>
+                                        <div className="border-t border-gray-700 pt-3 flex justify-between">
+                                            <span className="text-gray-300">Profit</span>
+                                            <span className="font-bold money-positive text-lg">${client.profit.toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-400">Margin</span>
+                                            <span className="text-indigo-400">{((client.profit/client.revenue)*100).toFixed(1)}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            <div className="glass rounded-xl p-5">
+                                <h3 className="font-semibold mb-4 text-gray-300">Contacts</h3>
+                                <div className="space-y-3">
+                                    {client.contacts.map((contact, i) => (
+                                        <div key={i} className="text-sm">
+                                            <div className="font-medium">{contact.name}</div>
+                                            <div className="text-gray-500">{contact.role}</div>
+                                            <div className="text-gray-600 text-xs">{contact.email}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Tasks */}
+                        <div className="col-span-1">
+                            <div className="glass rounded-xl p-5">
+                                <h3 className="font-semibold mb-4 text-gray-300">Tasks</h3>
+                                <div className="space-y-2">
+                                    {clientTasks.map(task => (
+                                        <TaskItem key={task.id} task={task} onToggle={() => onToggleTask(task.id)} compact />
+                                    ))}
+                                    {clientTasks.length === 0 && (
+                                        <div className="text-gray-500 text-sm">No pending tasks</div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Research */}
+                        <div className="col-span-1">
+                            <div className="glass rounded-xl p-5">
+                                <h3 className="font-semibold mb-4 text-gray-300">Research & Notes</h3>
+                                <div className="space-y-3">
+                                    {client.research.map((item, i) => (
+                                        <div key={i} className="bg-gray-800/50 rounded-lg p-3">
+                                            <div className="font-medium text-sm mb-1">{item.title}</div>
+                                            <div className="text-gray-500 text-xs mb-1">{item.date}</div>
+                                            <div className="text-gray-400 text-sm">{item.summary}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        function TaskItem({ task, onToggle, compact }) {
+            return (
+                <div className={`flex items-start gap-3 p-3 rounded-lg hover:bg-gray-800/30 transition priority-${task.priority}`}>
+                    <input 
+                        type="checkbox" 
+                        checked={task.status === "done"}
+                        onChange={onToggle}
+                        className="mt-1 w-4 h-4 rounded border-gray-600 bg-gray-700 text-indigo-600"
+                    />
+                    <div className="flex-1">
+                        <div className={`${task.status === "done" ? "line-through text-gray-500" : "text-gray-200"} ${compact ? "text-sm" : ""}`}>
+                            {task.title}
+                        </div>
+                        {!compact && (
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className={`text-xs px-2 py-0.5 rounded ${
+                                    task.priority === "high" ? "bg-red-900/30 text-red-400" :
+                                    task.priority === "medium" ? "bg-amber-900/30 text-amber-400" :
+                                    "bg-green-900/30 text-green-400"
+                                }`}>{task.priority}</span>
+                                <span className="text-xs text-gray-500">{task.due}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+        
+        function PersonalView({ tasks, onToggleTask }) {
+            const personalTasks = tasks.filter(t => t.type === "personal");
+            const pending = personalTasks.filter(t => t.status === "pending");
+            const done = personalTasks.filter(t => t.status === "done");
+            
+            return (
+                <div className="slide-in">
+                    <h2 className="text-2xl font-bold mb-6">Personal Life</h2>
+                    
+                    <div className="grid grid-cols-3 gap-4 mb-8">
+                        <div className="glass rounded-xl p-5">
+                            <div className="text-3xl font-bold text-pink-400">{pending.length}</div>
+                            <div className="text-sm text-gray-400 mt-1">To Do</div>
+                        </div>
+                        <div className="glass rounded-xl p-5">
+                            <div className="text-3xl font-bold text-green-400">{done.length}</div>
+                            <div className="text-sm text-gray-400 mt-1">Done</div>
+                        </div>
+                        <div className="glass rounded-xl p-5">
+                            <div className="text-3xl font-bold text-indigo-400">{personalTasks.length}</div>
+                            <div className="text-sm text-gray-400 mt-1">Total</div>
+                        </div>
+                    </div>
+                    
+                    <div className="glass rounded-xl divide-y divide-gray-800">
+                        {pending.map(task => (
+                            <TaskItem key={task.id} task={task} onToggle={() => onToggleTask(task.id)} />
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+        
+        // MAIN APP
+        function App() {
+            const [view, setView] = useState("dashboard"); // dashboard, client, personal
+            const [selectedClient, setSelectedClient] = useState(null);
+            const [tasks, setTasks] = useState(allTasks);
+            
+            const toggleTask = (id) => {
+                setTasks(tasks.map(t => t.id === id ? { ...t, status: t.status === "done" ? "pending" : "done" } : t));
+            };
+            
+            const handleSelectClient = (clientKey) => {
+                setSelectedClient(clientKey);
+                setView("client");
+            };
+            
+            const handleBack = () => {
+                setView("dashboard");
+                setSelectedClient(null);
+            };
+            
+            return (
+                <div className="max-w-7xl mx-auto p-6">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h1 className="text-4xl font-bold gradient-text">OV Consulting</h1>
+                            <p className="text-gray-400">Command Center</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="glass px-4 py-2 rounded-full flex items-center gap-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full pulse-dot"></div>
+                                <span className="text-sm text-gray-300">Aiden Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Navigation */}
+                    <div className="flex gap-2 mb-8">
+                        <button 
+                            onClick={() => setView("dashboard")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                view === "dashboard" ? "tab-active text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                            }`}
+                        >
+                            Dashboard
+                        </button>
+                        {Object.keys(clientsData).map(key => (
+                            <button 
+                                key={key}
+                                onClick={() => handleSelectClient(key)}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                    view === "client" && selectedClient === key 
+                                        ? "tab-active text-white" 
+                                        : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                                }`}
+                            >
+                                {clientsData[key].name}
+                            </button>
+                        ))}
+                        <button 
+                            onClick={() => setView("personal")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                view === "personal" ? "tab-active text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                            }`}
+                        >
+                            Personal
+                        </button>
+                    </div>
+                    
+                    {/* Content */}
+                    {view === "dashboard" && (
+                        <Dashboard 
+                            onSelectClient={handleSelectClient} 
+                            tasks={tasks} 
+                            onToggleTask={toggleTask}
+                        />
+                    )}
+                    {view === "client" && selectedClient && (
+                        <ClientDetail 
+                            clientKey={selectedClient} 
+                            onBack={handleBack}
+                            tasks={tasks}
+                            onToggleTask={toggleTask}
+                        />
+                    )}
+                    {view === "personal" && (
+                        <PersonalView tasks={tasks} onToggleTask={toggleTask} />
+                    )}
+                </div>
+            );
+        }
+        
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
