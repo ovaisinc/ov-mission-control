@@ -78,6 +78,7 @@
                 costs: 12000,
                 profit: 32400,
                 agents: 11,
+                lastContacted: "2026-02-05",
                 contacts: [
                     { name: "Tom", role: "CTO", email: "tom@face.com" },
                     { name: "Cash", role: "Operations", email: "cash@face.com" }
@@ -85,6 +86,9 @@
                 research: [
                     { title: "Sphere platform capabilities", date: "2026-02-05", summary: "AI-powered business intelligence platform" },
                     { title: "Power BI dashboard best practices", date: "2026-02-04", summary: "Real-time KPI tracking for amusement venues" }
+                ],
+                meetingNotes: [
+                    { date: "2026-02-05", attendees: "Tom", notes: "Discussed Sphere integration and agent workflow" }
                 ]
             },
             Adtime: {
@@ -95,12 +99,16 @@
                 costs: 5000,
                 profit: 14200,
                 agents: 0,
+                lastContacted: "2026-02-06",
                 contacts: [
                     { name: "Client Rep", role: "Primary", email: "client@adtime.com" }
                 ],
                 research: [
                     { title: "Invoice matching algorithms", date: "2026-02-05", summary: "OCR + automated reconciliation" },
                     { title: "Billboard software APIs", date: "2026-02-03", summary: "Integration options for outdoor advertising" }
+                ],
+                meetingNotes: [
+                    { date: "2026-02-06", attendees: "Client", notes: "Received $550K check, discussed portal integration" }
                 ]
             },
             AFT: {
@@ -111,6 +119,7 @@
                 costs: 8000,
                 profit: 29200,
                 agents: 0,
+                lastContacted: "2026-02-04",
                 contacts: [
                     { name: "Kristal", role: "Dedicated Sleep POC", email: "kristal@dedicatedsleep.com" },
                     { name: "Isac", role: "Team Lead", email: "isac@almostfreeteeth.com" }
@@ -118,7 +127,8 @@
                 research: [
                     { title: "HIPAA compliance checklist", date: "2026-02-05", summary: "Audit requirements for dental software" },
                     { title: "AI messaging for healthcare", date: "2026-02-04", summary: "Patient communication automation" }
-                ]
+                ],
+                meetingNotes: []
             },
             Chohan: {
                 name: "Chohan",
@@ -128,24 +138,30 @@
                 profit: 0,
                 isInternal: true,
                 agents: 0,
+                lastContacted: null,
                 contacts: [
                     { name: "OV", role: "Founder", email: "ov@chohan.com" }
                 ],
                 research: [
                     { title: "AI Audit service offerings", date: "2026-02-05", summary: "Service tiers and pricing for AI audits" },
                     { title: "Agent development best practices", date: "2026-02-04", summary: "Framework for building client agents" }
-                ]
+                ],
+                meetingNotes: []
             },
             AbbVie: {
                 name: "AbbVie",
                 color: "#059669",
                 isJob: true,
                 agents: 0,
+                lastContacted: "2026-02-06",
                 contacts: [
                     { name: "Manager", role: "Direct Report", email: "manager@abbvie.com" }
                 ],
                 research: [
                     { title: "LBE Process Documentation", date: "2026-02-05", summary: "Leadership Business Excellence framework" }
+                ],
+                meetingNotes: [
+                    { date: "2026-02-06", attendees: "Elissa, Susan", notes: "Need to respond about M21-558" }
                 ]
             },
             Jamaat: {
@@ -154,11 +170,15 @@
                 isCommunity: true,
                 role: "Motamid",
                 agents: 0,
+                lastContacted: "2026-02-06",
                 contacts: [
                     { name: "Jamaat President", role: "Leadership", email: "president@chicagojamaat.org" }
                 ],
                 research: [
                     { title: "Event Planning Checklist", date: "2026-02-05", summary: "Venue, catering, logistics for jamaat events" }
+                ],
+                meetingNotes: [
+                    { date: "2026-02-06", attendees: "Jazib, Fahad", notes: "Reports due tonight" }
                 ]
             }
         };
@@ -166,10 +186,10 @@
         // ALL TASKS
         const allTasks = [
             // FACE Tasks
-            { id: 1, title: "Send Tom the agent workflow", category: "FACE", priority: "high", status: "pending", due: "Today", type: "business" },
-            { id: 2, title: "Play with Sphere access (Tom gave access)", category: "FACE", priority: "high", status: "pending", due: "Today", type: "business" },
-            { id: 3, title: "Send Power BI updates to Upwork dev", category: "FACE", priority: "high", status: "pending", due: "This week", type: "business" },
-            { id: 4, title: "Meeting with Cash - new power dashboard", category: "FACE", priority: "high", status: "pending", due: "Upcoming", type: "business" },
+            { id: 1, title: "Send Tom the agent workflow", category: "FACE", priority: "high", status: "pending", due: "Today", type: "business", estimatedTime: 60 },
+            { id: 2, title: "Play with Sphere access (Tom gave access)", category: "FACE", priority: "high", status: "pending", due: "Today", type: "business", estimatedTime: 45 },
+            { id: 3, title: "Send Power BI updates to Upwork dev", category: "FACE", priority: "high", status: "pending", due: "This week", type: "business", estimatedTime: 30 },
+            { id: 4, title: "Meeting with Cash - new power dashboard", category: "FACE", priority: "high", status: "pending", due: "Upcoming", type: "business", estimatedTime: 60 },
             // Adtime Tasks
             { id: 5, title: "Finish invoice match system", category: "Adtime", priority: "high", status: "pending", due: "Today", type: "business" },
             { id: 6, title: "Integrate invoice match + billboard software to portal", category: "Adtime", priority: "high", status: "pending", due: "This week", type: "business" },
@@ -218,6 +238,7 @@
         
         // COMPONENTS
         function Dashboard({ onSelectClient, tasks, onToggleTask }) {
+            const [searchQuery, setSearchQuery] = useState("");
             const businessTasks = tasks.filter(t => t.type === "business" && t.status === "pending");
             const personalTasks = tasks.filter(t => t.type === "personal" && t.status === "pending");
             const externalClients = Object.values(clientsData).filter(c => !c.isInternal && !c.isJob && !c.isCommunity);
@@ -228,10 +249,41 @@
             const urgentTasks = tasks.filter(t => t.status === "pending" && (t.due.includes("Today") || t.due.includes("Tonight")));
             const highPriorityTasks = tasks.filter(t => t.status === "pending" && t.priority === "high");
             
+            // Filter tasks based on search
+            const filteredTasks = searchQuery 
+                ? tasks.filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()) || t.category.toLowerCase().includes(searchQuery.toLowerCase()))
+                : tasks;
+            
             return (
                 <div className="slide-in">
+                    {/* Search Bar */}
+                    <div className="mb-4">
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="🔍 Search tasks..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full bg-gray-800 text-white px-4 py-3 pl-10 rounded-lg border border-gray-700 focus:outline-none focus:border-indigo-500"
+                            />
+                            {searchQuery && (
+                                <button 
+                                    onClick={() => setSearchQuery("")}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                >
+                                    ✕
+                                </button>
+                            )}
+                        </div>
+                        {searchQuery && (
+                            <div className="mt-2 text-sm text-gray-400">
+                                Found {filteredTasks.filter(t => t.status === "pending").length} matching tasks
+                            </div>
+                        )}
+                    </div>
+                    
                     {/* Urgency Alert Banner */}
-                    {urgentTasks.length > 0 && (
+                    {urgentTasks.length > 0 && !searchQuery && (
                         <div className="bg-red-900/30 border border-red-700 rounded-xl p-3 mb-4 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <span className="text-2xl">🔥</span>
@@ -265,7 +317,16 @@
                     <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Your Roles & Clients</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
                         {Object.entries(clientsData).map(([key, client]) => {
-                            const clientTasks = businessTasks.filter(t => t.category === key);
+                            const clientAllTasks = tasks.filter(t => t.category === key);
+                            const clientPendingTasks = clientAllTasks.filter(t => t.status === "pending");
+                            const clientCompletedTasks = clientAllTasks.filter(t => t.status === "done");
+                            const progressPercent = clientAllTasks.length > 0 ? Math.round((clientCompletedTasks.length / clientAllTasks.length) * 100) : 0;
+                            
+                            // Calculate days since last contact
+                            const daysSinceContact = client.lastContacted ? Math.floor((new Date() - new Date(client.lastContacted)) / (1000 * 60 * 60 * 24)) : null;
+                            const contactStatus = daysSinceContact === null ? "Never" : daysSinceContact === 0 ? "Today" : daysSinceContact === 1 ? "Yesterday" : `${daysSinceContact} days ago`;
+                            const contactColor = daysSinceContact === null ? "text-gray-500" : daysSinceContact <= 3 ? "text-green-400" : daysSinceContact <= 7 ? "text-amber-400" : "text-red-400";
+                            
                             return (
                                 <div 
                                     key={key}
@@ -275,12 +336,36 @@
                                 >
                                     <div className="flex items-center justify-between mb-2 md:mb-3">
                                         <h3 className="font-semibold text-base md:text-lg">{client.name}</h3>
-                                        {client.isInternal ? (
-                                            <div className="text-xs bg-pink-900/50 text-pink-400 px-2 py-1 rounded">Internal</div>
-                                        ) : (
-                                            <div className="text-xs bg-gray-800 px-2 py-1 rounded">{clientTasks.length} tasks</div>
-                                        )}
+                                        <div className="flex items-center gap-2">
+                                            {client.lastContacted !== undefined && (
+                                                <span className={`text-xs ${contactColor}`} title="Last contacted">
+                                                    📞 {contactStatus}
+                                                </span>
+                                            )}
+                                            {client.isInternal ? (
+                                                <div className="text-xs bg-pink-900/50 text-pink-400 px-2 py-1 rounded">Internal</div>
+                                            ) : (
+                                                <div className="text-xs bg-gray-800 px-2 py-1 rounded">{clientPendingTasks.length} tasks</div>
+                                            )}
+                                        </div>
                                     </div>
+                                    
+                                    {/* Progress Bar */}
+                                    {clientAllTasks.length > 0 && (
+                                        <div className="mb-3">
+                                            <div className="flex justify-between text-xs mb-1">
+                                                <span className="text-gray-400">Progress</span>
+                                                <span className="text-gray-300">{progressPercent}% ({clientCompletedTasks.length}/{clientAllTasks.length})</span>
+                                            </div>
+                                            <div className="w-full bg-gray-800 rounded-full h-2">
+                                                <div 
+                                                    className="h-2 rounded-full transition-all duration-500" 
+                                                    style={{ width: `${progressPercent}%`, backgroundColor: client.color }}
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
                                     {client.isInternal ? (
                                         <div className="space-y-2 text-sm">
                                             <div className="flex justify-between">
@@ -289,7 +374,7 @@
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-gray-400">Admin Tasks</span>
-                                                <span className="text-white">{clientTasks.length}</span>
+                                                <span className="text-white">{clientPendingTasks.length}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-gray-400">Services</span>
@@ -304,7 +389,7 @@
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-gray-400">Work Tasks</span>
-                                                <span className="text-white">{clientTasks.length}</span>
+                                                <span className="text-white">{clientPendingTasks.length}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-gray-400">Company</span>
@@ -323,7 +408,7 @@
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-gray-400">Tasks</span>
-                                                <span className="text-gray-300">{clientTasks.length}</span>
+                                                <span className="text-gray-300">{clientPendingTasks.length}</span>
                                             </div>
                                         </div>
                                     ) : (
@@ -532,7 +617,7 @@
                         
                         {/* Research */}
                         <div className="col-span-1">
-                            <div className="glass rounded-xl p-5">
+                            <div className="glass rounded-xl p-5 mb-4">
                                 <h3 className="font-semibold mb-4 text-gray-300">Research & Notes</h3>
                                 <div className="space-y-3">
                                     {client.research.map((item, i) => (
@@ -542,6 +627,28 @@
                                             <div className="text-gray-400 text-sm">{item.summary}</div>
                                         </div>
                                     ))}
+                                </div>
+                            </div>
+                            
+                            {/* Meeting Notes */}
+                            <div className="glass rounded-xl p-5">
+                                <h3 className="font-semibold mb-4 text-gray-300 flex items-center gap-2">
+                                    <span>📝</span> Meeting Notes
+                                </h3>
+                                <div className="space-y-3">
+                                    {client.meetingNotes && client.meetingNotes.length > 0 ? (
+                                        client.meetingNotes.map((note, i) => (
+                                            <div key={i} className="bg-gray-800/50 rounded-lg p-3 border-l-2 border-indigo-500">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <div className="font-medium text-sm">{note.date}</div>
+                                                    <div className="text-xs text-gray-500">{note.attendees}</div>
+                                                </div>
+                                                <div className="text-gray-300 text-sm">{note.notes}</div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-gray-500 text-sm italic">No meeting notes yet</div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -564,13 +671,16 @@
                             {task.title}
                         </div>
                         {!compact && (
-                            <div className="flex items-center gap-2 mt-1">
+                            <div className="flex items-center gap-2 mt-1 flex-wrap">
                                 <span className={`text-xs px-2 py-0.5 rounded ${
                                     task.priority === "high" ? "bg-red-900/30 text-red-400" :
                                     task.priority === "medium" ? "bg-amber-900/30 text-amber-400" :
                                     "bg-green-900/30 text-green-400"
                                 }`}>{task.priority}</span>
                                 <span className="text-xs text-gray-500">{task.due}</span>
+                                {task.estimatedTime && (
+                                    <span className="text-xs text-indigo-400">⏱️ {task.estimatedTime}m</span>
+                                )}
                             </div>
                         )}
                     </div>
