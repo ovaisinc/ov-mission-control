@@ -134,10 +134,10 @@
             personal: "ovmc_personal",
             emergency: "ovmc_emergency",
             completed: "ovmc_completed",
-            clientNotes: "ovmc_client_notes",
-            personalNotes: "ovmc_personal_notes",
-            personalNoteDraft: "ovmc_personal_note_draft",
-            personalNoteTag: "ovmc_personal_note_tag",
+            notes: "ovmc_notes",
+            noteDraft: "ovmc_notes_draft",
+            noteTag: "ovmc_notes_tag",
+            noteLinkedTo: "ovmc_notes_linked_to",
             personalGoals: "ovmc_personal_goals",
         };
         
@@ -158,14 +158,6 @@
             }
         };
         
-        const buildInitialClientNotes = () => {
-            const initial = {};
-            clientsData.forEach(client => {
-                initial[client.id] = client.research || client.meetingNotes || "";
-            });
-            return initial;
-        };
-
         const buildInitialTaskState = () => {
             const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, allTasks);
             const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, personalTasks);
@@ -190,6 +182,43 @@
                 completed,
             };
         };
+
+        const migrateLegacyNotes = () => {
+            const storedNotes = loadFromStorage(STORAGE_KEYS.notes, null);
+            if (Array.isArray(storedNotes)) return storedNotes;
+
+            const legacyPersonal = loadFromStorage("ovmc_personal_notes", []);
+            const legacyClientNotes = loadFromStorage("ovmc_client_notes", null);
+            const migrated = [];
+
+            if (Array.isArray(legacyPersonal)) {
+                legacyPersonal.forEach(note => {
+                    migrated.push({
+                        id: note.id || Date.now() + Math.random(),
+                        timestamp: note.timestamp || new Date().toISOString(),
+                        content: note.content || "",
+                        tag: note.tag || "",
+                        linkedTo: "personal",
+                    });
+                });
+            }
+
+            if (legacyClientNotes && typeof legacyClientNotes === "object") {
+                Object.entries(legacyClientNotes).forEach(([clientId, content]) => {
+                    if ((content || "").trim()) {
+                        migrated.push({
+                            id: Date.now() + Math.random(),
+                            timestamp: new Date().toISOString(),
+                            content: String(content),
+                            tag: "",
+                            linkedTo: clientId,
+                        });
+                    }
+                });
+            }
+
+            return migrated;
+        };
         
         function App() {
             const [activeTab, setActiveTab] = useState("dashboard");
@@ -204,23 +233,17 @@
             const [completedTasks, setCompletedTasks] = useState(initialTaskState.completed);
             const [emergency, setEmergency] = useState(() => loadFromStorage(STORAGE_KEYS.emergency, emergencyItems));
             const [searchTerm, setSearchTerm] = useState("");
-            const [clientNotes, setClientNotes] = useState(() => {
-                const baseNotes = buildInitialClientNotes();
-                const stored = loadFromStorage(STORAGE_KEYS.clientNotes, null);
-                if (stored && typeof stored === "object") {
-                    return { ...baseNotes, ...stored };
-                }
-                return baseNotes;
-            });
-            const [personalNotes, setPersonalNotes] = useState(() => loadFromStorage(STORAGE_KEYS.personalNotes, []));
-            const [noteDraft, setNoteDraft] = useState(() => loadFromStorage(STORAGE_KEYS.personalNoteDraft, ""));
-            const [noteTag, setNoteTag] = useState(() => loadFromStorage(STORAGE_KEYS.personalNoteTag, ""));
+            const [notes, setNotes] = useState(() => migrateLegacyNotes());
+            const [noteDraft, setNoteDraft] = useState(() => loadFromStorage(STORAGE_KEYS.noteDraft, ""));
+            const [noteTag, setNoteTag] = useState(() => loadFromStorage(STORAGE_KEYS.noteTag, ""));
+            const [noteLinkedTo, setNoteLinkedTo] = useState(() => loadFromStorage(STORAGE_KEYS.noteLinkedTo, null));
             const [personalGoals, setPersonalGoals] = useState(() => loadFromStorage(STORAGE_KEYS.personalGoals, []));
             const [goalText, setGoalText] = useState("");
             const [taskFilter, setTaskFilter] = useState("all");
             const [clientFilter, setClientFilter] = useState(clientsData[0]?.taskCategory || "");
             const [expandedPrepCategory, setExpandedPrepCategory] = useState(null);
             const [showCompleted, setShowCompleted] = useState(false);
+            const [noteFilter, setNoteFilter] = useState("all");
             
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
@@ -239,20 +262,20 @@
             }, [completedTasks]);
             
             useEffect(() => {
-                localStorage.setItem(STORAGE_KEYS.clientNotes, JSON.stringify(clientNotes));
-            }, [clientNotes]);
+                localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(notes));
+            }, [notes]);
 
             useEffect(() => {
-                localStorage.setItem(STORAGE_KEYS.personalNotes, JSON.stringify(personalNotes));
-            }, [personalNotes]);
-
-            useEffect(() => {
-                localStorage.setItem(STORAGE_KEYS.personalNoteDraft, noteDraft);
+                localStorage.setItem(STORAGE_KEYS.noteDraft, noteDraft);
             }, [noteDraft]);
 
             useEffect(() => {
-                localStorage.setItem(STORAGE_KEYS.personalNoteTag, noteTag);
+                localStorage.setItem(STORAGE_KEYS.noteTag, noteTag);
             }, [noteTag]);
+
+            useEffect(() => {
+                localStorage.setItem(STORAGE_KEYS.noteLinkedTo, JSON.stringify(noteLinkedTo));
+            }, [noteLinkedTo]);
 
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.personalGoals, JSON.stringify(personalGoals));
@@ -375,18 +398,24 @@
                 setPersonalTaskDue("none");
             };
 
-            const addPersonalNote = () => {
+            const addNote = (linkedToOverride) => {
                 const content = noteDraft.trim();
                 if (!content) return;
+                const resolvedLinkedTo = linkedToOverride !== undefined ? linkedToOverride : noteLinkedTo;
                 const newNote = {
                     id: Date.now(),
                     timestamp: new Date().toISOString(),
                     content,
                     tag: noteTag.trim() || "",
+                    linkedTo: resolvedLinkedTo ?? null,
                 };
-                setPersonalNotes(prev => [newNote, ...prev]);
+                setNotes(prev => [newNote, ...prev]);
                 setNoteDraft("");
                 setNoteTag("");
+            };
+
+            const updateNote = (id, updates) => {
+                setNotes(prev => prev.map(note => note.id === id ? { ...note, ...updates } : note));
             };
 
             const addPersonalGoal = () => {
@@ -403,6 +432,7 @@
             
             const resetData = () => {
                 Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+                ["ovmc_personal_notes", "ovmc_client_notes", "ovmc_personal_note_draft", "ovmc_personal_note_tag"].forEach(key => localStorage.removeItem(key));
                 const resetCompleted = [];
                 const resetActiveTasks = [];
                 const resetActivePersonal = [];
@@ -424,10 +454,10 @@
                 setPersonal(resetActivePersonal);
                 setEmergency(emergencyItems);
                 setCompletedTasks(resetCompleted);
-                setClientNotes(buildInitialClientNotes());
-                setPersonalNotes([]);
+                setNotes([]);
                 setNoteDraft("");
                 setNoteTag("");
+                setNoteLinkedTo(null);
                 setPersonalGoals([]);
                 setGoalText("");
                 setPersonalTaskText("");
@@ -445,6 +475,7 @@
                 { id: "overview", label: "Overview" },
                 { id: "tasks", label: "Tasks" },
                 { id: "meetings", label: "Meetings" },
+                { id: "notes", label: "Notes" },
                 { id: "research", label: "Research" },
                 { id: "files", label: "Files" },
                 { id: "activity", label: "Activity" },
@@ -464,6 +495,29 @@
                     return iso;
                 }
             };
+
+            useEffect(() => {
+                if (selectedClient?.id) {
+                    setNoteLinkedTo(selectedClient.id);
+                }
+            }, [selectedClient?.id]);
+
+            const resolveNoteLinkLabel = (linkedTo) => {
+                if (linkedTo === "personal") return "Personal";
+                if (linkedTo === null || linkedTo === undefined || linkedTo === "") return "Global";
+                const client = clientsData.find(c => c.id === linkedTo);
+                return client ? client.name : "Client";
+            };
+
+            const notesSorted = [...notes].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            const clientNotes = selectedClient ? notesSorted.filter(note => note.linkedTo === selectedClient.id) : [];
+            const personalScopedNotes = notesSorted.filter(note => note.linkedTo === "personal" || note.linkedTo === null || note.linkedTo === undefined || note.linkedTo === "");
+            const globalNotesFiltered = notesSorted.filter(note => {
+                if (noteFilter === "linked") return note.linkedTo && note.linkedTo !== "personal";
+                if (noteFilter === "personal") return note.linkedTo === "personal";
+                if (noteFilter === "global") return note.linkedTo === null || note.linkedTo === undefined || note.linkedTo === "";
+                return true;
+            });
             
             return (
                 <div className={selectedClient ? "w-full px-6 lg:px-10 py-6" : "max-w-7xl mx-auto p-6"}>
@@ -750,6 +804,65 @@
                                         </div>
                                     )}
 
+                                    {detailTab === "notes" && (
+                                        <div className="space-y-5">
+                                            <div className="bg-black/20 rounded-2xl p-5">
+                                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                                                    <div>
+                                                        <div className="text-sm text-gray-400">Quick add</div>
+                                                        <div className="text-xs text-gray-500">Linked to {selectedClient.name}</div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => addNote(selectedClient.id)}
+                                                        className="px-4 py-2 rounded-xl bg-indigo-500/20 text-indigo-200 border border-indigo-500/40 text-xs uppercase tracking-wide"
+                                                    >
+                                                        Save Note
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <input
+                                                        value={noteTag}
+                                                        onChange={(e) => setNoteTag(e.target.value)}
+                                                        placeholder="Tag (optional)"
+                                                        className="w-full bg-black/30 border border-gray-700 rounded-xl px-4 py-3 text-gray-200"
+                                                    />
+                                                    <textarea
+                                                        value={noteDraft}
+                                                        onChange={(e) => setNoteDraft(e.target.value)}
+                                                        rows="6"
+                                                        className="w-full bg-black/30 border border-gray-700 rounded-2xl p-4 text-gray-200 text-base"
+                                                        placeholder={`Capture a note for ${selectedClient.name}...`}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-4">
+                                                {clientNotes.map(note => (
+                                                    <div key={note.id} className="bg-black/20 rounded-2xl p-4 space-y-3">
+                                                        <div className="flex items-center justify-between text-xs text-gray-500">
+                                                            <span>{formatNoteTime(note.timestamp)}</span>
+                                                            <span className="px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">Client</span>
+                                                        </div>
+                                                        <input
+                                                            value={note.tag || ""}
+                                                            onChange={(e) => updateNote(note.id, { tag: e.target.value })}
+                                                            placeholder="Tag"
+                                                            className="w-full bg-black/30 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm"
+                                                        />
+                                                        <textarea
+                                                            value={note.content}
+                                                            onChange={(e) => updateNote(note.id, { content: e.target.value })}
+                                                            rows="5"
+                                                            className="w-full bg-black/30 border border-gray-700 rounded-2xl p-4 text-gray-200 text-base"
+                                                        />
+                                                    </div>
+                                                ))}
+                                                {clientNotes.length === 0 && (
+                                                    <div className="text-gray-500">No notes linked to this client yet.</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {detailTab === "research" && (
                                         <div className="space-y-4">
                                             {selectedClient.research && (
@@ -758,15 +871,8 @@
                                                     <div className="text-gray-300">{selectedClient.research}</div>
                                                 </div>
                                             )}
-                                            <div>
-                                                <div className="text-sm text-gray-400 mb-2">Research & Notes</div>
-                                                <textarea
-                                                    value={clientNotes[selectedClient.id] || ""}
-                                                    onChange={(e) => setClientNotes({ ...clientNotes, [selectedClient.id]: e.target.value })}
-                                                    rows="14"
-                                                    className="w-full bg-black/30 border border-gray-700 rounded-2xl p-4 text-gray-200 text-base"
-                                                    placeholder="Capture research, ideas, and action notes..."
-                                                />
+                                            <div className="bg-black/20 rounded-2xl p-5 text-sm text-gray-400">
+                                                Use the Notes section to capture linked updates, decisions, and follow-ups.
                                             </div>
                                         </div>
                                     )}
@@ -1054,16 +1160,30 @@
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
                                         <h2 className="text-2xl font-semibold">Notes</h2>
-                                        <p className="text-sm text-gray-500">Quick capture for ideas, reminders, and follow-ups.</p>
+                                        <p className="text-sm text-gray-500">Universal notes system with optional client links.</p>
                                     </div>
                                     <button
-                                        onClick={addPersonalNote}
+                                        onClick={() => addNote()}
                                         className="px-4 py-2 rounded-xl bg-indigo-500/20 text-indigo-200 border border-indigo-500/40 text-sm uppercase tracking-wide"
                                     >
                                         Save Note
                                     </button>
                                 </div>
                                 <div className="space-y-3">
+                                    <select
+                                        value={noteLinkedTo ?? ""}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setNoteLinkedTo(value === "" ? null : value);
+                                        }}
+                                        className="w-full bg-black/30 border border-gray-700 rounded-xl px-4 py-3 text-gray-200"
+                                    >
+                                        <option value="">Global (no link)</option>
+                                        <option value="personal">Personal</option>
+                                        {clientsData.map(client => (
+                                            <option key={client.id} value={client.id}>{client.name}</option>
+                                        ))}
+                                    </select>
                                     <input
                                         value={noteTag}
                                         onChange={(e) => setNoteTag(e.target.value)}
@@ -1080,19 +1200,35 @@
                                 </div>
                             </div>
                             <div className="glass rounded-2xl p-6">
-                                <div className="text-sm text-gray-400 mb-4">Recent Notes</div>
+                                <div className="flex flex-wrap items-center gap-2 mb-4">
+                                    {[
+                                        { id: "all", label: "All" },
+                                        { id: "linked", label: "Linked to Clients" },
+                                        { id: "personal", label: "Personal Only" },
+                                        { id: "global", label: "Global" },
+                                    ].map(filter => (
+                                        <button
+                                            key={filter.id}
+                                            onClick={() => setNoteFilter(filter.id)}
+                                            className={`px-3 py-1 rounded-full text-xs uppercase tracking-wide ${noteFilter === filter.id ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40" : "bg-gray-800 text-gray-400 border border-gray-800 hover:text-gray-200"}`}
+                                        >
+                                            {filter.label}
+                                        </button>
+                                    ))}
+                                </div>
                                 <div className="space-y-4">
-                                    {personalNotes.map(note => (
+                                    {globalNotesFiltered.map(note => (
                                         <div key={note.id} className="bg-black/20 rounded-2xl p-4">
                                             <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
                                                 <span>{formatNoteTime(note.timestamp)}</span>
-                                                {note.tag && <span className="px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">{note.tag}</span>}
+                                                <span className="px-2 py-1 rounded-full bg-gray-800 text-gray-300 border border-gray-700">{resolveNoteLinkLabel(note.linkedTo)}</span>
                                             </div>
+                                            {note.tag && <div className="text-xs text-indigo-200 mb-2">{note.tag}</div>}
                                             <div className="text-gray-200 whitespace-pre-wrap">{note.content}</div>
                                         </div>
                                     ))}
-                                    {personalNotes.length === 0 && (
-                                        <div className="text-gray-500">No notes yet. Start typing to add your first note.</div>
+                                    {globalNotesFiltered.length === 0 && (
+                                        <div className="text-gray-500">No notes in this filter yet.</div>
                                     )}
                                 </div>
                             </div>
@@ -1208,11 +1344,11 @@
                             <div className="glass rounded-2xl p-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
-                                        <h2 className="text-2xl font-semibold">Quick Notes</h2>
-                                        <p className="text-sm text-gray-500">Saved immediately as you type.</p>
+                                        <h2 className="text-2xl font-semibold">Notes</h2>
+                                        <p className="text-sm text-gray-500">Personal and global notes.</p>
                                     </div>
                                     <button
-                                        onClick={addPersonalNote}
+                                        onClick={() => addNote("personal")}
                                         className="px-4 py-2 rounded-xl bg-indigo-500/20 text-indigo-200 border border-indigo-500/40 text-sm uppercase tracking-wide"
                                     >
                                         Save Note
@@ -1220,6 +1356,7 @@
                                 </div>
                                 <div className="grid grid-cols-1 lg:grid-cols-[1.1fr,1fr] gap-5">
                                     <div className="space-y-3">
+                                        <div className="text-xs text-gray-500 uppercase tracking-wide">Quick add</div>
                                         <input
                                             value={noteTag}
                                             onChange={(e) => setNoteTag(e.target.value)}
@@ -1235,17 +1372,18 @@
                                         />
                                     </div>
                                     <div className="space-y-3">
-                                        {personalNotes.slice(0, 4).map(note => (
+                                        {personalScopedNotes.slice(0, 4).map(note => (
                                             <div key={note.id} className="bg-black/20 rounded-2xl p-4">
                                                 <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
                                                     <span>{formatNoteTime(note.timestamp)}</span>
-                                                    {note.tag && <span className="px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">{note.tag}</span>}
+                                                    <span className="px-2 py-1 rounded-full bg-gray-800 text-gray-300 border border-gray-700">{resolveNoteLinkLabel(note.linkedTo)}</span>
                                                 </div>
+                                                {note.tag && <div className="text-xs text-indigo-200 mb-2">{note.tag}</div>}
                                                 <div className="text-gray-200 whitespace-pre-wrap">{note.content}</div>
                                             </div>
                                         ))}
-                                        {personalNotes.length === 0 && (
-                                            <div className="text-gray-500">No notes yet.</div>
+                                        {personalScopedNotes.length === 0 && (
+                                            <div className="text-gray-500">No personal or global notes yet.</div>
                                         )}
                                     </div>
                                 </div>
