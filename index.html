@@ -528,50 +528,34 @@ Deliverables:
             });
 
             // BRIEFS STATE
-            const [briefs, setBriefs] = useState(() => loadFromStorage(STORAGE_KEYS.briefs, []));
+            const seedBriefs = [
+                {
+                    id: 'ai-weekly-2026-02-08',
+                    date: '2026-02-08',
+                    type: 'AI Weekly',
+                    sentiment: { score: 82, label: 'Breakneck' },
+                    tickers: ['AI', 'AGI', 'Claude', 'Codex'],
+                    title: 'AI Weekly Brief: Opus 4.6 + GPT-5.3-Codex Drop',
+                    summary: 'Claude Opus 4.6 and GPT-5.3-Codex both released. First self-improving model. Super Bowl AI ad blitz. 400+ malicious ClawHub skills found.',
+                    content: 'Sample AI brief content',
+                    pdfUrl: 'https://ovaisinc.github.io/ov-mission-control/briefs/2026-02-08-ai-weekly.pdf'
+                },
+                {
+                    id: 'daily-2026-02-09',
+                    date: '2026-02-09',
+                    type: 'Daily',
+                    sentiment: { score: 72, label: 'Greed' },
+                    tickers: ['BTC', 'ETH', 'NVDA', 'GLD'],
+                    title: 'Daily Brief: Pre-Market — Tech Earnings Week',
+                    summary: 'S&P +0.4%. BTC @ $96,200 holding support. NVDA earnings Wed with 8% implied move. Gold near ATH at $2,865.',
+                    content: 'Sample daily brief content',
+                    pdfUrl: 'https://ovaisinc.github.io/ov-mission-control/briefs/2026-02-09-daily-sample.pdf'
+                }
+            ];
+            const [briefs, setBriefs] = useState(() => loadFromStorage(STORAGE_KEYS.briefs, seedBriefs));
             const [readBriefIds, setReadBriefIds] = useState(() => loadFromStorage(STORAGE_KEYS.briefsRead, []));
             const [activeBriefModal, setActiveBriefModal] = useState(null);
             const [briefFilter, setBriefFilter] = useState("all");
-
-            // Load briefs from GitHub repo on mount
-            useEffect(() => {
-                fetch('https://raw.githubusercontent.com/ovaisinc/ov-mission-control/main/briefs/2026-02-08-ai-weekly.pdf', { method: 'HEAD' })
-                    .then(() => {
-                        // Repo has briefs, add them to state
-                        const repoBriefs = [
-                            {
-                                id: 'ai-weekly-2026-02-08',
-                                date: '2026-02-08',
-                                type: 'AI Weekly',
-                                sentiment: { score: 82, label: 'Breakneck' },
-                                tickers: ['AI', 'AGI', 'Claude', 'Codex'],
-                                title: 'AI Weekly Brief: Opus 4.6 + GPT-5.3-Codex Drop',
-                                summary: 'Claude Opus 4.6 and GPT-5.3-Codex both released. First self-improving model. Super Bowl AI ad blitz. 400+ malicious ClawHub skills found.',
-                                content: 'https://ovaisinc.github.io/ov-mission-control/briefs/2026-02-08-ai-weekly.pdf',
-                                pdfUrl: 'https://ovaisinc.github.io/ov-mission-control/briefs/2026-02-08-ai-weekly.pdf'
-                            },
-                            {
-                                id: 'daily-2026-02-09',
-                                date: '2026-02-09',
-                                type: 'Daily',
-                                sentiment: { score: 72, label: 'Greed' },
-                                tickers: ['BTC', 'ETH', 'NVDA', 'GLD'],
-                                title: 'Daily Brief: Pre-Market — Tech Earnings Week',
-                                summary: 'S&P +0.4%. BTC @ $96,200 holding support. NVDA earnings Wed with 8% implied move. Gold near ATH at $2,865.',
-                                content: 'https://ovaisinc.github.io/ov-mission-control/briefs/2026-02-09-daily-sample.pdf',
-                                pdfUrl: 'https://ovaisinc.github.io/ov-mission-control/briefs/2026-02-09-daily-sample.pdf'
-                            }
-                        ];
-                        setBriefs(prev => {
-                            const existingIds = new Set(prev.map(b => b.id));
-                            const newBriefs = repoBriefs.filter(b => !existingIds.has(b.id));
-                            return [...newBriefs, ...prev];
-                        });
-                    })
-                    .catch(() => {
-                        // Repo doesn't have briefs yet, that's fine
-                    });
-            }, []);
             
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
