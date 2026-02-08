@@ -3,15 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ov Command Center</title>
+    <title>Ov Mission Control</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #0a0a0f; color: #e4e4e7; }
         .glass { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
         .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .client-card { transition: all 0.2s; cursor: pointer; }
+        .client-card:hover { transform: translateY(-2px); background: rgba(255,255,255,0.08); }
+        .tab-active { border-bottom: 2px solid #6366f1; color: #6366f1; }
+        .progress-bar { background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 999px; transition: width 0.3s; }
+        .last-contact-green { color: #10b981; }
+        .last-contact-yellow { color: #f59e0b; }
+        .last-contact-red { color: #ef4444; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -19,71 +27,438 @@
     <script type="text/babel">
         const { useState } = React;
         
-        const clients = [
-            { name: "FACE Amusement", revenue: 3700, color: "#6366f1", isLegacy: true },
-            { name: "Adtime Marketing", revenue: 1600, color: "#f59e0b" },
-            { name: "Almost Free Teeth", revenue: 3100, color: "#06b6d4" },
-            { name: "Chohan", revenue: 0, color: "#ec4899", isInternal: true },
+        // ALL CLIENTS & ROLES
+        const clientsData = [
+            { 
+                id: "face", name: "FACE Amusement", revenue: 3700, color: "#6366f1", isLegacy: true,
+                brand: "Ov Theory (Legacy)", lastContact: "2 days ago", contactStatus: "green",
+                progress: 65, tasksTotal: 12, tasksDone: 8,
+                meetingNotes: "Tom needs agent workflow. 11 agents planned across 3 phases.",
+                research: "Review Tracking MCP waiting on Google Business info",
+                docs: ["AI Agent Implementation Blueprint", "MCP Server Development Guide"]
+            },
+            { 
+                id: "adtime", name: "Adtime Marketing", revenue: 1600, color: "#f59e0b",
+                brand: "", lastContact: "1 week ago", contactStatus: "yellow",
+                progress: 40, tasksTotal: 8, tasksDone: 3,
+                meetingNotes: "$550K check deposit scheduled. Invoice matching software in progress.",
+                research: "Billboard software integration, labor law compliance",
+                docs: ["Invoice Matching Research"]
+            },
+            { 
+                id: "aft", name: "Almost Free Teeth", revenue: 3100, color: "#06b6d4",
+                brand: "", lastContact: "3 days ago", contactStatus: "green",
+                progress: 75, tasksTotal: 6, tasksDone: 5,
+                meetingNotes: "HIPAA compliance critical. Dental software project.",
+                research: "HIPAA requirements for AI handling patient data",
+                docs: ["HIPAA Compliance Checklist"]
+            },
+            { 
+                id: "chohan", name: "Chohan", revenue: 0, color: "#ec4899", isInternal: true,
+                brand: "AI Audits & Agents", lastContact: "Today", contactStatus: "green",
+                progress: 30, tasksTotal: 15, tasksDone: 5,
+                meetingNotes: "New company - AI audits, agent development. Building brand.",
+                research: "Service offerings, pricing, target market",
+                docs: ["AI Transformation Audit Template", "AI Audit Service Offerings"]
+            },
+            { 
+                id: "abbvie", name: "AbbVie", revenue: 0, color: "#10b981", isEmployment: true,
+                brand: "Employment", lastContact: "Yesterday", contactStatus: "green",
+                progress: 50, tasksTotal: 10, tasksDone: 5,
+                meetingNotes: "Ross submissions ongoing. Day job.",
+                research: "",
+                docs: []
+            },
+            { 
+                id: "jamaat", name: "Chicago Jamaat", revenue: 0, color: "#8b5cf6", isCommunity: true,
+                brand: "Motamid Role", lastContact: "Today", contactStatus: "green",
+                progress: 20, tasksTotal: 5, tasksDone: 1,
+                meetingNotes: "Motamid report due TONIGHT. Follow up with Jazib & Fahad.",
+                research: "",
+                docs: []
+            },
         ];
         
-        const tasks = [
-            { id: 1, title: "Submit Motamid report", category: "Jamaat", priority: "high", due: "Tonight" },
-            { id: 2, title: "Deposit $550K check", category: "Adtime", priority: "high", due: "Today" },
-            { id: 3, title: "Send Tom agent workflow", category: "FACE", priority: "high", due: "Today" },
+        // ALL TASKS
+        const allTasks = [
+            { id: 1, title: "Submit Motamid report", category: "Jamaat", priority: "high", due: "Tonight", done: false },
+            { id: 2, title: "Follow up with Jazib & Fahad", category: "Jamaat", priority: "high", due: "Tonight", done: false },
+            { id: 3, title: "Deposit $550K check", category: "Adtime", priority: "high", due: "Today", done: false },
+            { id: 4, title: "Send Tom agent workflow", category: "FACE", priority: "high", due: "Today", done: false },
+            { id: 5, title: "Ross submission - batch 1", category: "AbbVie", priority: "medium", due: "This week", done: true },
+            { id: 6, title: "Ross submission - batch 2", category: "AbbVie", priority: "medium", due: "This week", done: false },
+            { id: 7, title: "Review FACE phase 1 agents", category: "FACE", priority: "medium", due: "Tomorrow", done: false },
+            { id: 8, title: "HIPAA compliance review", category: "AFT", priority: "high", due: "This week", done: false },
+            { id: 9, title: "Chohan service offerings doc", category: "Chohan", priority: "medium", due: "This week", done: false },
+            { id: 10, title: "Update invoicing system", category: "Adtime", priority: "low", due: "Next week", done: false },
+        ];
+        
+        // EMERGENCY PREP (SHTF) LIST
+        const emergencyItems = [
+            { id: 1, item: "3-day water supply (1 gal/person/day)", category: "Water", priority: "critical", done: true },
+            { id: 2, item: "Water purification tablets", category: "Water", priority: "high", done: true },
+            { id: 3, item: "30-day non-perishable food", category: "Food", priority: "critical", done: false },
+            { id: 4, item: "Manual can opener", category: "Food", priority: "high", done: true },
+            { id: 5, item: "First aid kit + medications", category: "Medical", priority: "critical", done: true },
+            { id: 6, item: "Prescription meds (30-day)", category: "Medical", priority: "critical", done: false },
+            { id: 7, item: "Flashlights + batteries", category: "Power", priority: "critical", done: true },
+            { id: 8, item: "Battery-powered radio", category: "Power", priority: "high", done: true },
+            { id: 9, item: "Power bank (fully charged)", category: "Power", priority: "high", done: true },
+            { id: 10, item: "Solar/crank charger", category: "Power", priority: "medium", done: false },
+            { id: 11, item: "Cash ($500-1000 small bills)", category: "Financial", priority: "critical", done: false },
+            { id: 12, item: "Important docs (copies)", category: "Financial", priority: "critical", done: true },
+            { id: 13, item: "Emergency contacts list", category: "Communication", priority: "critical", done: true },
+            { id: 14, item: "Whistle (3 blasts = help)", category: "Safety", priority: "high", done: true },
+            { id: 15, item: "Fire extinguisher", category: "Safety", priority: "critical", done: true },
+            { id: 16, item: "Dust masks", category: "Safety", priority: "medium", done: false },
+            { id: 17, item: "Multi-tool / Swiss Army", category: "Tools", priority: "high", done: true },
+            { id: 18, item: "Duct tape", category: "Tools", priority: "medium", done: true },
+            { id: 19, item: "Plastic sheeting", category: "Shelter", priority: "medium", done: false },
+            { id: 20, item: "Sleeping bags/blankets", category: "Shelter", priority: "high", done: true },
+            { id: 21, item: "Personal hygiene items", category: "Hygiene", priority: "medium", done: true },
+            { id: 22, item: "Bleach (sanitization)", category: "Hygiene", priority: "medium", done: false },
+            { id: 23, item: "Family emergency plan", category: "Planning", priority: "critical", done: false },
+        ];
+        
+        // PERSONAL TASKS
+        const personalTasks = [
+            { id: 1, title: "Gym - Monday/Wednesday/Friday", category: "Health", done: false },
+            { id: 2, title: "Call parents", category: "Family", done: false },
+            { id: 3, title: "Review investment portfolio", category: "Finance", done: false },
+            { id: 4, title: "Car maintenance check", category: "Maintenance", done: true },
+            { id: 5, title: "Grocery shopping", category: "Home", done: false },
+            { id: 6, title: "Read 30 mins", category: "Growth", done: true },
+            { id: 7, title: "Meditate", category: "Health", done: false },
         ];
         
         function App() {
+            const [activeTab, setActiveTab] = useState("dashboard");
+            const [selectedClient, setSelectedClient] = useState(null);
+            const [tasks, setTasks] = useState(allTasks);
+            const [emergency, setEmergency] = useState(emergencyItems);
+            const [personal, setPersonal] = useState(personalTasks);
+            const [searchTerm, setSearchTerm] = useState("");
+            
+            const toggleTask = (id, list, setList) => {
+                setList(list.map(t => t.id === id ? { ...t, done: !t.done } : t));
+            };
+            
+            const filteredTasks = tasks.filter(t => 
+                t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                t.category.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            const totalRev = clientsData.reduce((sum, c) => sum + c.revenue, 0);
+            const totalProfit = totalRev * 0.75; // ~75% profit margin
+            const pendingTasks = tasks.filter(t => !t.done).length + personal.filter(t => !t.done).length;
+            const emergencyDone = emergency.filter(e => e.done).length;
+            const emergencyProgress = (emergencyDone / emergency.length) * 100;
+            
+            const getContactClass = (status) => {
+                if (status === "green") return "last-contact-green";
+                if (status === "yellow") return "last-contact-yellow";
+                return "last-contact-red";
+            };
+            
             return (
                 <div className="max-w-7xl mx-auto p-6">
-                    <h1 className="text-4xl font-bold gradient-text mb-2">Ov</h1>
-                    <p className="text-gray-400 mb-6">Command Center</p>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                        <div className="glass rounded-xl p-5">
-                            <div className="text-3xl font-bold text-indigo-400">33</div>
-                            <div className="text-sm text-gray-400">Business Tasks</div>
+                    {/* HEADER */}
+                    <div className="flex justify-between items-start mb-6">
+                        <div>
+                            <h1 className="text-4xl font-bold gradient-text mb-1">Ov Mission Control</h1>
+                            <p className="text-gray-400">Complete Life & Business Dashboard</p>
                         </div>
-                        <div className="glass rounded-xl p-5">
-                            <div className="text-3xl font-bold text-amber-400">7</div>
-                            <div className="text-sm text-gray-400">Personal Tasks</div>
-                        </div>
-                        <div className="glass rounded-xl p-5">
-                            <div className="text-3xl font-bold text-green-400">$101k</div>
-                            <div className="text-sm text-gray-400">Annual Revenue</div>
-                        </div>
-                        <div className="glass rounded-xl p-5">
-                            <div className="text-3xl font-bold text-purple-400">$76k</div>
-                            <div className="text-sm text-gray-400">Annual Profit</div>
+                        <div className="text-right">
+                            <div className="text-2xl font-bold text-green-400">${(totalRev/1000).toFixed(1)}k<span className="text-sm text-gray-500">/mo</span></div>
+                            <div className="text-sm text-gray-500">${(totalProfit/1000).toFixed(1)}k profit</div>
                         </div>
                     </div>
                     
-                    <h2 className="text-xl font-semibold mb-4">Clients</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                        {clients.map(c => (
-                            <div key={c.name} className="glass rounded-xl p-5" style={{borderTop: `3px solid ${c.color}`}}>
-                                <h3 className="font-semibold text-lg">{c.name}</h3>
-                                {c.isLegacy && <span className="text-xs text-purple-400">Ov Theory (Legacy)</span>}
-                                {c.isInternal && <span className="text-xs text-pink-400">Internal</span>}
-                                <div className="mt-2 text-green-400">${c.revenue.toLocaleString()}/mo</div>
-                            </div>
+                    {/* NAVIGATION */}
+                    <div className="flex gap-6 border-b border-gray-800 mb-6 overflow-x-auto">
+                        {["dashboard", "clients", "tasks", "emergency", "personal"].map(tab => (
+                            <button
+                                key={tab}
+                                onClick={() => { setActiveTab(tab); setSelectedClient(null); }}
+                                className={`pb-3 px-2 capitalize whitespace-nowrap ${activeTab === tab ? "tab-active" : "text-gray-500 hover:text-gray-300"}`}
+                            >
+                                {tab === "emergency" ? "SHTF Prep" : tab}
+                            </button>
                         ))}
                     </div>
                     
-                    <h2 className="text-xl font-semibold mb-4">Due Today/Tonight</h2>
-                    <div className="glass rounded-xl divide-y divide-gray-800">
-                        {tasks.map(t => (
-                            <div key={t.id} className="p-4 flex items-center gap-3">
-                                <input type="checkbox" className="w-5 h-5 rounded" />
-                                <div className="flex-1">
-                                    <div className="text-gray-200">{t.title}</div>
-                                    <div className="flex gap-2 mt-1">
-                                        <span className="text-xs bg-gray-800 px-2 py-1 rounded">{t.category}</span>
-                                        <span className="text-xs text-red-400">{t.due}</span>
+                    {/* DASHBOARD TAB */}
+                    {activeTab === "dashboard" && !selectedClient && (
+                        <>
+                            {/* STATS ROW */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                                <div className="glass rounded-xl p-5">
+                                    <div className="text-3xl font-bold text-indigo-400">{tasks.length}</div>
+                                    <div className="text-sm text-gray-400">Business Tasks</div>
+                                    <div className="text-xs text-red-400 mt-1">{pendingTasks} pending</div>
+                                </div>
+                                <div className="glass rounded-xl p-5">
+                                    <div className="text-3xl font-bold text-amber-400">{personal.length}</div>
+                                    <div className="text-sm text-gray-400">Personal Tasks</div>
+                                    <div className="text-xs text-gray-500 mt-1">{personal.filter(t => !t.done).length} pending</div>
+                                </div>
+                                <div className="glass rounded-xl p-5">
+                                    <div className="text-3xl font-bold text-green-400">${(totalRev * 12 / 1000).toFixed(0)}k</div>
+                                    <div className="text-sm text-gray-400">Annual Revenue</div>
+                                </div>
+                                <div className="glass rounded-xl p-5">
+                                    <div className="text-3xl font-bold text-purple-400">{emergencyDone}/{emergency.length}</div>
+                                    <div className="text-sm text-gray-400">Emergency Prep</div>
+                                    <div className="progress-bar mt-2 h-2">
+                                        <div className="progress-fill bg-purple-500" style={{width: `${emergencyProgress}%`}}></div>
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                            
+                            {/* CLIENTS OVERVIEW */}
+                            <h2 className="text-xl font-semibold mb-4">Clients & Roles</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                                {clientsData.map(client => (
+                                    <div 
+                                        key={client.id} 
+                                        className="glass client-card rounded-xl p-5"
+                                        style={{borderTop: `3px solid ${client.color}`}}
+                                        onClick={() => setSelectedClient(client)}
+                                    >
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h3 className="font-semibold text-lg">{client.name}</h3>
+                                            <span className={`text-xs ${getContactClass(client.contactStatus)}`}>{client.lastContact}</span>
+                                        </div>
+                                        {client.brand && <span className="text-xs text-gray-500 block mb-2">{client.brand}</span>}
+                                        {client.revenue > 0 && (
+                                            <div className="text-green-400 font-semibold mb-2">${client.revenue.toLocaleString()}/mo</div>
+                                        )}
+                                        <div className="progress-bar h-2 mb-2">
+                                            <div className="progress-fill" style={{width: `${client.progress}%`, background: client.color}}></div>
+                                        </div>
+                                        <div className="text-xs text-gray-500">{client.tasksDone}/{client.tasksTotal} tasks • Click for details →</div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {/* URGENT TASKS */}
+                            <h2 className="text-xl font-semibold mb-4">Due Today/Tonight</h2>
+                            <div className="glass rounded-xl divide-y divide-gray-800">
+                                {tasks.filter(t => !t.done && (t.due === "Tonight" || t.due === "Today")).map(t => (
+                                    <div key={t.id} className="p-4 flex items-center gap-3">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={t.done}
+                                            onChange={() => toggleTask(t.id, tasks, setTasks)}
+                                            className="w-5 h-5 rounded border-gray-600 bg-gray-800"
+                                        />
+                                        <div className="flex-1">
+                                            <div className="text-gray-200">{t.title}</div>
+                                            <div className="flex gap-2 mt-1">
+                                                <span className="text-xs bg-gray-800 px-2 py-1 rounded">{t.category}</span>
+                                                <span className={`text-xs ${t.priority === "high" ? "text-red-400" : "text-yellow-400"}`}>{t.due}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                {tasks.filter(t => !t.done && (t.due === "Tonight" || t.due === "Today")).length === 0 && (
+                                    <div className="p-4 text-gray-500">No urgent tasks! 🎉</div>
+                                )}
+                            </div>
+                        </>
+                    )}
+                    
+                    {/* CLIENT DETAIL VIEW */}
+                    {selectedClient && (
+                        <div className="space-y-6">
+                            <button 
+                                onClick={() => setSelectedClient(null)}
+                                className="text-gray-400 hover:text-white flex items-center gap-2"
+                            >
+                                ← Back to Dashboard
+                            </button>
+                            
+                            <div className="glass rounded-xl p-6" style={{borderLeft: `4px solid ${selectedClient.color}`}}>
+                                <h2 className="text-2xl font-bold mb-2">{selectedClient.name}</h2>
+                                {selectedClient.brand && <p className="text-gray-400 mb-4">{selectedClient.brand}</p>}
+                                
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                    {selectedClient.revenue > 0 && (
+                                        <div>
+                                            <div className="text-2xl font-bold text-green-400">${selectedClient.revenue.toLocaleString()}</div>
+                                            <div className="text-sm text-gray-500">Monthly Revenue</div>
+                                        </div>
+                                    )}
+                                    <div>
+                                        <div className="text-2xl font-bold" style={{color: selectedClient.color}}>{selectedClient.progress}%</div>
+                                        <div className="text-sm text-gray-500">Progress</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-2xl font-bold text-blue-400">{selectedClient.tasksDone}/{selectedClient.tasksTotal}</div>
+                                        <div className="text-sm text-gray-500">Tasks Complete</div>
+                                    </div>
+                                    <div>
+                                        <div className={`text-2xl font-bold ${getContactClass(selectedClient.contactStatus)}`}>{selectedClient.lastContact}</div>
+                                        <div className="text-sm text-gray-500">Last Contact</div>
+                                    </div>
+                                </div>
+                                
+                                {selectedClient.meetingNotes && (
+                                    <div className="mb-4">
+                                        <h3 className="font-semibold mb-2 text-gray-300">Meeting Notes</h3>
+                                        <p className="text-gray-400 bg-black/20 p-3 rounded-lg">{selectedClient.meetingNotes}</p>
+                                    </div>
+                                )}
+                                
+                                {selectedClient.research && (
+                                    <div className="mb-4">
+                                        <h3 className="font-semibold mb-2 text-gray-300">Research & Notes</h3>
+                                        <p className="text-gray-400 bg-black/20 p-3 rounded-lg">{selectedClient.research}</p>
+                                    </div>
+                                )}
+                                
+                                {selectedClient.docs.length > 0 && (
+                                    <div>
+                                        <h3 className="font-semibold mb-2 text-gray-300">Documents</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {selectedClient.docs.map((doc, i) => (
+                                                <span key={i} className="text-xs bg-gray-800 px-3 py-1 rounded-full">📄 {doc}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* CLIENTS LIST TAB */}
+                    {activeTab === "clients" && !selectedClient && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {clientsData.map(client => (
+                                <div 
+                                    key={client.id} 
+                                    className="glass client-card rounded-xl p-5"
+                                    style={{borderLeft: `4px solid ${client.color}`}}
+                                    onClick={() => setSelectedClient(client)}
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="font-semibold text-lg">{client.name}</h3>
+                                            {client.brand && <p className="text-sm text-gray-500">{client.brand}</p>}
+                                        </div>
+                                        <span className={`text-sm ${getContactClass(client.contactStatus)}`}>{client.lastContact}</span>
+                                    </div>
+                                    {client.revenue > 0 && (
+                                        <div className="text-green-400 font-semibold mt-2">${client.revenue.toLocaleString()}/mo</div>
+                                    )}
+                                    <div className="mt-3">
+                                        <div className="flex justify-between text-sm text-gray-500 mb-1">
+                                            <span>Progress</span>
+                                            <span>{client.progress}%</span>
+                                        </div>
+                                        <div className="progress-bar h-2">
+                                            <div className="progress-fill" style={{width: `${client.progress}%`, background: client.color}}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    
+                    {/* TASKS TAB */}
+                    {activeTab === "tasks" && (
+                        <>
+                            <div className="flex gap-4 mb-6">
+                                <input
+                                    type="text"
+                                    placeholder="Search tasks..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2"
+                                />
+                            </div>
+                            <div className="glass rounded-xl divide-y divide-gray-800">
+                                {filteredTasks.map(t => (
+                                    <div key={t.id} className="p-4 flex items-center gap-3">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={t.done}
+                                            onChange={() => toggleTask(t.id, tasks, setTasks)}
+                                            className="w-5 h-5 rounded border-gray-600 bg-gray-800"
+                                        />
+                                        <div className="flex-1">
+                                            <div className={t.done ? "line-through text-gray-600" : "text-gray-200"}>{t.title}</div>
+                                            <div className="flex gap-2 mt-1">
+                                                <span className="text-xs bg-gray-800 px-2 py-1 rounded">{t.category}</span>
+                                                <span className={`text-xs ${t.priority === "high" ? "text-red-400" : t.priority === "medium" ? "text-yellow-400" : "text-gray-400"}`}>{t.priority}</span>
+                                                <span className="text-xs text-gray-500">{t.due}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                    
+                    {/* EMERGENCY PREP TAB */}
+                    {activeTab === "emergency" && (
+                        <>
+                            <div className="glass rounded-xl p-4 mb-6">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-gray-400">Emergency Preparedness Progress</span>
+                                    <span className="font-bold text-purple-400">{emergencyDone}/{emergency.length}</span>
+                                </div>
+                                <div className="progress-bar h-3">
+                                    <div className="progress-fill bg-purple-500" style={{width: `${emergencyProgress}%`}}></div>
+                                </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {["Water", "Food", "Medical", "Power", "Financial", "Communication", "Safety", "Tools", "Shelter", "Hygiene", "Planning"].map(category => {
+                                    const items = emergency.filter(e => e.category === category);
+                                    if (items.length === 0) return null;
+                                    return (
+                                        <div key={category} className="glass rounded-xl p-4">
+                                            <h3 className="font-semibold mb-3 text-gray-300">{category}</h3>
+                                            <div className="space-y-2">
+                                                {items.map(item => (
+                                                    <div key={item.id} className="flex items-center gap-2">
+                                                        <input 
+                                                            type="checkbox" 
+                                                            checked={item.done}
+                                                            onChange={() => toggleTask(item.id, emergency, setEmergency)}
+                                                            className="w-4 h-4 rounded border-gray-600 bg-gray-800"
+                                                        />
+                                                        <span className={item.done ? "line-through text-gray-600 text-sm" : "text-gray-300 text-sm"}>{item.item}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </>
+                    )}
+                    
+                    {/* PERSONAL TAB */}
+                    {activeTab === "personal" && (
+                        <div className="glass rounded-xl divide-y divide-gray-800">
+                            {personal.map(t => (
+                                <div key={t.id} className="p-4 flex items-center gap-3">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={t.done}
+                                        onChange={() => toggleTask(t.id, personal, setPersonal)}
+                                        className="w-5 h-5 rounded border-gray-600 bg-gray-800"
+                                    />
+                                    <div className="flex-1">
+                                        <div className={t.done ? "line-through text-gray-600" : "text-gray-200"}>{t.title}</div>
+                                        <span className="text-xs text-gray-500">{t.category}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -91,4 +466,4 @@
         ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
-</html>// v2
+</html>
