@@ -414,6 +414,19 @@ Deliverables:
             const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, shouldLoadDefaultTasks ? allTasks : []);
             const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, shouldLoadDefaultPersonal ? personalTasks : []);
 
+            // MIGRATE: Add any new default tasks that aren't in localStorage yet
+            const existingIds = new Set(rawTasks.map(t => t.id));
+            const newTasks = allTasks.filter(t => !existingIds.has(t.id));
+            if (newTasks.length > 0) {
+                rawTasks.push(...newTasks);
+                // Save back to localStorage
+                try {
+                    localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(rawTasks));
+                } catch (err) {
+                    // Ignore write failures
+                }
+            }
+
             // Set flags for future reference
             try {
                 localStorage.setItem("ovmc_initialized", "true");
