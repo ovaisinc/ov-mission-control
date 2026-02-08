@@ -294,130 +294,6 @@
             { id: 5, title: "Pay Schaumburg ticket", category: "Personal", priority: "critical", done: false, type: "personal" },
         ];
 
-        // SAMPLE BRIEFINGS SEED DATA
-        const sampleBriefingsSeed = [
-            {
-                id: 1,
-                date: "2026-02-08",
-                type: "Daily",
-                sentiment: { score: 72, label: "Greed" },
-                tickers: ["BTC", "ETH", "NVDA", "TSLA", "GLD"],
-                title: "Pre-Market Brief: Tech Earnings Week",
-                summary: "Markets digesting Friday's tech sell-off. BTC holding $96k support. NVDA reports Wednesday - options pricing 8% move. Crypto Twitter bullish on AI tokens. Gold near ATH at $2,865.",
-                keyPoints: [
-                    "📊 S&P 500 futures +0.4% after Friday's -1.5% drop",
-                    "🪙 BTC @ $96,200 (+1.2%) - whales accumulating per Santiment",
-                    "😱 VIX elevated at 22 - caution warranted",
-                    "💡 Insider buying spike in regional banks (KRE)"
-                ],
-                content: `## Market Snapshot
-**Fear & Greed Index: 72 (Greed)**
-
-### Macro
-- 10Y Treasury: 4.52% (+3bps)
-- DXY: 108.2 (strong dollar persists)
-- Oil: $71.40 (-0.8%)
-- Gold: $2,865 (+0.3%) - new ATH Friday
-
-### Crypto
-- BTC: $96,200 (+1.2%) - Holding $95k support
-- ETH: $2,640 (-0.4%) - Underperforming BTC
-- SOL: $198 (+2.1%) - DeFi TVL climbing
-- Total Crypto MC: $3.42T (+0.8%)
-
-### Equity Highlights
-- NVDA: $132.50 (earnings Wed - 8% implied move)
-- TSLA: $355 (-3.2% Friday) - EU sales concerns
-- AAPL: $228 (+0.5%) - AI features delayed
-- META: $647 (+1.2%) - Llama 4 rumors
-
-### Atlas Intel
-🐋 Whale watching: 3 large BTC wallets (10k+ coins) moved to cold storage Friday night
-
-📰 Crypto Twitter Alpha: @CryptoCred highlighting AI agent tokens (AI16Z, VIRTUAL)
-
-⚠️ Insider Alert: CFO of $PACW bought $500k shares Friday after close`
-            },
-            {
-                id: 2,
-                date: "2026-02-07",
-                type: "Weekend",
-                sentiment: { score: 45, label: "Neutral" },
-                tickers: ["BTC", "ETH", "MSTR", "COIN", "HOOD"],
-                title: "Weekend Crypto Digest: Regulation Rumors",
-                summary: "Quieter weekend volume. Rumors of executive order on crypto reserves circulating. MSTR buys another $500M BTC. COIN and HOOD seeing institutional inflows.",
-                keyPoints: [
-                    "📊 Weekend volume down 35% vs 30-day average",
-                    "🪙 MSTR purchases 5,200 BTC at $96,100 average",
-                    "😱 Funding rates neutral - no excessive leverage",
-                    "💡 Crypto reserve EO rumor gaining traction on X"
-                ],
-                content: `## Weekend Market Status
-**Fear & Greed Index: 45 (Neutral)**
-
-### Crypto Focus
-Weekend price action muted with typical lower volume. Key observation: MSTR continued accumulation despite Friday's equity weakness.
-
-- BTC Range: $95,800 - $97,400
-- ETH Range: $2,620 - $2,680
-- DeFi TVL: $72.4B (+1.2% WoW)
-
-### Institutional Flows
-- MSTR: Added 5,200 BTC ($500M) at $96,100 avg
-- COIN: +$120M institutional inflows (Friday)
-- HOOD: +$85M inflows, crypto rev up 2x YoY
-- BlackRock IBIT: $1.2B inflows last week
-
-### Social Sentiment
-Crypto Twitter engagement up 15% on EO rumors. Key accounts: @Saylor, @Naval, @balajis discussing strategic BTC reserve.
-
-### Atlas Alert
-🔍 Monitoring for Monday morning futures gap. CME BTC futures closed at $96,450."
-            },
-            {
-                id: 3,
-                date: "2026-02-06",
-                type: "Crypto",
-                sentiment: { score: 28, label: "Fear" },
-                tickers: ["BTC", "SOL", "XRP", "DOGE", "AI16Z"],
-                title: "Crypto Flash: Altcoin Bloodbath",
-                summary: "Risk-off across crypto majors. BTC dominance rising as alts selloff. Memecoins down 15-30%. AI agent tokens showing relative strength.",
-                keyPoints: [
-                    "📊 BTC dominance at 58.2% (multi-year high)",
-                    "🪙 Altcoin index down -8.5% in 24h",
-                    "😱 Liquidations: $420M (mostly longs)",
-                    "💡 AI16Z only green in top 100 (+12%)"
-                ],
-                content: `## Crypto Flash Brief
-**Fear & Greed Index: 28 (Fear)**
-
-### Market Structure
-Rotation to BTC safety apparent. Altcoin bleeding accelerating. Funding flipped negative on major perp exchanges.
-
-| Asset | Price | 24h Change |
-|-------|-------|------------|
-| BTC | $95,100 | -1.2% |
-| ETH | $2,580 | -4.5% |
-| SOL | $192 | -6.8% |
-| XRP | $2.15 | -8.2% |
-| DOGE | $0.245 | -12.5% |
-| AI16Z | $0.85 | +12.3% |
-
-### Liquidations
-- Total: $420M (longs: $385M, shorts: $35M)
-- Largest single: $18M ETH long on Binance
-- Exchange breakdown: Binance 45%, Bybit 28%, OKX 15%
-
-### On-Chain
-- Exchange inflows: +$180M (selling pressure)
-- Stablecoin supply: $235B (holding steady)
-- BTC ETFs: +$85M net inflows (buying dip)
-
-### Atlas Intel
-📉 Fear is palpable but not at capitulation levels. Watch $92k BTC support."
-            }
-        ];
-
         const proposalsProjectsSeed = [
             {
                 id: 101,
@@ -498,8 +374,6 @@ Deliverables:
             noteLinkedTo: "ovmc_notes_linked_to",
             personalGoals: "ovmc_personal_goals",
             projects: "ovmc_projects",
-            briefs: "ovmc_briefs",
-            briefsRead: "ovmc_briefs_read",
         };
         
         const loadFromStorage = (key, fallback) => {
@@ -638,16 +512,6 @@ Deliverables:
                 return loadFromStorage(STORAGE_KEYS.projects, shouldLoadSeed ? proposalsProjectsSeed : []);
             });
             const [activeProjectModal, setActiveProjectModal] = useState(null);
-            
-            // BRIEFS STATE
-            const [briefs, setBriefs] = useState(() => {
-                const existingBriefs = localStorage.getItem(STORAGE_KEYS.briefs);
-                const shouldLoadSeed = !existingBriefs || existingBriefs === "[]";
-                return loadFromStorage(STORAGE_KEYS.briefs, shouldLoadSeed ? sampleBriefingsSeed : []);
-            });
-            const [readBriefIds, setReadBriefIds] = useState(() => loadFromStorage(STORAGE_KEYS.briefsRead, []));
-            const [activeBriefModal, setActiveBriefModal] = useState(null);
-            const [briefFilter, setBriefFilter] = useState("all");
             const [newProjectForm, setNewProjectForm] = useState({
                 clientId: "adtime",
                 clientName: "AdTime",
@@ -698,14 +562,6 @@ Deliverables:
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify(projects));
             }, [projects]);
-
-            useEffect(() => {
-                localStorage.setItem(STORAGE_KEYS.briefs, JSON.stringify(briefs));
-            }, [briefs]);
-
-            useEffect(() => {
-                localStorage.setItem(STORAGE_KEYS.briefsRead, JSON.stringify(readBriefIds));
-            }, [readBriefIds]);
             
             const toggleTask = (id, list, setList) => {
                 setList(list.map(t => t.id === id ? { ...t, done: !t.done } : t));
@@ -915,57 +771,6 @@ Deliverables:
                     .filter(client => client.id !== "adtime")
                     .map(client => ({ id: client.id, name: client.name })),
             ];
-
-            // BRIEFS HELPERS
-            const markBriefAsRead = (briefId) => {
-                if (!readBriefIds.includes(briefId)) {
-                    setReadBriefIds(prev => [...prev, briefId]);
-                }
-            };
-
-            const isBriefRead = (briefId) => readBriefIds.includes(briefId);
-
-            const getSentimentColor = (score) => {
-                if (score <= 25) return "text-red-400";
-                if (score <= 45) return "text-orange-400";
-                if (score <= 55) return "text-yellow-400";
-                if (score <= 75) return "text-emerald-400";
-                return "text-green-400";
-            };
-
-            const getSentimentBg = (score) => {
-                if (score <= 25) return "bg-red-500/20 border-red-500/30";
-                if (score <= 45) return "bg-orange-500/20 border-orange-500/30";
-                if (score <= 55) return "bg-yellow-500/20 border-yellow-500/30";
-                if (score <= 75) return "bg-emerald-500/20 border-emerald-500/30";
-                return "bg-green-500/20 border-green-500/30";
-            };
-
-            const getTypeIcon = (type) => {
-                switch (type) {
-                    case "Daily": return "📊";
-                    case "Weekend": return "🌅";
-                    case "Crypto": return "🪙";
-                    default: return "📄";
-                }
-            };
-
-            const filteredBriefs = briefs.filter(brief => {
-                if (briefFilter === "all") return true;
-                if (briefFilter === "unread") return !isBriefRead(brief.id);
-                if (briefFilter === "crypto") return brief.type === "Crypto";
-                if (briefFilter === "daily") return brief.type === "Daily";
-                return true;
-            });
-
-            const unreadCount = briefs.filter(b => !isBriefRead(b.id)).length;
-            const thisWeekCount = briefs.filter(b => {
-                const briefDate = new Date(b.date);
-                const weekAgo = new Date();
-                weekAgo.setDate(weekAgo.getDate() - 7);
-                return briefDate >= weekAgo;
-            }).length;
-            const lastUpdated = briefs.length > 0 ? briefs[0].date : "--";
             
             const resetData = () => {
                 Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
@@ -1016,10 +821,6 @@ Deliverables:
                     notes: "",
                     proposalContent: "",
                 });
-                setBriefs(sampleBriefingsSeed);
-                setReadBriefIds([]);
-                setActiveBriefModal(null);
-                setBriefFilter("all");
             };
 
             const clearCompleted = () => setCompletedTasks([]);
@@ -1090,7 +891,6 @@ Deliverables:
                 { id: "clients", label: "clients" },
                 { id: "tasks", label: "tasks" },
                 { id: "aiworkforce", label: "AI Workforce" },
-                { id: "briefs", label: "briefs" },
                 { id: "personal", label: "personal" },
                 { id: "notes", label: "notes" },
                 { id: "emergency", label: "Prep" },
@@ -1166,22 +966,6 @@ Deliverables:
                     capabilities: ["Autonomous browsing", "Web actions", "Live task execution"],
                     description: "Operations agent for real-time browser-side execution.",
                     accent: "from-sky-500/35 to-emerald-400/20",
-                },
-                {
-                    name: "Atlas 🪙",
-                    role: "Finance & Market Intelligence",
-                    model: "Multi-source aggregation",
-                    costTier: "Free APIs + AISA",
-                    status: "active",
-                    capabilities: [
-                        "Real-time market data (stocks, gold, crypto)",
-                        "X/Twitter crypto alpha scanning",
-                        "SEC insider trading alerts",
-                        "Daily automated briefings",
-                        "Portfolio allocation modeling"
-                    ],
-                    description: "Tracks global markets, hunts crypto opportunities on X, monitors insider trades, and delivers daily intelligence briefings. Your financial early warning system.",
-                    accent: "from-emerald-600/40 via-amber-500/25 to-emerald-500/30"
                 },
             ];
 
@@ -1922,10 +1706,10 @@ Deliverables:
                                         </div>
 
                                         <div className="hidden md:block mt-4 px-10">
-                                            <div className="h-px bg-gradient-to-r from-emerald-400/40 via-cyan-400/40 via-sky-400/40 to-amber-400/40"></div>
+                                            <div className="h-px bg-gradient-to-r from-emerald-400/40 via-cyan-400/40 to-sky-400/40"></div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 stagger">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 stagger">
                                             <div className="space-y-2">
                                                 <div className="hidden md:flex justify-center">
                                                     <div className="h-4 w-px bg-emerald-400/50"></div>
@@ -1979,26 +1763,6 @@ Deliverables:
                                                         <div className="rounded-xl bg-black/25 border border-sky-500/20 p-3">
                                                             <div className="font-semibold text-sky-100">Browser Use</div>
                                                             <div className="text-xs text-gray-400 mt-1">Field Agent</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <div className="hidden md:flex justify-center">
-                                                    <div className="h-4 w-px bg-amber-400/50"></div>
-                                                </div>
-                                                <div className="flex justify-center text-amber-300 text-lg">↓</div>
-                                                <div className="workforce-node workforce-node-end rounded-xl p-5 hover-lift" style={{background: 'linear-gradient(140deg, rgba(16, 185, 129, 0.15), rgba(245, 158, 11, 0.08))'}}>
-                                                    <div className="text-xs uppercase tracking-widest text-amber-300 mb-3">FINANCE INTELLIGENCE</div>
-                                                    <div className="space-y-2">
-                                                        <div className="rounded-xl bg-black/40 border border-emerald-500/30 p-3" style={{boxShadow: '0 0 20px rgba(16, 185, 129, 0.15)'}}>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-amber-400">🪙</span>
-                                                                <div className="font-semibold text-emerald-100">Atlas</div>
-                                                            </div>
-                                                            <div className="text-xs text-amber-400/80 mt-1">Finance & Market Intelligence</div>
-                                                            <div className="text-[10px] text-emerald-300/60 mt-2">Stocks • Crypto • Gold • Insider Alerts</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2080,262 +1844,6 @@ Deliverables:
                         </div>
                     )}
                     
-                    {/* BRIEFS TAB */}
-                    {activeTab === "briefs" && (
-                        <div className="space-y-6">
-                            {/* Stats Cards */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 stagger">
-                                <div className="glass rounded-2xl p-5 hover-lift">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-xl">📚</span>
-                                        <span className="text-xs uppercase tracking-widest text-gray-500">Total</span>
-                                    </div>
-                                    <div className="text-3xl font-bold text-indigo-300 mono">{briefs.length}</div>
-                                    <div className="text-xs text-gray-400 mt-1">Briefs archived</div>
-                                </div>
-                                <div className="glass rounded-2xl p-5 hover-lift">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-xl">📅</span>
-                                        <span className="text-xs uppercase tracking-widest text-gray-500">This Week</span>
-                                    </div>
-                                    <div className="text-3xl font-bold text-emerald-300 mono">{thisWeekCount}</div>
-                                    <div className="text-xs text-gray-400 mt-1">New briefings</div>
-                                </div>
-                                <div className="glass rounded-2xl p-5 hover-lift">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-xl">🔔</span>
-                                        <span className="text-xs uppercase tracking-widest text-gray-500">Unread</span>
-                                    </div>
-                                    <div className="text-3xl font-bold text-amber-300 mono">{unreadCount}</div>
-                                    <div className="text-xs text-gray-400 mt-1">Need attention</div>
-                                </div>
-                                <div className="glass rounded-2xl p-5 hover-lift">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-xl">🔄</span>
-                                        <span className="text-xs uppercase tracking-widest text-gray-500">Last Update</span>
-                                    </div>
-                                    <div className="text-lg font-bold text-cyan-300 mono">{lastUpdated}</div>
-                                    <div className="text-xs text-gray-400 mt-1">From Atlas</div>
-                                </div>
-                            </div>
-
-                            {/* Filter Tabs */}
-                            <div className="flex flex-wrap gap-2">
-                                {[
-                                    { id: "all", label: "All Briefs", count: briefs.length },
-                                    { id: "unread", label: "Unread", count: unreadCount },
-                                    { id: "daily", label: "Daily", count: briefs.filter(b => b.type === "Daily").length },
-                                    { id: "crypto", label: "Crypto", count: briefs.filter(b => b.type === "Crypto").length },
-                                ].map(filter => (
-                                    <button
-                                        key={filter.id}
-                                        onClick={() => setBriefFilter(filter.id)}
-                                        className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
-                                            briefFilter === filter.id 
-                                                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" 
-                                                : "bg-black/20 text-gray-400 border border-gray-700 hover:text-gray-200"
-                                        }`}
-                                    >
-                                        {filter.label}
-                                        <span className="ml-2 text-xs opacity-60">({filter.count})</span>
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Briefs List */}
-                            <div className="space-y-4">
-                                {filteredBriefs.map((brief, index) => {
-                                    const read = isBriefRead(brief.id);
-                                    return (
-                                        <div
-                                            key={brief.id}
-                                            onClick={() => { markBriefAsRead(brief.id); setActiveBriefModal(brief); }}
-                                            className={`glass rounded-2xl p-5 cursor-pointer hover-lift transition ${
-                                                read ? "opacity-70" : "border-l-4 border-l-emerald-500/50"
-                                            }`}
-                                            style={{ animationDelay: `${index * 50}ms` }}
-                                        >
-                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-3 mb-2">
-                                                        <span className="text-2xl">{getTypeIcon(brief.type)}</span>
-                                                        <span className={`text-xs uppercase tracking-widest px-2 py-1 rounded-full border ${
-                                                            brief.type === "Daily" ? "bg-blue-500/20 text-blue-300 border-blue-500/40" :
-                                                            brief.type === "Weekend" ? "bg-purple-500/20 text-purple-300 border-purple-500/40" :
-                                                            "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                                                        }`}>
-                                                            {brief.type}
-                                                        </span>
-                                                        <span className="text-xs text-gray-500">{brief.date}</span>
-                                                        {!read && (
-                                                            <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded-full border border-emerald-500/40">
-                                                                New
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <h3 className={`text-lg font-semibold ${read ? "text-gray-400" : "text-gray-100"}`}>
-                                                        {brief.title}
-                                                    </h3>
-                                                    <p className="text-sm text-gray-400 mt-1 line-clamp-2">{brief.summary}</p>
-                                                    
-                                                    {/* Key Points Preview */}
-                                                    <div className="flex flex-wrap gap-2 mt-3">
-                                                        {brief.keyPoints.slice(0, 2).map((point, i) => (
-                                                            <span key={i} className="text-xs text-gray-500 bg-black/30 px-2 py-1 rounded">
-                                                                {point.split(' ')[0]} {point.split(' ').slice(1, 4).join(' ')}...
-                                                            </span>
-                                                        ))}
-                                                        {brief.keyPoints.length > 2 && (
-                                                            <span className="text-xs text-gray-600">+{brief.keyPoints.length - 2} more</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* Right Side: Sentiment & Tickers */}
-                                                <div className="flex flex-row md:flex-col items-center md:items-end gap-4 md:gap-3">
-                                                    {/* Fear/Greed Score */}
-                                                    <div className={`text-center px-4 py-2 rounded-xl border ${getSentimentBg(brief.sentiment.score)}`}>
-                                                        <div className={`text-2xl font-bold ${getSentimentColor(brief.sentiment.score)}`}>
-                                                            {brief.sentiment.score}
-                                                        </div>
-                                                        <div className="text-[10px] uppercase tracking-wider text-gray-400">
-                                                            {brief.sentiment.label}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Tickers */}
-                                                    <div className="flex flex-wrap gap-1 justify-end max-w-[150px]">
-                                                        {brief.tickers.map(ticker => (
-                                                            <span key={ticker} className="text-[10px] bg-black/40 text-gray-400 px-1.5 py-0.5 rounded border border-gray-700">
-                                                                {ticker}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                                
-                                {filteredBriefs.length === 0 && (
-                                    <div className="glass rounded-2xl p-12 text-center">
-                                        <span className="text-4xl">📭</span>
-                                        <p className="mt-4 text-gray-400">No briefs match this filter</p>
-                                        <button
-                                            onClick={() => setBriefFilter("all")}
-                                            className="mt-4 px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-sm"
-                                        >
-                                            View All Briefs
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Brief Viewer Modal */}
-                            {activeBriefModal && (
-                                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm px-4 py-8 md:py-12 overflow-y-auto">
-                                    <div className="max-w-3xl mx-auto glass rounded-2xl p-6 md:p-8 border border-emerald-400/20">
-                                        {/* Header */}
-                                        <div className="flex items-start justify-between gap-4 mb-6">
-                                            <div>
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <span className="text-2xl">{getTypeIcon(activeBriefModal.type)}</span>
-                                                    <span className={`text-xs uppercase tracking-widest px-2 py-1 rounded-full border ${
-                                                        activeBriefModal.type === "Daily" ? "bg-blue-500/20 text-blue-300 border-blue-500/40" :
-                                                        activeBriefModal.type === "Weekend" ? "bg-purple-500/20 text-purple-300 border-purple-500/40" :
-                                                        "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                                                    }`}>
-                                                        {activeBriefModal.type} Brief
-                                                    </span>
-                                                    <span className="text-xs text-gray-500">{activeBriefModal.date}</span>
-                                                </div>
-                                                <h2 className="text-2xl md:text-3xl font-bold text-gray-100">{activeBriefModal.title}</h2>
-                                            </div>
-                                            <button
-                                                onClick={() => setActiveBriefModal(null)}
-                                                className="btn btn-ghost px-3 py-2 text-xs uppercase tracking-wide"
-                                            >
-                                                Close
-                                            </button>
-                                        </div>
-
-                                        {/* Sentiment Banner */}
-                                        <div className={`rounded-xl border p-4 mb-6 ${getSentimentBg(activeBriefModal.sentiment.score)}`}>
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <div className="text-xs uppercase tracking-widest text-gray-400 mb-1">Market Sentiment</div>
-                                                    <div className={`text-3xl font-bold ${getSentimentColor(activeBriefModal.sentiment.score)}`}>
-                                                        {activeBriefModal.sentiment.label}
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className={`text-5xl font-bold ${getSentimentColor(activeBriefModal.sentiment.score)}`}>
-                                                        {activeBriefModal.sentiment.score}
-                                                    </div>
-                                                    <div className="text-xs text-gray-500">Fear & Greed Index</div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Summary */}
-                                        <div className="rounded-2xl border border-gray-700 bg-black/25 p-5 mb-6">
-                                            <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Executive Summary</div>
-                                            <p className="text-gray-200 leading-relaxed">{activeBriefModal.summary}</p>
-                                        </div>
-
-                                        {/* Key Points */}
-                                        <div className="mb-6">
-                                            <div className="text-xs uppercase tracking-wide text-gray-500 mb-3">Key Points</div>
-                                            <div className="grid gap-2">
-                                                {activeBriefModal.keyPoints.map((point, i) => (
-                                                    <div key={i} className="flex items-start gap-3 rounded-xl border border-gray-700/50 bg-black/20 px-4 py-3">
-                                                        <span className="text-lg">{point.split(' ')[0]}</span>
-                                                        <span className="text-sm text-gray-300">{point.substring(point.indexOf(' ') + 1)}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Tickers */}
-                                        <div className="mb-6">
-                                            <div className="text-xs uppercase tracking-wide text-gray-500 mb-3">Tickers Mentioned</div>
-                                            <div className="flex flex-wrap gap-2">
-                                                {activeBriefModal.tickers.map(ticker => (
-                                                    <span key={ticker} className="text-sm bg-black/40 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700">
-                                                        {ticker}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Full Content */}
-                                        <div className="rounded-2xl border border-gray-700 bg-black/25 p-5">
-                                            <div className="text-xs uppercase tracking-wide text-gray-500 mb-3">Full Briefing</div>
-                                            <div className="prose prose-invert prose-sm max-w-none">
-                                                <pre className="whitespace-pre-wrap text-sm text-gray-300 font-sans leading-relaxed">
-                                                    {activeBriefModal.content}
-                                                </pre>
-                                            </div>
-                                        </div>
-
-                                        {/* Footer */}
-                                        <div className="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-                                            <div className="text-xs text-gray-500">
-                                                Generated by <span className="text-emerald-400">Atlas 🪙</span> • Finance Intelligence Agent
-                                            </div>
-                                            <button
-                                                onClick={() => setActiveBriefModal(null)}
-                                                className="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-sm uppercase tracking-wide hover:bg-emerald-500/30 transition"
-                                            >
-                                                Mark as Read & Close
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
                     {/* EMERGENCY PREP TAB */}
                     {activeTab === "emergency" && (
                         <>
@@ -2746,5 +2254,3 @@ Deliverables:
     </script>
 </body>
 </html>
-<!-- Cache bust: Sun Feb  8 15:12:01 CST 2026 -->
-<!-- deployed: 1770585169 -->
