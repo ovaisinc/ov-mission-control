@@ -324,8 +324,26 @@
         };
         
         const buildInitialTaskState = () => {
-            const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, allTasks);
-            const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, personalTasks);
+            let hasTaskInit = false;
+            let hasPersonalInit = false;
+            try {
+                hasTaskInit = Boolean(localStorage.getItem("ovmc_initialized"));
+                hasPersonalInit = Boolean(localStorage.getItem("ovmc_personal_initialized"));
+            } catch (err) {
+                hasTaskInit = false;
+                hasPersonalInit = false;
+            }
+
+            const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, hasTaskInit ? [] : allTasks);
+            const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, hasPersonalInit ? [] : personalTasks);
+
+            try {
+                if (!hasTaskInit) localStorage.setItem("ovmc_initialized", "true");
+                if (!hasPersonalInit) localStorage.setItem("ovmc_personal_initialized", "true");
+            } catch (err) {
+                // Ignore localStorage write failures and continue with in-memory state.
+            }
+
             const storedCompleted = loadFromStorage(STORAGE_KEYS.completed, []);
             const completed = Array.isArray(storedCompleted) ? [...storedCompleted] : [];
 
