@@ -293,6 +293,75 @@
             { id: 4, title: "Take cholesterol test", category: "Personal", priority: "high", done: false, type: "personal" },
             { id: 5, title: "Pay Schaumburg ticket", category: "Personal", priority: "critical", done: false, type: "personal" },
         ];
+
+        const proposalsProjectsSeed = [
+            {
+                id: 101,
+                clientId: "adtime",
+                clientName: "AdTime",
+                projectName: "AI Automation Retainer Proposal",
+                type: "Retainer",
+                status: "Draft",
+                value: "$4,000/mo",
+                notes: "Monthly automation roadmap for reporting, lead ops, and billing workflows.",
+                proposalContent: `Scope:
+- Weekly automation planning and deployment support
+- CRM and invoice workflow automations
+- Monthly optimization report
+
+Timeline:
+- Month-to-month retainer with 30-day notice
+
+Deliverables:
+- Priority automation queue
+- KPI dashboard updates
+- SOP updates for internal team handoff`,
+            },
+            {
+                id: 102,
+                clientId: "adtime",
+                clientName: "AdTime",
+                projectName: "List Home Flat Fee Website Project",
+                type: "Website",
+                status: "Sent",
+                value: "$6,500",
+                notes: "Marketing site focused on seller conversion and local SEO.",
+                proposalContent: `Scope:
+- 6 core marketing pages
+- Lead form integrations and analytics
+- SEO foundation and launch QA
+
+Timeline:
+- 4-6 weeks including revisions
+
+Deliverables:
+- Responsive website build
+- CMS handoff with editing guide
+- Launch checklist and performance baseline`,
+            },
+            {
+                id: 103,
+                clientId: "adtime",
+                clientName: "AdTime",
+                projectName: "Gym Website Project",
+                type: "Website",
+                status: "In Progress",
+                value: "$8,200",
+                notes: "Membership-focused website with class schedule and inquiry funnel.",
+                proposalContent: `Scope:
+- Homepage, class pages, trainer bios, and contact flow
+- Lead capture and CRM sync
+- Mobile-first performance optimization
+
+Timeline:
+- 5 weeks with staged milestone approvals
+
+Deliverables:
+- Full design + development implementation
+- Basic content migration
+- Launch support and analytics setup`,
+            },
+        ];
         
         const STORAGE_KEYS = {
             tasks: "ovmc_tasks",
@@ -304,6 +373,7 @@
             noteTag: "ovmc_notes_tag",
             noteLinkedTo: "ovmc_notes_linked_to",
             personalGoals: "ovmc_personal_goals",
+            projects: "ovmc_projects",
         };
         
         const loadFromStorage = (key, fallback) => {
@@ -431,6 +501,18 @@
             const [editingTaskType, setEditingTaskType] = useState(null);
             const [editForm, setEditForm] = useState({ title: "", category: "", priority: "medium", due: "" });
             const [editError, setEditError] = useState("");
+            const [projects, setProjects] = useState(() => loadFromStorage(STORAGE_KEYS.projects, proposalsProjectsSeed));
+            const [activeProjectModal, setActiveProjectModal] = useState(null);
+            const [newProjectForm, setNewProjectForm] = useState({
+                clientId: "adtime",
+                clientName: "AdTime",
+                projectName: "",
+                type: "Website",
+                status: "Draft",
+                value: "",
+                notes: "",
+                proposalContent: "",
+            });
             
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
@@ -467,6 +549,10 @@
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.personalGoals, JSON.stringify(personalGoals));
             }, [personalGoals]);
+
+            useEffect(() => {
+                localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify(projects));
+            }, [projects]);
             
             const toggleTask = (id, list, setList) => {
                 setList(list.map(t => t.id === id ? { ...t, done: !t.done } : t));
@@ -616,6 +702,66 @@
                 setPersonalGoals(prev => [newGoal, ...prev]);
                 setGoalText("");
             };
+
+            const projectStatusStyles = {
+                Draft: "text-gray-300 border-gray-600 bg-gray-500/10",
+                Sent: "text-cyan-200 border-cyan-500/40 bg-cyan-500/10",
+                "In Progress": "text-indigo-200 border-indigo-500/40 bg-indigo-500/10",
+                Approved: "text-emerald-200 border-emerald-500/40 bg-emerald-500/10",
+                Completed: "text-purple-200 border-purple-500/40 bg-purple-500/10",
+            };
+
+            const projectStatusOptions = ["Draft", "Sent", "In Progress", "Approved", "Completed"];
+
+            const updateProjectField = (id, field, value) => {
+                setProjects(prev => prev.map(project => project.id === id ? { ...project, [field]: value } : project));
+            };
+
+            const addProject = () => {
+                const name = newProjectForm.projectName.trim();
+                if (!name) return;
+                const value = newProjectForm.value.trim();
+                const notes = newProjectForm.notes.trim();
+                const proposalContent = newProjectForm.proposalContent.trim();
+                const nextProject = {
+                    id: Date.now(),
+                    clientId: newProjectForm.clientId,
+                    clientName: newProjectForm.clientName,
+                    projectName: name,
+                    type: newProjectForm.type,
+                    status: newProjectForm.status,
+                    value: value || "$0",
+                    notes,
+                    proposalContent: proposalContent || "Proposal content not added yet.",
+                };
+                setProjects(prev => [nextProject, ...prev]);
+                setNewProjectForm(prev => ({
+                    ...prev,
+                    projectName: "",
+                    value: "",
+                    notes: "",
+                    proposalContent: "",
+                }));
+            };
+
+            const groupedProjects = projects.reduce((acc, project) => {
+                if (!acc[project.clientId]) {
+                    acc[project.clientId] = {
+                        clientId: project.clientId,
+                        clientName: project.clientName,
+                        projects: [],
+                    };
+                }
+                acc[project.clientId].projects.push(project);
+                return acc;
+            }, {});
+
+            const projectClientOptions = [
+                { id: "adtime", name: "AdTime" },
+                ...clientsData
+                    .filter(client => client.id !== "adtime")
+                    .map(client => ({ id: client.id, name: client.name })),
+            ];
             
             const resetData = () => {
                 Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
@@ -654,6 +800,18 @@
                 setClientFilter(clientsData[0]?.taskCategory || "");
                 setExpandedPrepCategory(null);
                 setShowCompleted(false);
+                setProjects(proposalsProjectsSeed);
+                setActiveProjectModal(null);
+                setNewProjectForm({
+                    clientId: "adtime",
+                    clientName: "AdTime",
+                    projectName: "",
+                    type: "Website",
+                    status: "Draft",
+                    value: "",
+                    notes: "",
+                    proposalContent: "",
+                });
             };
 
             const clearCompleted = () => setCompletedTasks([]);
@@ -722,6 +880,7 @@
             const navTabs = [
                 { id: "dashboard", label: "dashboard" },
                 { id: "clients", label: "clients" },
+                { id: "projects", label: "projects" },
                 { id: "tasks", label: "tasks" },
                 { id: "aiworkforce", label: "AI Workforce" },
                 { id: "personal", label: "personal" },
@@ -876,7 +1035,7 @@
                         {navTabs.map(tab => (
                             <button
                                 key={tab.id}
-                                onClick={() => { setActiveTab(tab.id); setSelectedClient(null); }}
+                                onClick={() => { setActiveTab(tab.id); setSelectedClient(null); setActiveProjectModal(null); }}
                                 className={`pb-3 px-2 whitespace-nowrap text-sm ${tab.id === "aiworkforce" ? "normal-case tracking-normal" : "uppercase tracking-wide capitalize"} ${activeTab === tab.id ? "tab-active" : "text-gray-500 hover:text-gray-200"}`}
                             >
                                 {tab.label}
@@ -1280,6 +1439,172 @@
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    )}
+
+                    {/* PROJECTS TAB */}
+                    {activeTab === "projects" && (
+                        <div className="space-y-6">
+                            <div className="glass rounded-2xl p-6">
+                                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-5">
+                                    <div>
+                                        <h2 className="text-2xl md:text-3xl font-semibold gradient-text">Proposals & Projects</h2>
+                                        <p className="text-sm text-gray-500 mt-1">View and manage proposal pipeline, delivery status, and notes.</p>
+                                    </div>
+                                    <div className="text-xs uppercase tracking-wide text-gray-500">{projects.length} tracked projects</div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                                    <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-4 py-3">
+                                        <div className="text-xs text-gray-400 uppercase tracking-wide">Draft</div>
+                                        <div className="text-2xl font-semibold text-indigo-200">{projects.filter(project => project.status === "Draft").length}</div>
+                                    </div>
+                                    <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-3">
+                                        <div className="text-xs text-gray-400 uppercase tracking-wide">Sent</div>
+                                        <div className="text-2xl font-semibold text-cyan-200">{projects.filter(project => project.status === "Sent").length}</div>
+                                    </div>
+                                    <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
+                                        <div className="text-xs text-gray-400 uppercase tracking-wide">In Progress</div>
+                                        <div className="text-2xl font-semibold text-emerald-200">{projects.filter(project => project.status === "In Progress").length}</div>
+                                    </div>
+                                    <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 px-4 py-3">
+                                        <div className="text-xs text-gray-400 uppercase tracking-wide">Completed</div>
+                                        <div className="text-2xl font-semibold text-purple-200">{projects.filter(project => project.status === "Completed").length}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="glass rounded-2xl p-6">
+                                <div className="text-sm text-gray-400 mb-3">Add project</div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-3">
+                                    <select
+                                        value={newProjectForm.clientId}
+                                        onChange={(e) => {
+                                            const nextClient = projectClientOptions.find(option => option.id === e.target.value);
+                                            setNewProjectForm(prev => ({
+                                                ...prev,
+                                                clientId: e.target.value,
+                                                clientName: nextClient?.name || prev.clientName,
+                                            }));
+                                        }}
+                                        className="ui-input ui-select rounded-xl px-3 py-3 text-sm"
+                                    >
+                                        {projectClientOptions.map(client => (
+                                            <option key={client.id} value={client.id}>{client.name}</option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        value={newProjectForm.projectName}
+                                        onChange={(e) => setNewProjectForm(prev => ({ ...prev, projectName: e.target.value }))}
+                                        placeholder="Project name"
+                                        className="ui-input rounded-xl px-3 py-3 text-sm"
+                                    />
+                                    <select
+                                        value={newProjectForm.type}
+                                        onChange={(e) => setNewProjectForm(prev => ({ ...prev, type: e.target.value }))}
+                                        className="ui-input ui-select rounded-xl px-3 py-3 text-sm"
+                                    >
+                                        {["Retainer", "Website", "Automation", "Consulting", "Other"].map(type => (
+                                            <option key={type} value={type}>{type}</option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        value={newProjectForm.value}
+                                        onChange={(e) => setNewProjectForm(prev => ({ ...prev, value: e.target.value }))}
+                                        placeholder="Value (e.g. $5,000 or $3,000/mo)"
+                                        className="ui-input rounded-xl px-3 py-3 text-sm"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 xl:grid-cols-[1fr,auto] gap-3">
+                                    <textarea
+                                        value={newProjectForm.notes}
+                                        onChange={(e) => setNewProjectForm(prev => ({ ...prev, notes: e.target.value }))}
+                                        rows="2"
+                                        placeholder="Quick notes"
+                                        className="ui-input rounded-xl px-3 py-3 text-sm"
+                                    />
+                                    <button
+                                        onClick={addProject}
+                                        className="btn btn-indigo px-5 py-3 text-sm uppercase tracking-wide"
+                                    >
+                                        Add Project
+                                    </button>
+                                </div>
+                                <textarea
+                                    value={newProjectForm.proposalContent}
+                                    onChange={(e) => setNewProjectForm(prev => ({ ...prev, proposalContent: e.target.value }))}
+                                    rows="4"
+                                    placeholder="Proposal content (scope, timeline, deliverables)"
+                                    className="ui-input rounded-xl px-3 py-3 text-sm mt-3 w-full"
+                                />
+                            </div>
+
+                            <div className="space-y-5">
+                                {Object.values(groupedProjects).map(group => (
+                                    <div key={group.clientId} className="glass rounded-2xl p-6">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-xl font-semibold">{group.clientName}</h3>
+                                            <span className="text-xs uppercase tracking-wide text-gray-500">{group.projects.length} projects</span>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {group.projects.map(project => (
+                                                <div key={project.id} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                                                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                                                        <div>
+                                                            <div className="text-lg font-semibold text-gray-100">{project.projectName}</div>
+                                                            <div className="flex flex-wrap items-center gap-2 mt-2">
+                                                                <span className="badge px-2.5 py-1 text-[11px] text-gray-300 border-gray-700">{project.type}</span>
+                                                                <span className={`badge px-2.5 py-1 text-[11px] border ${projectStatusStyles[project.status] || "text-gray-300 border-gray-600 bg-gray-500/10"}`}>
+                                                                    {project.status}
+                                                                </span>
+                                                                <span className="mono text-sm text-emerald-300">{project.value}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <button
+                                                                onClick={() => setActiveProjectModal(project)}
+                                                                className="btn btn-ghost px-3 py-2 text-xs uppercase tracking-wide"
+                                                            >
+                                                                View Proposal
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                                                        <select
+                                                            value={project.type}
+                                                            onChange={(e) => updateProjectField(project.id, "type", e.target.value)}
+                                                            className="ui-input ui-select rounded-lg px-3 py-2 text-sm"
+                                                        >
+                                                            {["Retainer", "Website", "Automation", "Consulting", "Other"].map(type => (
+                                                                <option key={type} value={type}>{type}</option>
+                                                            ))}
+                                                        </select>
+                                                        <select
+                                                            value={project.status}
+                                                            onChange={(e) => updateProjectField(project.id, "status", e.target.value)}
+                                                            className="ui-input ui-select rounded-lg px-3 py-2 text-sm"
+                                                        >
+                                                            {projectStatusOptions.map(status => (
+                                                                <option key={status} value={status}>{status}</option>
+                                                            ))}
+                                                        </select>
+                                                        <input
+                                                            value={project.value}
+                                                            onChange={(e) => updateProjectField(project.id, "value", e.target.value)}
+                                                            className="ui-input rounded-lg px-3 py-2 text-sm"
+                                                        />
+                                                    </div>
+                                                    <textarea
+                                                        value={project.notes}
+                                                        onChange={(e) => updateProjectField(project.id, "notes", e.target.value)}
+                                                        rows="2"
+                                                        className="ui-input rounded-lg px-3 py-2 text-sm mt-3 w-full"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                     
@@ -2036,6 +2361,45 @@
                                             <div className="text-gray-500">No personal or global notes yet.</div>
                                         )}
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeProjectModal && (
+                        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm px-4 py-8 md:py-12 overflow-y-auto">
+                            <div className="max-w-3xl mx-auto glass rounded-2xl p-6 md:p-8 border border-indigo-400/30">
+                                <div className="flex items-start justify-between gap-4 mb-5">
+                                    <div>
+                                        <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{activeProjectModal.clientName}</div>
+                                        <h3 className="text-2xl font-semibold mt-1">{activeProjectModal.projectName}</h3>
+                                        <div className="flex flex-wrap items-center gap-2 mt-3">
+                                            <span className="badge px-2.5 py-1 text-[11px] text-gray-300 border-gray-700">{activeProjectModal.type}</span>
+                                            <span className={`badge px-2.5 py-1 text-[11px] border ${projectStatusStyles[activeProjectModal.status] || "text-gray-300 border-gray-600 bg-gray-500/10"}`}>
+                                                {activeProjectModal.status}
+                                            </span>
+                                            <span className="mono text-sm text-emerald-300">{activeProjectModal.value}</span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setActiveProjectModal(null)}
+                                        className="btn btn-ghost px-3 py-2 text-xs uppercase tracking-wide"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                                <div className="rounded-2xl border border-gray-700 bg-black/25 p-4">
+                                    <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Proposal Content</div>
+                                    <pre className="whitespace-pre-wrap text-sm text-gray-200 font-sans leading-relaxed">{activeProjectModal.proposalContent}</pre>
+                                </div>
+                                <div className="mt-4">
+                                    <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Quick Notes</div>
+                                    <textarea
+                                        value={projects.find(project => project.id === activeProjectModal.id)?.notes || ""}
+                                        onChange={(e) => updateProjectField(activeProjectModal.id, "notes", e.target.value)}
+                                        rows="3"
+                                        className="ui-input rounded-xl px-3 py-3 text-sm w-full"
+                                    />
                                 </div>
                             </div>
                         </div>
