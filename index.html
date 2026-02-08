@@ -394,22 +394,26 @@ Deliverables:
         };
         
         const buildInitialTaskState = () => {
-            let hasTaskInit = false;
-            let hasPersonalInit = false;
-            try {
-                hasTaskInit = Boolean(localStorage.getItem("ovmc_initialized"));
-                hasPersonalInit = Boolean(localStorage.getItem("ovmc_personal_initialized"));
-            } catch (err) {
-                hasTaskInit = false;
-                hasPersonalInit = false;
-            }
+            // DEFENSIVE: Check if actual data exists in localStorage first
+            const existingTasksRaw = localStorage.getItem(STORAGE_KEYS.tasks);
+            const existingPersonalRaw = localStorage.getItem(STORAGE_KEYS.personal);
+            const existingCompletedRaw = localStorage.getItem(STORAGE_KEYS.completed);
+            
+            const hasExistingTasks = Boolean(existingTasksRaw && existingTasksRaw !== "[]");
+            const hasExistingPersonal = Boolean(existingPersonalRaw && existingPersonalRaw !== "[]");
+            const hasExistingCompleted = Boolean(existingCompletedRaw && existingCompletedRaw !== "[]");
+            
+            // Only load defaults if NO data exists yet (first visit)
+            const shouldLoadDefaultTasks = !hasExistingTasks && !hasExistingCompleted;
+            const shouldLoadDefaultPersonal = !hasExistingPersonal && !hasExistingCompleted;
 
-            const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, hasTaskInit ? [] : allTasks);
-            const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, hasPersonalInit ? [] : personalTasks);
+            const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, shouldLoadDefaultTasks ? allTasks : []);
+            const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, shouldLoadDefaultPersonal ? personalTasks : []);
 
+            // Set flags for future reference
             try {
-                if (!hasTaskInit) localStorage.setItem("ovmc_initialized", "true");
-                if (!hasPersonalInit) localStorage.setItem("ovmc_personal_initialized", "true");
+                localStorage.setItem("ovmc_initialized", "true");
+                localStorage.setItem("ovmc_personal_initialized", "true");
             } catch (err) {
                 // Ignore localStorage write failures and continue with in-memory state.
             }
@@ -501,7 +505,12 @@ Deliverables:
             const [editingTaskType, setEditingTaskType] = useState(null);
             const [editForm, setEditForm] = useState({ title: "", category: "", priority: "medium", due: "" });
             const [editError, setEditError] = useState("");
-            const [projects, setProjects] = useState(() => loadFromStorage(STORAGE_KEYS.projects, proposalsProjectsSeed));
+            const [projects, setProjects] = useState(() => {
+                // DEFENSIVE: Only load seed projects if no projects exist yet
+                const existingProjects = localStorage.getItem(STORAGE_KEYS.projects);
+                const shouldLoadSeed = !existingProjects || existingProjects === "[]";
+                return loadFromStorage(STORAGE_KEYS.projects, shouldLoadSeed ? proposalsProjectsSeed : []);
+            });
             const [activeProjectModal, setActiveProjectModal] = useState(null);
             const [newProjectForm, setNewProjectForm] = useState({
                 clientId: "adtime",
