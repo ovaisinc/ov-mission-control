@@ -2533,7 +2533,7 @@ Deliverables:
                                         Mark as Read
                                     </button>
                                     <button
-                                        onClick={() => markBriefAsRead(activeBriefModal.id); window.open(activeBriefModal.pdfUrl, '_blank')}
+                                        onClick={() => { markBriefAsRead(activeBriefModal.id); window.open(activeBriefModal.pdfUrl, '_blank'); }}
                                         className="btn btn-ghost px-4 py-2 text-sm"
                                     >
                                         Open & Read
