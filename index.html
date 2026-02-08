@@ -530,6 +530,46 @@ Deliverables:
             const [readBriefIds, setReadBriefIds] = useState(() => loadFromStorage(STORAGE_KEYS.briefsRead, []));
             const [activeBriefModal, setActiveBriefModal] = useState(null);
             const [briefFilter, setBriefFilter] = useState("all");
+
+            // Load briefs from GitHub repo on mount
+            useEffect(() => {
+                fetch('https://raw.githubusercontent.com/ovaisinc/ov-mission-control/main/briefs/2026-02-08-ai-weekly.pdf', { method: 'HEAD' })
+                    .then(() => {
+                        // Repo has briefs, add them to state
+                        const repoBriefs = [
+                            {
+                                id: 'ai-weekly-2026-02-08',
+                                date: '2026-02-08',
+                                type: 'AI Weekly',
+                                sentiment: { score: 82, label: 'Breakneck' },
+                                tickers: ['AI', 'AGI', 'Claude', 'Codex'],
+                                title: 'AI Weekly Brief: Opus 4.6 + GPT-5.3-Codex Drop',
+                                summary: 'Claude Opus 4.6 and GPT-5.3-Codex both released. First self-improving model. Super Bowl AI ad blitz. 400+ malicious ClawHub skills found.',
+                                content: 'https://ovaisinc.github.io/ov-mission-control/briefs/2026-02-08-ai-weekly.pdf',
+                                pdfUrl: 'https://ovaisinc.github.io/ov-mission-control/briefs/2026-02-08-ai-weekly.pdf'
+                            },
+                            {
+                                id: 'daily-2026-02-09',
+                                date: '2026-02-09',
+                                type: 'Daily',
+                                sentiment: { score: 72, label: 'Greed' },
+                                tickers: ['BTC', 'ETH', 'NVDA', 'GLD'],
+                                title: 'Daily Brief: Pre-Market — Tech Earnings Week',
+                                summary: 'S&P +0.4%. BTC @ $96,200 holding support. NVDA earnings Wed with 8% implied move. Gold near ATH at $2,865.',
+                                content: 'https://ovaisinc.github.io/ov-mission-control/briefs/2026-02-09-daily-sample.pdf',
+                                pdfUrl: 'https://ovaisinc.github.io/ov-mission-control/briefs/2026-02-09-daily-sample.pdf'
+                            }
+                        ];
+                        setBriefs(prev => {
+                            const existingIds = new Set(prev.map(b => b.id));
+                            const newBriefs = repoBriefs.filter(b => !existingIds.has(b.id));
+                            return [...newBriefs, ...prev];
+                        });
+                    })
+                    .catch(() => {
+                        // Repo doesn't have briefs yet, that's fine
+                    });
+            }, []);
             
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
@@ -2464,9 +2504,24 @@ Deliverables:
                                     </div>
                                 )}
                                 
-                                <div className="rounded-2xl border border-gray-700 bg-black/25 p-4 max-h-[60vh] overflow-y-auto">
-                                    <pre className="whitespace-pre-wrap text-sm text-gray-200 font-sans leading-relaxed">{activeBriefModal.content}</pre>
-                                </div>
+                                {activeBriefModal.pdfUrl ? (
+                                    <div className="rounded-2xl border border-gray-700 bg-black/25 p-6 text-center">
+                                        <div className="text-5xl mb-4">📄</div>
+                                        <p className="text-gray-300 mb-4">This brief is available as a PDF</p>
+                                        <a 
+                                            href={activeBriefModal.pdfUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="btn btn-emerald px-6 py-3 text-sm inline-block"
+                                        >
+                                            Open PDF
+                                        </a>
+                                    </div>
+                                ) : (
+                                    <div className="rounded-2xl border border-gray-700 bg-black/25 p-4 max-h-[60vh] overflow-y-auto">
+                                        <pre className="whitespace-pre-wrap text-sm text-gray-200 font-sans leading-relaxed">{activeBriefModal.content}</pre>
+                                    </div>
+                                )}
                                 
                                 <div className="flex gap-3 mt-4">
                                     <button
@@ -2474,6 +2529,12 @@ Deliverables:
                                         className="btn btn-emerald px-4 py-2 text-sm"
                                     >
                                         Mark as Read
+                                    </button>
+                                    <button
+                                        onClick={() => markBriefAsRead(activeBriefModal.id); window.open(activeBriefModal.pdfUrl, '_blank')}
+                                        className="btn btn-ghost px-4 py-2 text-sm"
+                                    >
+                                        Open & Read
                                     </button>
                                     <button
                                         onClick={() => markBriefAsUnread(activeBriefModal.id)}
