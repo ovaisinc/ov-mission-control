@@ -374,6 +374,8 @@ Deliverables:
             noteLinkedTo: "ovmc_notes_linked_to",
             personalGoals: "ovmc_personal_goals",
             projects: "ovmc_projects",
+            briefs: "ovmc_briefs",
+            briefsRead: "ovmc_briefs_read",
         };
         
         const loadFromStorage = (key, fallback) => {
@@ -522,6 +524,12 @@ Deliverables:
                 notes: "",
                 proposalContent: "",
             });
+
+            // BRIEFS STATE
+            const [briefs, setBriefs] = useState(() => loadFromStorage(STORAGE_KEYS.briefs, []));
+            const [readBriefIds, setReadBriefIds] = useState(() => loadFromStorage(STORAGE_KEYS.briefsRead, []));
+            const [activeBriefModal, setActiveBriefModal] = useState(null);
+            const [briefFilter, setBriefFilter] = useState("all");
             
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
@@ -562,6 +570,14 @@ Deliverables:
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify(projects));
             }, [projects]);
+
+            useEffect(() => {
+                localStorage.setItem(STORAGE_KEYS.briefs, JSON.stringify(briefs));
+            }, [briefs]);
+
+            useEffect(() => {
+                localStorage.setItem(STORAGE_KEYS.briefsRead, JSON.stringify(readBriefIds));
+            }, [readBriefIds]);
             
             const toggleTask = (id, list, setList) => {
                 setList(list.map(t => t.id === id ? { ...t, done: !t.done } : t));
@@ -825,6 +841,38 @@ Deliverables:
 
             const clearCompleted = () => setCompletedTasks([]);
 
+            // BRIEFS HELPERS
+            const isBriefRead = (briefId) => readBriefIds.includes(briefId);
+            const markBriefAsRead = (briefId) => {
+                if (!isBriefRead(briefId)) {
+                    setReadBriefIds(prev => [...prev, briefId]);
+                }
+            };
+            const markBriefAsUnread = (briefId) => {
+                setReadBriefIds(prev => prev.filter(id => id !== briefId));
+            };
+            const getTypeIcon = (type) => {
+                switch(type) {
+                    case "Daily": return "📊";
+                    case "Weekend": return "📅";
+                    case "Crypto": return "🪙";
+                    default: return "📈";
+                }
+            };
+            const filteredBriefs = briefs.filter(brief => {
+                if (briefFilter === "all") return true;
+                if (briefFilter === "unread") return !isBriefRead(brief.id);
+                return brief.type.toLowerCase() === briefFilter.toLowerCase();
+            });
+            const unreadCount = briefs.filter(b => !isBriefRead(b.id)).length;
+            const thisWeekCount = briefs.filter(b => {
+                const briefDate = new Date(b.date);
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                return briefDate >= weekAgo;
+            }).length;
+            const lastUpdated = briefs.length > 0 ? briefs[0].date : "--";
+
             const startEditTask = (task, typeOverride) => {
                 const resolvedType = typeOverride || task.type || "business";
                 setEditingTaskId(task.id);
@@ -891,6 +939,7 @@ Deliverables:
                 { id: "clients", label: "clients" },
                 { id: "tasks", label: "tasks" },
                 { id: "aiworkforce", label: "AI Workforce" },
+                { id: "briefs", label: "briefs" },
                 { id: "personal", label: "personal" },
                 { id: "notes", label: "notes" },
                 { id: "emergency", label: "Prep" },
@@ -1981,6 +2030,124 @@ Deliverables:
                         </div>
                     )}
                     
+                    {/* BRIEFS TAB */}
+                    {activeTab === "briefs" && (
+                        <div className="space-y-6">
+                            {/* Stats Cards */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 stagger">
+                                <div className="glass rounded-2xl p-5 hover-lift">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-xl">📚</span>
+                                        <span className="text-xs uppercase tracking-widest text-gray-500">Total</span>
+                                    </div>
+                                    <div className="text-3xl font-bold text-indigo-300 mono">{briefs.length}</div>
+                                    <div className="text-xs text-gray-400 mt-1">Briefs archived</div>
+                                </div>
+                                <div className="glass rounded-2xl p-5 hover-lift">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-xl">📅</span>
+                                        <span className="text-xs uppercase tracking-widest text-gray-500">This Week</span>
+                                    </div>
+                                    <div className="text-3xl font-bold text-emerald-300 mono">{thisWeekCount}</div>
+                                    <div className="text-xs text-gray-400 mt-1">New briefings</div>
+                                </div>
+                                <div className="glass rounded-2xl p-5 hover-lift">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-xl">🔔</span>
+                                        <span className="text-xs uppercase tracking-widest text-gray-500">Unread</span>
+                                    </div>
+                                    <div className="text-3xl font-bold text-amber-300 mono">{unreadCount}</div>
+                                    <div className="text-xs text-gray-400 mt-1">Need attention</div>
+                                </div>
+                                <div className="glass rounded-2xl p-5 hover-lift">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-xl">🔄</span>
+                                        <span className="text-xs uppercase tracking-widest text-gray-500">Last Update</span>
+                                    </div>
+                                    <div className="text-lg font-bold text-cyan-300 mono">{lastUpdated}</div>
+                                    <div className="text-xs text-gray-400 mt-1">From Atlas</div>
+                                </div>
+                            </div>
+
+                            {/* Filter Tabs */}
+                            <div className="flex flex-wrap gap-2">
+                                {["all", "unread", "daily", "crypto"].map(filter => (
+                                    <button
+                                        key={filter}
+                                        onClick={() => setBriefFilter(filter)}
+                                        className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+                                            briefFilter === filter 
+                                                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" 
+                                                : "bg-black/20 text-gray-400 border border-gray-700 hover:text-gray-200"
+                                        }`}
+                                    >
+                                        {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Briefs List */}
+                            <div className="space-y-4">
+                                {filteredBriefs.length === 0 ? (
+                                    <div className="glass rounded-2xl p-8 text-center text-gray-400">
+                                        <div className="text-4xl mb-3">📊</div>
+                                        <p>No briefings yet.</p>
+                                        <p className="text-sm mt-2">Your Atlas daily briefings will appear here.</p>
+                                    </div>
+                                ) : (
+                                    filteredBriefs.map(brief => {
+                                        const read = isBriefRead(brief.id);
+                                        return (
+                                            <div
+                                                key={brief.id}
+                                                onClick={() => { markBriefAsRead(brief.id); setActiveBriefModal(brief); }}
+                                                className={`glass rounded-2xl p-5 cursor-pointer hover-lift transition ${
+                                                    read ? "opacity-70" : "border-l-4 border-l-emerald-500/50"
+                                                }`}
+                                            >
+                                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-3 mb-2">
+                                                            <span className="text-2xl">{getTypeIcon(brief.type)}</span>
+                                                            <span className={`text-xs uppercase tracking-widest px-2 py-1 rounded-full border ${
+                                                                brief.type === "Daily" ? "bg-blue-500/20 text-blue-300 border-blue-500/40" :
+                                                                brief.type === "Weekend" ? "bg-purple-500/20 text-purple-300 border-purple-500/40" :
+                                                                "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                                                            }`}>
+                                                                {brief.type}
+                                                            </span>
+                                                            <span className="text-xs text-gray-500">{brief.date}</span>
+                                                            {!read && (
+                                                                <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded-full border border-emerald-500/40">
+                                                                    New
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <h3 className={`text-lg font-semibold ${read ? "text-gray-400" : "text-gray-100"}`}>
+                                                            {brief.title || `${brief.type} Brief: ${brief.date}`}
+                                                        </h3>
+                                                        {brief.summary && (
+                                                            <p className="text-sm text-gray-400 mt-1 line-clamp-2">{brief.summary}</p>
+                                                        )}
+                                                        {brief.tickers && (
+                                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                                {brief.tickers.map(ticker => (
+                                                                    <span key={ticker} className="text-xs bg-black/30 px-2 py-1 rounded text-gray-300">
+                                                                        ${ticker}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    
                     {/* PERSONAL TAB */}
                     {activeTab === "personal" && (
                         <div className="space-y-6">
@@ -2242,6 +2409,78 @@ Deliverables:
                                         rows="3"
                                         className="ui-input rounded-xl px-3 py-3 text-sm w-full"
                                     />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* BRIEFS MODAL */}
+                    {activeBriefModal && (
+                        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm px-4 py-8 md:py-12 overflow-y-auto">
+                            <div className="max-w-3xl mx-auto glass rounded-2xl p-6 md:p-8 border border-emerald-400/30">
+                                <div className="flex items-start justify-between gap-4 mb-5">
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <span className="text-3xl">{getTypeIcon(activeBriefModal.type)}</span>
+                                            <span className={`text-xs uppercase tracking-widest px-2 py-1 rounded-full border ${
+                                                activeBriefModal.type === "Daily" ? "bg-blue-500/20 text-blue-300 border-blue-500/40" :
+                                                activeBriefModal.type === "Weekend" ? "bg-purple-500/20 text-purple-300 border-purple-500/40" :
+                                                "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                                            }`}>
+                                                {activeBriefModal.type}
+                                            </span>
+                                            <span className="text-xs text-gray-500">{activeBriefModal.date}</span>
+                                        </div>
+                                        <h3 className="text-2xl font-semibold">{activeBriefModal.title}</h3>
+                                        {activeBriefModal.sentiment && (
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <span className="text-sm text-gray-400">Sentiment:</span>
+                                                <span className={`text-sm font-medium ${
+                                                    activeBriefModal.sentiment.score <= 25 ? "text-red-400" :
+                                                    activeBriefModal.sentiment.score <= 50 ? "text-yellow-400" :
+                                                    activeBriefModal.sentiment.score <= 75 ? "text-emerald-400" :
+                                                    "text-green-400"
+                                                }`}>
+                                                    {activeBriefModal.sentiment.label} ({activeBriefModal.sentiment.score}/100)
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={() => setActiveBriefModal(null)}
+                                        className="btn btn-ghost px-3 py-2 text-xs uppercase tracking-wide"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                                
+                                {activeBriefModal.tickers && (
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        {activeBriefModal.tickers.map(ticker => (
+                                            <span key={ticker} className="text-xs bg-black/30 px-3 py-1.5 rounded-lg text-gray-300 border border-gray-700">
+                                                ${ticker}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                                
+                                <div className="rounded-2xl border border-gray-700 bg-black/25 p-4 max-h-[60vh] overflow-y-auto">
+                                    <pre className="whitespace-pre-wrap text-sm text-gray-200 font-sans leading-relaxed">{activeBriefModal.content}</pre>
+                                </div>
+                                
+                                <div className="flex gap-3 mt-4">
+                                    <button
+                                        onClick={() => markBriefAsRead(activeBriefModal.id)}
+                                        className="btn btn-emerald px-4 py-2 text-sm"
+                                    >
+                                        Mark as Read
+                                    </button>
+                                    <button
+                                        onClick={() => markBriefAsUnread(activeBriefModal.id)}
+                                        className="btn btn-ghost px-4 py-2 text-sm"
+                                    >
+                                        Mark Unread
+                                    </button>
                                 </div>
                             </div>
                         </div>
