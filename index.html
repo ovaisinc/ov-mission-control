@@ -726,12 +726,6 @@
                         <div className="text-right">
                             <div className="text-3xl font-bold text-green-400 mono">${(totalRev/1000).toFixed(1)}k<span className="text-sm text-gray-500">/mo</span></div>
                             <div className="text-sm text-gray-500 mono">${(totalProfit/1000).toFixed(1)}k profit</div>
-                            <button
-                                onClick={resetData}
-                                className="mt-4 text-xs uppercase tracking-wide px-3 py-2 btn btn-ghost"
-                            >
-                                Reset Data
-                            </button>
                         </div>
                     </div>
                     
@@ -1293,7 +1287,7 @@
                                                     </div>
                                                     <button
                                                         onClick={() => startEditTask(t)}
-                                                        className="text-xs uppercase tracking-wide text-gray-400 hover:text-gray-200 px-2 py-1 rounded-md border border-gray-700 hover:border-gray-500 opacity-100 transition"
+                                                        className="text-xs uppercase tracking-wide text-white px-3 py-1.5 rounded-lg bg-indigo-500/30 border border-indigo-500/50 hover:bg-indigo-500/50 transition"
                                                     >
                                                         Edit
                                                     </button>
@@ -1626,7 +1620,7 @@
                                                             </div>
                                                             <button
                                                                 onClick={() => startEditTask(t, "personal")}
-                                                                className="text-xs uppercase tracking-wide text-gray-400 hover:text-gray-200 px-2 py-1 rounded-md border border-gray-700 hover:border-gray-500 opacity-100 transition"
+                                                                className="text-xs uppercase tracking-wide text-white px-3 py-1.5 rounded-lg bg-pink-500/30 border border-pink-500/50 hover:bg-pink-500/50 transition"
                                                             >
                                                                 Edit
                                                             </button>
