@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', system-ui, sans-serif; background: #0a0a0f; color: #e4e4e7; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #0f0a0f; color: #e4e4e7; }
         .glass { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
         .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .client-card { transition: all 0.2s; cursor: pointer; }
@@ -25,13 +25,13 @@
 <body class="min-h-screen">
     <div id="root"></div>
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
         
         // ALL CLIENTS & ROLES
         const clientsData = [
             { 
                 id: "face", name: "FACE Amusement", revenue: 3700, color: "#6366f1", isLegacy: true,
-                brand: "Ov Theory (Legacy)", lastContact: "2 days ago", contactStatus: "green",
+                brand: "Ov Theory (Legacy)", lastContact: "2 days ago", contactStatus: "green", taskCategory: "FACE",
                 progress: 65, tasksTotal: 12, tasksDone: 8,
                 meetingNotes: "Tom needs agent workflow. 11 agents planned across 3 phases.",
                 research: "Review Tracking MCP waiting on Google Business info",
@@ -39,7 +39,7 @@
             },
             { 
                 id: "adtime", name: "Adtime Marketing", revenue: 1600, color: "#f59e0b",
-                brand: "", lastContact: "1 week ago", contactStatus: "yellow",
+                brand: "", lastContact: "1 week ago", contactStatus: "yellow", taskCategory: "Adtime",
                 progress: 40, tasksTotal: 8, tasksDone: 3,
                 meetingNotes: "$550K check deposit scheduled. Invoice matching software in progress.",
                 research: "Billboard software integration, labor law compliance",
@@ -47,7 +47,7 @@
             },
             { 
                 id: "aft", name: "Almost Free Teeth", revenue: 3100, color: "#06b6d4",
-                brand: "", lastContact: "3 days ago", contactStatus: "green",
+                brand: "", lastContact: "3 days ago", contactStatus: "green", taskCategory: "AFT",
                 progress: 75, tasksTotal: 6, tasksDone: 5,
                 meetingNotes: "HIPAA compliance critical. Dental software project.",
                 research: "HIPAA requirements for AI handling patient data",
@@ -55,7 +55,7 @@
             },
             { 
                 id: "chohan", name: "Chohan", revenue: 0, color: "#ec4899", isInternal: true,
-                brand: "AI Audits & Agents", lastContact: "Today", contactStatus: "green",
+                brand: "AI Audits & Agents", lastContact: "Today", contactStatus: "green", taskCategory: "Chohan",
                 progress: 30, tasksTotal: 15, tasksDone: 5,
                 meetingNotes: "New company - AI audits, agent development. Building brand.",
                 research: "Service offerings, pricing, target market",
@@ -63,7 +63,7 @@
             },
             { 
                 id: "abbvie", name: "AbbVie", revenue: 0, color: "#10b981", isEmployment: true,
-                brand: "Employment", lastContact: "Yesterday", contactStatus: "green",
+                brand: "Employment", lastContact: "Yesterday", contactStatus: "green", taskCategory: "AbbVie",
                 progress: 50, tasksTotal: 10, tasksDone: 5,
                 meetingNotes: "Ross submissions ongoing. Day job.",
                 research: "",
@@ -71,7 +71,7 @@
             },
             { 
                 id: "jamaat", name: "Chicago Jamaat", revenue: 0, color: "#8b5cf6", isCommunity: true,
-                brand: "Motamid Role", lastContact: "Today", contactStatus: "green",
+                brand: "Motamid Role", lastContact: "Today", contactStatus: "green", taskCategory: "Jamaat",
                 progress: 20, tasksTotal: 5, tasksDone: 1,
                 meetingNotes: "Motamid report due TONIGHT. Follow up with Jazib & Fahad.",
                 research: "",
@@ -95,29 +95,29 @@
         
         // EMERGENCY PREP (SHTF) LIST
         const emergencyItems = [
-            { id: 1, item: "3-day water supply (1 gal/person/day)", category: "Water", priority: "critical", done: true },
-            { id: 2, item: "Water purification tablets", category: "Water", priority: "high", done: true },
-            { id: 3, item: "30-day non-perishable food", category: "Food", priority: "critical", done: false },
-            { id: 4, item: "Manual can opener", category: "Food", priority: "high", done: true },
-            { id: 5, item: "First aid kit + medications", category: "Medical", priority: "critical", done: true },
-            { id: 6, item: "Prescription meds (30-day)", category: "Medical", priority: "critical", done: false },
-            { id: 7, item: "Flashlights + batteries", category: "Power", priority: "critical", done: true },
-            { id: 8, item: "Battery-powered radio", category: "Power", priority: "high", done: true },
-            { id: 9, item: "Power bank (fully charged)", category: "Power", priority: "high", done: true },
-            { id: 10, item: "Solar/crank charger", category: "Power", priority: "medium", done: false },
+            { id: 1, item: "3-day water supply (1 gal/person/day)", category: "Supplies", priority: "critical", done: true },
+            { id: 2, item: "Water purification tablets", category: "Supplies", priority: "high", done: true },
+            { id: 3, item: "30-day non-perishable food", category: "Supplies", priority: "critical", done: false },
+            { id: 4, item: "Manual can opener", category: "Supplies", priority: "high", done: true },
+            { id: 5, item: "First aid kit + medications", category: "Supplies", priority: "critical", done: true },
+            { id: 6, item: "Prescription meds (30-day)", category: "Supplies", priority: "critical", done: false },
+            { id: 7, item: "Flashlights + batteries", category: "Supplies", priority: "critical", done: true },
+            { id: 8, item: "Battery-powered radio", category: "Supplies", priority: "high", done: true },
+            { id: 9, item: "Power bank (fully charged)", category: "Supplies", priority: "high", done: true },
+            { id: 10, item: "Solar/crank charger", category: "Supplies", priority: "medium", done: false },
             { id: 11, item: "Cash ($500-1000 small bills)", category: "Financial", priority: "critical", done: false },
-            { id: 12, item: "Important docs (copies)", category: "Financial", priority: "critical", done: true },
-            { id: 13, item: "Emergency contacts list", category: "Communication", priority: "critical", done: true },
-            { id: 14, item: "Whistle (3 blasts = help)", category: "Safety", priority: "high", done: true },
-            { id: 15, item: "Fire extinguisher", category: "Safety", priority: "critical", done: true },
-            { id: 16, item: "Dust masks", category: "Safety", priority: "medium", done: false },
-            { id: 17, item: "Multi-tool / Swiss Army", category: "Tools", priority: "high", done: true },
-            { id: 18, item: "Duct tape", category: "Tools", priority: "medium", done: true },
-            { id: 19, item: "Plastic sheeting", category: "Shelter", priority: "medium", done: false },
-            { id: 20, item: "Sleeping bags/blankets", category: "Shelter", priority: "high", done: true },
-            { id: 21, item: "Personal hygiene items", category: "Hygiene", priority: "medium", done: true },
-            { id: 22, item: "Bleach (sanitization)", category: "Hygiene", priority: "medium", done: false },
-            { id: 23, item: "Family emergency plan", category: "Planning", priority: "critical", done: false },
+            { id: 12, item: "Important docs (copies)", category: "Documents", priority: "critical", done: true },
+            { id: 13, item: "Emergency contacts list", category: "Network", priority: "critical", done: true },
+            { id: 14, item: "Whistle (3 blasts = help)", category: "Skills", priority: "high", done: true },
+            { id: 15, item: "Fire extinguisher", category: "Supplies", priority: "critical", done: true },
+            { id: 16, item: "Dust masks", category: "Supplies", priority: "medium", done: false },
+            { id: 17, item: "Multi-tool / Swiss Army", category: "Supplies", priority: "high", done: true },
+            { id: 18, item: "Duct tape", category: "Supplies", priority: "medium", done: true },
+            { id: 19, item: "Plastic sheeting", category: "Supplies", priority: "medium", done: false },
+            { id: 20, item: "Sleeping bags/blankets", category: "Supplies", priority: "high", done: true },
+            { id: 21, item: "Personal hygiene items", category: "Supplies", priority: "medium", done: true },
+            { id: 22, item: "Bleach (sanitization)", category: "Supplies", priority: "medium", done: false },
+            { id: 23, item: "Family emergency plan", category: "Documents", priority: "critical", done: false },
         ];
         
         // PERSONAL TASKS
@@ -131,33 +131,145 @@
             { id: 7, title: "Meditate", category: "Health", done: false },
         ];
         
+        const STORAGE_KEYS = {
+            tasks: "ovmc_tasks",
+            personal: "ovmc_personal",
+            emergency: "ovmc_emergency",
+            clientNotes: "ovmc_client_notes",
+        };
+        
+        const loadFromStorage = (key, fallback) => {
+            try {
+                const raw = localStorage.getItem(key);
+                if (!raw) return fallback;
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(fallback)) {
+                    return Array.isArray(parsed) ? parsed : fallback;
+                }
+                if (fallback && typeof fallback === "object") {
+                    return parsed && typeof parsed === "object" ? parsed : fallback;
+                }
+                return parsed ?? fallback;
+            } catch (err) {
+                return fallback;
+            }
+        };
+        
+        const buildInitialClientNotes = () => {
+            const initial = {};
+            clientsData.forEach(client => {
+                initial[client.id] = client.research || client.meetingNotes || "";
+            });
+            return initial;
+        };
+        
         function App() {
             const [activeTab, setActiveTab] = useState("dashboard");
             const [selectedClient, setSelectedClient] = useState(null);
-            const [tasks, setTasks] = useState(allTasks);
-            const [emergency, setEmergency] = useState(emergencyItems);
-            const [personal, setPersonal] = useState(personalTasks);
+            const [detailTab, setDetailTab] = useState("tasks");
+            const [tasks, setTasks] = useState(() => loadFromStorage(STORAGE_KEYS.tasks, allTasks));
+            const [emergency, setEmergency] = useState(() => loadFromStorage(STORAGE_KEYS.emergency, emergencyItems));
+            const [personal, setPersonal] = useState(() => loadFromStorage(STORAGE_KEYS.personal, personalTasks));
             const [searchTerm, setSearchTerm] = useState("");
+            const [clientNotes, setClientNotes] = useState(() => {
+                const baseNotes = buildInitialClientNotes();
+                const stored = loadFromStorage(STORAGE_KEYS.clientNotes, null);
+                if (stored && typeof stored === "object") {
+                    return { ...baseNotes, ...stored };
+                }
+                return baseNotes;
+            });
+            const [taskFilter, setTaskFilter] = useState("all");
+            const [clientFilter, setClientFilter] = useState(clientsData[0]?.taskCategory || "");
+            const [expandedPrepCategory, setExpandedPrepCategory] = useState(null);
+            
+            useEffect(() => {
+                localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
+            }, [tasks]);
+            
+            useEffect(() => {
+                localStorage.setItem(STORAGE_KEYS.personal, JSON.stringify(personal));
+            }, [personal]);
+            
+            useEffect(() => {
+                localStorage.setItem(STORAGE_KEYS.emergency, JSON.stringify(emergency));
+            }, [emergency]);
+            
+            useEffect(() => {
+                localStorage.setItem(STORAGE_KEYS.clientNotes, JSON.stringify(clientNotes));
+            }, [clientNotes]);
             
             const toggleTask = (id, list, setList) => {
                 setList(list.map(t => t.id === id ? { ...t, done: !t.done } : t));
             };
             
-            const filteredTasks = tasks.filter(t => 
-                t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                t.category.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+            const mergedTasks = [
+                ...tasks.map(t => ({ ...t, type: "business" })),
+                ...personal.map(t => ({ ...t, type: "personal" })),
+            ];
+            
+            const matchesSearch = (task) => {
+                const term = searchTerm.trim().toLowerCase();
+                if (!term) return true;
+                const fields = [task.title, task.category, task.type];
+                return fields.some(field => (field || "").toLowerCase().includes(term));
+            };
+            
+            const matchesFilter = (task) => {
+                if (taskFilter === "business") return task.type === "business";
+                if (taskFilter === "personal") return task.type === "personal";
+                if (taskFilter === "client") return task.type === "business" && task.category === clientFilter;
+                return true;
+            };
+            
+            const filteredTasks = mergedTasks.filter(task => matchesSearch(task) && matchesFilter(task));
             
             const totalRev = clientsData.reduce((sum, c) => sum + c.revenue, 0);
             const totalProfit = totalRev * 0.75; // ~75% profit margin
             const pendingTasks = tasks.filter(t => !t.done).length + personal.filter(t => !t.done).length;
             const emergencyDone = emergency.filter(e => e.done).length;
             const emergencyProgress = (emergencyDone / emergency.length) * 100;
+            const emergencyCategories = [
+                { id: "Financial", label: "Financial", bar: "bg-emerald-500", accent: "text-emerald-300" },
+                { id: "Supplies", label: "Supplies", bar: "bg-cyan-500", accent: "text-cyan-300" },
+                { id: "Documents", label: "Documents", bar: "bg-amber-500", accent: "text-amber-300" },
+                { id: "Skills", label: "Skills", bar: "bg-indigo-500", accent: "text-indigo-300" },
+                { id: "Network", label: "Network", bar: "bg-pink-500", accent: "text-pink-300" },
+            ];
+            const emergencyCategoryData = emergencyCategories.map(category => {
+                const items = emergency.filter(item => item.category === category.id);
+                const done = items.filter(item => item.done).length;
+                const total = items.length;
+                const progress = total > 0 ? Math.round((done / total) * 100) : 0;
+                return { ...category, items, done, total, progress };
+            });
             
             const getContactClass = (status) => {
                 if (status === "green") return "last-contact-green";
                 if (status === "yellow") return "last-contact-yellow";
                 return "last-contact-red";
+            };
+            
+            const getClientColor = (category) => {
+                const client = clientsData.find(c => c.taskCategory.toLowerCase() === (category || "").toLowerCase());
+                return client?.color || "#6b7280";
+            };
+
+            const openClient = (client) => {
+                setSelectedClient(client);
+                setDetailTab("tasks");
+            };
+            
+            const resetData = () => {
+                Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+                setTasks(allTasks);
+                setPersonal(personalTasks);
+                setEmergency(emergencyItems);
+                setClientNotes(buildInitialClientNotes());
+                setSearchTerm("");
+                setTaskFilter("all");
+                setClientFilter(clientsData[0]?.taskCategory || "");
+                setExpandedPrepCategory(null);
             };
             
             return (
@@ -171,6 +283,12 @@
                         <div className="text-right">
                             <div className="text-2xl font-bold text-green-400">${(totalRev/1000).toFixed(1)}k<span className="text-sm text-gray-500">/mo</span></div>
                             <div className="text-sm text-gray-500">${(totalProfit/1000).toFixed(1)}k profit</div>
+                            <button
+                                onClick={resetData}
+                                className="mt-3 text-xs uppercase tracking-wide text-gray-400 hover:text-gray-200 border border-gray-700 px-3 py-1 rounded-full"
+                            >
+                                Reset Data
+                            </button>
                         </div>
                     </div>
                     
@@ -223,7 +341,7 @@
                                         key={client.id} 
                                         className="glass client-card rounded-xl p-5"
                                         style={{borderTop: `3px solid ${client.color}`}}
-                                        onClick={() => setSelectedClient(client)}
+                                        onClick={() => openClient(client)}
                                     >
                                         <div className="flex justify-between items-start mb-2">
                                             <h3 className="font-semibold text-lg">{client.name}</h3>
@@ -272,59 +390,99 @@
                     {selectedClient && (
                         <div className="space-y-6">
                             <button 
-                                onClick={() => setSelectedClient(null)}
+                                onClick={() => { setSelectedClient(null); setActiveTab("clients"); }}
                                 className="text-gray-400 hover:text-white flex items-center gap-2"
                             >
-                                ← Back to Dashboard
+                                ← Back to Client List
                             </button>
                             
                             <div className="glass rounded-xl p-6" style={{borderLeft: `4px solid ${selectedClient.color}`}}>
-                                <h2 className="text-2xl font-bold mb-2">{selectedClient.name}</h2>
-                                {selectedClient.brand && <p className="text-gray-400 mb-4">{selectedClient.brand}</p>}
-                                
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    {selectedClient.revenue > 0 && (
-                                        <div>
-                                            <div className="text-2xl font-bold text-green-400">${selectedClient.revenue.toLocaleString()}</div>
-                                            <div className="text-sm text-gray-500">Monthly Revenue</div>
-                                        </div>
-                                    )}
+                                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
                                     <div>
-                                        <div className="text-2xl font-bold" style={{color: selectedClient.color}}>{selectedClient.progress}%</div>
-                                        <div className="text-sm text-gray-500">Progress</div>
+                                        <h2 className="text-2xl font-bold">{selectedClient.name}</h2>
+                                        {selectedClient.brand && <p className="text-gray-400">{selectedClient.brand}</p>}
                                     </div>
-                                    <div>
-                                        <div className="text-2xl font-bold text-blue-400">{selectedClient.tasksDone}/{selectedClient.tasksTotal}</div>
-                                        <div className="text-sm text-gray-500">Tasks Complete</div>
-                                    </div>
-                                    <div>
-                                        <div className={`text-2xl font-bold ${getContactClass(selectedClient.contactStatus)}`}>{selectedClient.lastContact}</div>
-                                        <div className="text-sm text-gray-500">Last Contact</div>
+                                    <div className="text-right">
+                                        {selectedClient.revenue > 0 ? (
+                                            <div className="text-2xl font-bold text-green-400">${selectedClient.revenue.toLocaleString()}<span className="text-sm text-gray-500">/mo</span></div>
+                                        ) : (
+                                            <div className="text-sm text-gray-500">Revenue tracked as needed</div>
+                                        )}
+                                        <div className={`text-sm ${getContactClass(selectedClient.contactStatus)}`}>Last contact: {selectedClient.lastContact}</div>
                                     </div>
                                 </div>
                                 
-                                {selectedClient.meetingNotes && (
-                                    <div className="mb-4">
-                                        <h3 className="font-semibold mb-2 text-gray-300">Meeting Notes</h3>
-                                        <p className="text-gray-400 bg-black/20 p-3 rounded-lg">{selectedClient.meetingNotes}</p>
+                                <div className="flex gap-6 border-b border-gray-800 mb-6">
+                                    {["tasks", "notes", "documents"].map(tab => (
+                                        <button
+                                            key={tab}
+                                            onClick={() => setDetailTab(tab)}
+                                            className={`pb-3 px-2 capitalize ${detailTab === tab ? "tab-active" : "text-gray-500 hover:text-gray-300"}`}
+                                        >
+                                            {tab}
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                {detailTab === "tasks" && (
+                                    <div className="space-y-3">
+                                        {tasks.filter(t => t.category.toLowerCase() === selectedClient.taskCategory.toLowerCase()).map(t => (
+                                            <div key={t.id} className="flex items-center gap-3 bg-black/20 rounded-lg p-3">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={t.done}
+                                                    onChange={() => toggleTask(t.id, tasks, setTasks)}
+                                                    className="w-5 h-5 rounded border-gray-600 bg-gray-800"
+                                                />
+                                                <div className="flex-1">
+                                                    <div className={t.done ? "line-through text-gray-600" : "text-gray-200"}>{t.title}</div>
+                                                    <div className="flex gap-2 mt-1">
+                                                        <span className="text-xs bg-gray-800 px-2 py-1 rounded">{t.priority}</span>
+                                                        <span className="text-xs text-gray-500">{t.due}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {tasks.filter(t => t.category.toLowerCase() === selectedClient.taskCategory.toLowerCase()).length === 0 && (
+                                            <div className="text-gray-500">No tasks for this client yet.</div>
+                                        )}
                                     </div>
                                 )}
                                 
-                                {selectedClient.research && (
-                                    <div className="mb-4">
-                                        <h3 className="font-semibold mb-2 text-gray-300">Research & Notes</h3>
-                                        <p className="text-gray-400 bg-black/20 p-3 rounded-lg">{selectedClient.research}</p>
-                                    </div>
-                                )}
-                                
-                                {selectedClient.docs.length > 0 && (
-                                    <div>
-                                        <h3 className="font-semibold mb-2 text-gray-300">Documents</h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {selectedClient.docs.map((doc, i) => (
-                                                <span key={i} className="text-xs bg-gray-800 px-3 py-1 rounded-full">📄 {doc}</span>
-                                            ))}
+                                {detailTab === "notes" && (
+                                    <div className="space-y-4">
+                                        {selectedClient.meetingNotes && (
+                                            <div>
+                                                <div className="text-sm text-gray-400 mb-2">Meeting Notes</div>
+                                                <div className="text-gray-300 bg-black/20 p-3 rounded-lg">{selectedClient.meetingNotes}</div>
+                                            </div>
+                                        )}
+                                        <div>
+                                            <div className="text-sm text-gray-400 mb-2">Research & Notes</div>
+                                            <textarea
+                                                value={clientNotes[selectedClient.id] || ""}
+                                                onChange={(e) => setClientNotes({ ...clientNotes, [selectedClient.id]: e.target.value })}
+                                                rows="8"
+                                                className="w-full bg-black/30 border border-gray-700 rounded-lg p-3 text-gray-200"
+                                                placeholder="Capture research, ideas, and action notes..."
+                                            />
                                         </div>
+                                    </div>
+                                )}
+                                
+                                {detailTab === "documents" && (
+                                    <div className="space-y-4">
+                                        <div className="text-sm text-gray-400">Documents</div>
+                                        <div className="border border-dashed border-gray-700 rounded-xl p-6 text-center text-gray-500 bg-black/20">
+                                            Drop files here or click to upload (placeholder)
+                                        </div>
+                                        {selectedClient.docs.length > 0 && (
+                                            <div className="flex flex-wrap gap-2">
+                                                {selectedClient.docs.map((doc, i) => (
+                                                    <span key={i} className="text-xs bg-gray-800 px-3 py-1 rounded-full">{doc}</span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -339,7 +497,7 @@
                                     key={client.id} 
                                     className="glass client-card rounded-xl p-5"
                                     style={{borderLeft: `4px solid ${client.color}`}}
-                                    onClick={() => setSelectedClient(client)}
+                                    onClick={() => openClient(client)}
                                 >
                                     <div className="flex justify-between items-start">
                                         <div>
@@ -368,34 +526,84 @@
                     {/* TASKS TAB */}
                     {activeTab === "tasks" && (
                         <>
-                            <div className="flex gap-4 mb-6">
-                                <input
-                                    type="text"
-                                    placeholder="Search tasks..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2"
-                                />
+                            <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-6">
+                                <div className="flex gap-2 flex-wrap">
+                                    {[
+                                        { id: "all", label: "All" },
+                                        { id: "business", label: "Business" },
+                                        { id: "personal", label: "Personal" },
+                                        { id: "client", label: "By Client" },
+                                    ].map(filter => (
+                                        <button
+                                            key={filter.id}
+                                            onClick={() => setTaskFilter(filter.id)}
+                                            className={`px-3 py-1 rounded-full text-xs uppercase tracking-wide ${taskFilter === filter.id ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40" : "bg-gray-800 text-gray-400 border border-gray-800 hover:text-gray-200"}`}
+                                        >
+                                            {filter.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="flex-1 flex flex-col sm:flex-row gap-3">
+                                    {taskFilter === "client" && (
+                                        <select
+                                            value={clientFilter}
+                                            onChange={(e) => setClientFilter(e.target.value)}
+                                            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+                                        >
+                                            {clientsData.map(client => (
+                                                <option key={client.id} value={client.taskCategory}>{client.name}</option>
+                                            ))}
+                                        </select>
+                                    )}
+                                    <input
+                                        type="text"
+                                        placeholder="Search tasks..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2"
+                                    />
+                                </div>
                             </div>
                             <div className="glass rounded-xl divide-y divide-gray-800">
                                 {filteredTasks.map(t => (
-                                    <div key={t.id} className="p-4 flex items-center gap-3">
+                                    <div
+                                        key={`${t.type}-${t.id}`}
+                                        className="p-4 flex items-center gap-3 border-l-2"
+                                        style={{ borderColor: t.type === "business" ? getClientColor(t.category) : "#f472b6" }}
+                                    >
                                         <input 
                                             type="checkbox" 
                                             checked={t.done}
-                                            onChange={() => toggleTask(t.id, tasks, setTasks)}
+                                            onChange={() => t.type === "business" ? toggleTask(t.id, tasks, setTasks) : toggleTask(t.id, personal, setPersonal)}
                                             className="w-5 h-5 rounded border-gray-600 bg-gray-800"
                                         />
                                         <div className="flex-1">
                                             <div className={t.done ? "line-through text-gray-600" : "text-gray-200"}>{t.title}</div>
                                             <div className="flex gap-2 mt-1">
-                                                <span className="text-xs bg-gray-800 px-2 py-1 rounded">{t.category}</span>
-                                                <span className={`text-xs ${t.priority === "high" ? "text-red-400" : t.priority === "medium" ? "text-yellow-400" : "text-gray-400"}`}>{t.priority}</span>
-                                                <span className="text-xs text-gray-500">{t.due}</span>
+                                                {t.type === "business" ? (
+                                                    <>
+                                                        <span
+                                                            className="text-xs px-2 py-1 rounded-full border"
+                                                            style={{ borderColor: getClientColor(t.category), color: getClientColor(t.category), background: "rgba(15, 23, 42, 0.4)" }}
+                                                        >
+                                                            {t.category}
+                                                        </span>
+                                                        <span className={`text-xs ${t.priority === "high" ? "text-red-400" : t.priority === "medium" ? "text-yellow-400" : "text-gray-400"}`}>{t.priority}</span>
+                                                        <span className="text-xs text-gray-500">{t.due}</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span className="text-xs px-2 py-1 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/40">Personal</span>
+                                                        <span className="text-xs text-gray-500">{t.category}</span>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
                                 ))}
+                                {filteredTasks.length === 0 && (
+                                    <div className="p-4 text-gray-500">No tasks match this view.</div>
+                                )}
                             </div>
                         </>
                     )}
@@ -414,28 +622,43 @@
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {["Water", "Food", "Medical", "Power", "Financial", "Communication", "Safety", "Tools", "Shelter", "Hygiene", "Planning"].map(category => {
-                                    const items = emergency.filter(e => e.category === category);
-                                    if (items.length === 0) return null;
-                                    return (
-                                        <div key={category} className="glass rounded-xl p-4">
-                                            <h3 className="font-semibold mb-3 text-gray-300">{category}</h3>
-                                            <div className="space-y-2">
-                                                {items.map(item => (
-                                                    <div key={item.id} className="flex items-center gap-2">
-                                                        <input 
-                                                            type="checkbox" 
+                                {emergencyCategoryData.map(category => (
+                                    <div key={category.id} className="glass rounded-xl p-4">
+                                        <button
+                                            onClick={() => setExpandedPrepCategory(expandedPrepCategory === category.id ? null : category.id)}
+                                            className="w-full text-left"
+                                        >
+                                            <div className="flex justify-between items-center mb-3">
+                                                <div>
+                                                    <h3 className="font-semibold text-gray-200">{category.label}</h3>
+                                                    <div className="text-xs text-gray-500">{category.done}/{category.total} complete</div>
+                                                </div>
+                                                <div className={`text-lg font-semibold ${category.accent}`}>{category.progress}%</div>
+                                            </div>
+                                            <div className="progress-bar h-2">
+                                                <div className={`progress-fill ${category.bar}`} style={{width: `${category.progress}%`}}></div>
+                                            </div>
+                                        </button>
+                                        {expandedPrepCategory === category.id && (
+                                            <div className="mt-4 space-y-2">
+                                                {category.items.map(item => (
+                                                    <label key={item.id} className="flex items-center gap-2 text-sm text-gray-300">
+                                                        <input
+                                                            type="checkbox"
                                                             checked={item.done}
                                                             onChange={() => toggleTask(item.id, emergency, setEmergency)}
                                                             className="w-4 h-4 rounded border-gray-600 bg-gray-800"
                                                         />
-                                                        <span className={item.done ? "line-through text-gray-600 text-sm" : "text-gray-300 text-sm"}>{item.item}</span>
-                                                    </div>
+                                                        <span className={item.done ? "line-through text-gray-600" : ""}>{item.item}</span>
+                                                    </label>
                                                 ))}
+                                                {category.items.length === 0 && (
+                                                    <div className="text-xs text-gray-500">No items in this category yet.</div>
+                                                )}
                                             </div>
-                                        </div>
-                                    );
-                                })}
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </>
                     )}
