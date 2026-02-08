@@ -25,7 +25,7 @@
 <body class="min-h-screen">
     <div id="root"></div>
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useMemo } = React;
         
         // ALL CLIENTS & ROLES
         const clientsData = [
@@ -122,19 +122,18 @@
         
         // PERSONAL TASKS
         const personalTasks = [
-            { id: 1, title: "Gym - Monday/Wednesday/Friday", category: "Health", done: false },
-            { id: 2, title: "Call parents", category: "Family", done: false },
-            { id: 3, title: "Review investment portfolio", category: "Finance", done: false },
-            { id: 4, title: "Car maintenance check", category: "Maintenance", done: true },
-            { id: 5, title: "Grocery shopping", category: "Home", done: false },
-            { id: 6, title: "Read 30 mins", category: "Growth", done: true },
-            { id: 7, title: "Meditate", category: "Health", done: false },
+            { id: 1, title: "Email Kris from Village back", category: "Personal", priority: "high", done: false, type: "personal" },
+            { id: 2, title: "Order food prep stuff", category: "Personal", priority: "medium", done: false, type: "personal" },
+            { id: 3, title: "Schedule dentist appointment", category: "Personal", priority: "high", done: false, type: "personal" },
+            { id: 4, title: "Take cholesterol test", category: "Personal", priority: "high", done: false, type: "personal" },
+            { id: 5, title: "Pay Schaumburg ticket", category: "Personal", priority: "critical", done: false, type: "personal" },
         ];
         
         const STORAGE_KEYS = {
             tasks: "ovmc_tasks",
             personal: "ovmc_personal",
             emergency: "ovmc_emergency",
+            completed: "ovmc_completed",
             clientNotes: "ovmc_client_notes",
         };
         
@@ -162,14 +161,41 @@
             });
             return initial;
         };
+
+        const buildInitialTaskState = () => {
+            const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, allTasks);
+            const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, personalTasks);
+            const storedCompleted = loadFromStorage(STORAGE_KEYS.completed, []);
+            const completed = Array.isArray(storedCompleted) ? [...storedCompleted] : [];
+
+            const splitActive = (items, type) => {
+                const active = [];
+                items.forEach(item => {
+                    if (item.done) {
+                        completed.push({ ...item, type });
+                    } else {
+                        active.push(item);
+                    }
+                });
+                return active;
+            };
+
+            return {
+                activeTasks: splitActive(rawTasks, "business"),
+                activePersonal: splitActive(rawPersonal, "personal"),
+                completed,
+            };
+        };
         
         function App() {
             const [activeTab, setActiveTab] = useState("dashboard");
             const [selectedClient, setSelectedClient] = useState(null);
             const [detailTab, setDetailTab] = useState("tasks");
-            const [tasks, setTasks] = useState(() => loadFromStorage(STORAGE_KEYS.tasks, allTasks));
+            const initialTaskState = useMemo(() => buildInitialTaskState(), []);
+            const [tasks, setTasks] = useState(initialTaskState.activeTasks);
+            const [personal, setPersonal] = useState(initialTaskState.activePersonal);
+            const [completedTasks, setCompletedTasks] = useState(initialTaskState.completed);
             const [emergency, setEmergency] = useState(() => loadFromStorage(STORAGE_KEYS.emergency, emergencyItems));
-            const [personal, setPersonal] = useState(() => loadFromStorage(STORAGE_KEYS.personal, personalTasks));
             const [searchTerm, setSearchTerm] = useState("");
             const [clientNotes, setClientNotes] = useState(() => {
                 const baseNotes = buildInitialClientNotes();
@@ -182,6 +208,7 @@
             const [taskFilter, setTaskFilter] = useState("all");
             const [clientFilter, setClientFilter] = useState(clientsData[0]?.taskCategory || "");
             const [expandedPrepCategory, setExpandedPrepCategory] = useState(null);
+            const [showCompleted, setShowCompleted] = useState(false);
             
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
@@ -194,6 +221,10 @@
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.emergency, JSON.stringify(emergency));
             }, [emergency]);
+
+            useEffect(() => {
+                localStorage.setItem(STORAGE_KEYS.completed, JSON.stringify(completedTasks));
+            }, [completedTasks]);
             
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.clientNotes, JSON.stringify(clientNotes));
@@ -201,6 +232,25 @@
             
             const toggleTask = (id, list, setList) => {
                 setList(list.map(t => t.id === id ? { ...t, done: !t.done } : t));
+            };
+
+            const completeTask = (task, type) => {
+                if (type === "business") {
+                    setTasks(prev => prev.filter(t => t.id !== task.id));
+                } else {
+                    setPersonal(prev => prev.filter(t => t.id !== task.id));
+                }
+                setCompletedTasks(prev => [{ ...task, done: true, type }, ...prev]);
+            };
+
+            const restoreTask = (task) => {
+                setCompletedTasks(prev => prev.filter(t => !(t.id === task.id && t.type === task.type)));
+                if (task.type === "business") {
+                    const { type, ...rest } = task;
+                    setTasks(prev => [{ ...rest, done: false }, ...prev]);
+                } else {
+                    setPersonal(prev => [{ ...task, done: false, type: "personal" }, ...prev]);
+                }
             };
             
             const mergedTasks = [
@@ -223,6 +273,9 @@
             };
             
             const filteredTasks = mergedTasks.filter(task => matchesSearch(task) && matchesFilter(task));
+            const filteredCompleted = completedTasks
+                .filter(task => matchesSearch(task) && matchesFilter(task))
+                .map(task => ({ ...task, type: task.type || "business" }));
             
             const totalRev = clientsData.reduce((sum, c) => sum + c.revenue, 0);
             const totalProfit = totalRev * 0.75; // ~75% profit margin
@@ -262,15 +315,36 @@
             
             const resetData = () => {
                 Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
-                setTasks(allTasks);
-                setPersonal(personalTasks);
+                const resetCompleted = [];
+                const resetActiveTasks = [];
+                const resetActivePersonal = [];
+                allTasks.forEach(item => {
+                    if (item.done) {
+                        resetCompleted.push({ ...item, type: "business" });
+                    } else {
+                        resetActiveTasks.push(item);
+                    }
+                });
+                personalTasks.forEach(item => {
+                    if (item.done) {
+                        resetCompleted.push({ ...item, type: "personal" });
+                    } else {
+                        resetActivePersonal.push(item);
+                    }
+                });
+                setTasks(resetActiveTasks);
+                setPersonal(resetActivePersonal);
                 setEmergency(emergencyItems);
+                setCompletedTasks(resetCompleted);
                 setClientNotes(buildInitialClientNotes());
                 setSearchTerm("");
                 setTaskFilter("all");
                 setClientFilter(clientsData[0]?.taskCategory || "");
                 setExpandedPrepCategory(null);
+                setShowCompleted(false);
             };
+
+            const clearCompleted = () => setCompletedTasks([]);
             
             return (
                 <div className="max-w-7xl mx-auto p-6">
@@ -367,7 +441,7 @@
                                         <input 
                                             type="checkbox" 
                                             checked={t.done}
-                                            onChange={() => toggleTask(t.id, tasks, setTasks)}
+                                            onChange={() => completeTask(t, "business")}
                                             className="w-5 h-5 rounded border-gray-600 bg-gray-800"
                                         />
                                         <div className="flex-1">
@@ -431,7 +505,7 @@
                                                 <input 
                                                     type="checkbox" 
                                                     checked={t.done}
-                                                    onChange={() => toggleTask(t.id, tasks, setTasks)}
+                                                    onChange={() => completeTask(t, "business")}
                                                     className="w-5 h-5 rounded border-gray-600 bg-gray-800"
                                                 />
                                                 <div className="flex-1">
@@ -574,7 +648,7 @@
                                         <input 
                                             type="checkbox" 
                                             checked={t.done}
-                                            onChange={() => t.type === "business" ? toggleTask(t.id, tasks, setTasks) : toggleTask(t.id, personal, setPersonal)}
+                                            onChange={() => completeTask(t, t.type)}
                                             className="w-5 h-5 rounded border-gray-600 bg-gray-800"
                                         />
                                         <div className="flex-1">
@@ -605,6 +679,68 @@
                                     <div className="p-4 text-gray-500">No tasks match this view.</div>
                                 )}
                             </div>
+                            <div className="flex flex-wrap items-center gap-3 mt-4">
+                                <button
+                                    onClick={() => setShowCompleted(prev => !prev)}
+                                    className="text-xs uppercase tracking-wide text-gray-400 hover:text-gray-200 border border-gray-700 px-3 py-1 rounded-full"
+                                >
+                                    {showCompleted ? "Hide Completed" : `Show Completed (${filteredCompleted.length})`}
+                                </button>
+                                <button
+                                    onClick={clearCompleted}
+                                    disabled={completedTasks.length === 0}
+                                    className={`text-xs uppercase tracking-wide border px-3 py-1 rounded-full ${completedTasks.length === 0 ? "border-gray-800 text-gray-600 cursor-not-allowed" : "border-gray-700 text-gray-400 hover:text-gray-200"}`}
+                                >
+                                    Clear Completed
+                                </button>
+                            </div>
+                            {showCompleted && (
+                                <div className="glass rounded-xl divide-y divide-gray-800 mt-4">
+                                    {filteredCompleted.map(t => (
+                                        <div
+                                            key={`completed-${t.type}-${t.id}`}
+                                            className="p-3 flex items-center gap-3 border-l-2 text-sm opacity-70"
+                                            style={{ borderColor: t.type === "business" ? getClientColor(t.category) : "#f472b6" }}
+                                        >
+                                            <input 
+                                                type="checkbox" 
+                                                checked={true}
+                                                onChange={() => restoreTask(t)}
+                                                className="w-4 h-4 rounded border-gray-600 bg-gray-800"
+                                            />
+                                            <div className="flex-1">
+                                                <div className="line-through text-gray-500">{t.title}</div>
+                                                <div className="flex gap-2 mt-1">
+                                                    {t.type === "business" ? (
+                                                        <>
+                                                            <span
+                                                                className="text-[10px] px-2 py-0.5 rounded-full border"
+                                                                style={{ borderColor: getClientColor(t.category), color: getClientColor(t.category), background: "rgba(15, 23, 42, 0.4)" }}
+                                                            >
+                                                                {t.category}
+                                                            </span>
+                                                            {t.priority && (
+                                                                <span className="text-[10px] text-gray-500">{t.priority}</span>
+                                                            )}
+                                                            {t.due && (
+                                                                <span className="text-[10px] text-gray-600">{t.due}</span>
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-300 border border-pink-500/30">Personal</span>
+                                                            <span className="text-[10px] text-gray-600">{t.category}</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {filteredCompleted.length === 0 && (
+                                        <div className="p-4 text-gray-500 text-sm">No completed tasks in this view.</div>
+                                    )}
+                                </div>
+                            )}
                         </>
                     )}
                     
@@ -665,15 +801,15 @@
                     
                     {/* PERSONAL TAB */}
                     {activeTab === "personal" && (
-                        <div className="glass rounded-xl divide-y divide-gray-800">
-                            {personal.map(t => (
-                                <div key={t.id} className="p-4 flex items-center gap-3">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={t.done}
-                                        onChange={() => toggleTask(t.id, personal, setPersonal)}
-                                        className="w-5 h-5 rounded border-gray-600 bg-gray-800"
-                                    />
+                            <div className="glass rounded-xl divide-y divide-gray-800">
+                                {personal.map(t => (
+                                    <div key={t.id} className="p-4 flex items-center gap-3">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={t.done}
+                                            onChange={() => completeTask(t, "personal")}
+                                            className="w-5 h-5 rounded border-gray-600 bg-gray-800"
+                                        />
                                     <div className="flex-1">
                                         <div className={t.done ? "line-through text-gray-600" : "text-gray-200"}>{t.title}</div>
                                         <span className="text-xs text-gray-500">{t.category}</span>
