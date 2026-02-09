@@ -1512,9 +1512,32 @@ Deliverables:
                                             </div>
                                             {selectedClient.docs.length > 0 && (
                                                 <div className="flex flex-wrap gap-2">
-                                                    {selectedClient.docs.map((doc, i) => (
-                                                        <span key={i} className="text-xs bg-gray-800 px-3 py-1 rounded-full">{doc}</span>
-                                                    ))}
+                                                    {selectedClient.docs.map((doc, i) => {
+                                                        // Map doc names to file paths
+                                                        const fileMap = {
+                                                            "AI Transformation Audit (HTML Deck)": "files/cineplex-ai-audit.html",
+                                                            "AI Agent Implementation Blueprint": "#",
+                                                            "MCP Server Development Guide": "#",
+                                                            "Invoice Matching Research": "#",
+                                                            "HIPAA Compliance Checklist": "#",
+                                                            "AI Transformation Audit Template": "#",
+                                                            "AI Audit Service Offerings": "#"
+                                                        };
+                                                        const filePath = fileMap[doc] || "#";
+                                                        const isClickable = filePath !== "#";
+                                                        return (
+                                                            <a
+                                                                key={i}
+                                                                href={filePath}
+                                                                target={isClickable ? "_blank" : ""}
+                                                                rel={isClickable ? "noopener noreferrer" : ""}
+                                                                className={`text-xs px-3 py-1 rounded-full ${isClickable ? 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50 hover:bg-emerald-900/60 cursor-pointer' : 'bg-gray-800 text-gray-400'}`}
+                                                                onClick={(e) => !isClickable && e.preventDefault()}
+                                                            >
+                                                                {doc} {isClickable && "↗"}
+                                                            </a>
+                                                        );
+                                                    })}
                                                 </div>
                                             )}
                                         </div>
