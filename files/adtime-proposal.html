@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdTime Marketing — Technology Partnership Proposal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0a1628; color: #e2e8f0; }
+  
+  .slide {
+    width: 100%;
+    min-height: 100vh;
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(90,158,217,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .glass-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(20px);
+    margin-bottom: 20px;
+  }
+
+  .glass-card-accent {
+    background: rgba(90,158,217,0.06);
+    border: 1px solid rgba(90,158,217,0.15);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(20px);
+    margin-bottom: 20px;
+  }
+
+  .glass-card-green {
+    background: rgba(52,211,153,0.06);
+    border: 1px solid rgba(52,211,153,0.15);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(20px);
+    margin-bottom: 20px;
+  }
+
+  .glass-card-purple {
+    background: rgba(139,92,246,0.06);
+    border: 1px solid rgba(139,92,246,0.15);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(20px);
+    margin-bottom: 20px;
+  }
+
+  .glass-card-amber {
+    background: rgba(245,158,11,0.06);
+    border: 1px solid rgba(245,158,11,0.15);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(20px);
+    margin-bottom: 20px;
+  }
+
+  h1 { font-size: 48px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+  h2 { font-size: 36px; font-weight: 700; letter-spacing: -1px; line-height: 1.2; margin-bottom: 24px; }
+  h3 { font-size: 22px; font-weight: 600; margin-bottom: 12px; }
+  h4 { font-size: 16px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+
+  .accent { color: #5a9ed9; }
+  .green { color: #34d399; }
+  .purple { color: #8b5cf6; }
+  .amber { color: #f59e0b; }
+  .dim { color: #64748b; }
+  .bright { color: #f8fafc; }
+
+  .subtitle { font-size: 20px; color: #94a3b8; font-weight: 400; line-height: 1.6; margin-bottom: 32px; }
+  .body-text { font-size: 16px; color: #cbd5e1; line-height: 1.7; margin-bottom: 16px; }
+
+  .tag {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+  .tag-blue { background: rgba(90,158,217,0.15); color: #5a9ed9; border: 1px solid rgba(90,158,217,0.3); }
+  .tag-green { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
+  .tag-purple { background: rgba(139,92,246,0.15); color: #8b5cf6; border: 1px solid rgba(139,92,246,0.3); }
+  .tag-amber { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .flow-num {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .flow-num-blue { background: rgba(90,158,217,0.2); color: #5a9ed9; border: 1px solid rgba(90,158,217,0.4); }
+  .flow-num-green { background: rgba(52,211,153,0.2); color: #34d399; border: 1px solid rgba(52,211,153,0.4); }
+  .flow-num-purple { background: rgba(139,92,246,0.2); color: #8b5cf6; border: 1px solid rgba(139,92,246,0.4); }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    margin: 32px 0;
+  }
+
+  .price-box {
+    text-align: center;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(90,158,217,0.08), rgba(139,92,246,0.08));
+    border: 1px solid rgba(90,158,217,0.2);
+    border-radius: 20px;
+  }
+  .price-amount { font-size: 64px; font-weight: 800; letter-spacing: -2px; }
+  .price-period { font-size: 20px; color: #94a3b8; }
+
+  .check-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .check-icon { color: #34d399; font-size: 18px; min-width: 24px; margin-top: 2px; }
+
+  .logo-area {
+    position: absolute;
+    top: 40px;
+    right: 60px;
+    font-size: 14px;
+    color: #475569;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .footer-bar {
+    position: absolute;
+    bottom: 30px;
+    left: 80px;
+    right: 80px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #475569;
+  }
+
+  .flowchart {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 24px 0;
+    flex-wrap: nowrap;
+  }
+  .flow-box {
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    min-width: 120px;
+    flex-shrink: 0;
+  }
+  .flow-arrow {
+    color: #475569;
+    font-size: 20px;
+    padding: 0 6px;
+    flex-shrink: 0;
+  }
+  .flow-box-blue { background: rgba(90,158,217,0.12); border: 1px solid rgba(90,158,217,0.3); color: #93c5fd; }
+  .flow-box-green { background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.3); color: #6ee7b7; }
+  .flow-box-purple { background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.3); color: #c4b5fd; }
+  .flow-box-amber { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; }
+
+  ul { list-style: none; padding: 0; }
+  li { padding: 6px 0; font-size: 15px; color: #cbd5e1; }
+  li::before { content: '→'; color: #5a9ed9; margin-right: 10px; }
+
+  .stat-number { font-size: 42px; font-weight: 800; line-height: 1; }
+  .stat-label { font-size: 13px; color: #94a3b8; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+  @media print {
+    .slide { min-height: auto; height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Cover -->
+<div class="slide" style="justify-content: center; align-items: center; text-align: center;">
+  <div class="logo-area">OV THEORY</div>
+  <div class="tag tag-blue">Technology Partnership Proposal</div>
+  <h1 style="font-size: 56px; max-width: 800px;">
+    Custom Software Suite<br>for <span class="accent">AdTime Marketing</span>
+  </h1>
+  <p class="subtitle" style="max-width: 600px;">
+    Two AI-powered tools. One dedicated portal.<br>Built exclusively for your business.
+  </p>
+  <div style="display: flex; gap: 24px; margin-top: 20px;">
+    <div class="glass-card" style="padding: 16px 28px; margin: 0;">
+      <span class="dim" style="font-size: 13px;">Tool 1</span><br>
+      <span class="bright" style="font-weight: 600;">PayMatch — Invoice Intelligence</span>
+    </div>
+    <div class="glass-card" style="padding: 16px 28px; margin: 0;">
+      <span class="dim" style="font-size: 13px;">Tool 2</span><br>
+      <span class="bright" style="font-weight: 600;">Campaign Command — Billboard Manager</span>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span>Prepared by Ov Theory</span>
+    <span>February 2026</span>
+    <span>Confidential</span>
+  </div>
+</div>
+
+<!-- SLIDE 2: The Problem -->
+<div class="slide">
+  <div class="logo-area">OV THEORY</div>
+  <div class="tag tag-amber">The Challenge</div>
+  <h2>Manual Processes Are<br>Costing You <span class="amber">Time & Money</span></h2>
+  
+  <div class="grid-2">
+    <div class="glass-card-amber">
+      <h3 class="amber">📧 Invoice Processing</h3>
+      <p class="body-text">Invoices arrive via email from dozens of vendors. Matching them to contracts, verifying amounts, and tracking payments requires hours of manual work every week. Scanned PDFs are especially painful — OCR misreads data, forcing manual correction.</p>
+      <div class="divider"></div>
+      <div style="display: flex; gap: 32px;">
+        <div><div class="stat-number amber">5-8</div><div class="stat-label">Hours/week manual matching</div></div>
+        <div><div class="stat-number amber">15%</div><div class="stat-label">Error rate on scanned docs</div></div>
+      </div>
+    </div>
+    <div class="glass-card-amber">
+      <h3 class="amber">📊 Campaign Tracking</h3>
+      <p class="body-text">Billboard campaigns are tracked across spreadsheets, emails, and memory. There's no single view of what's live, what's ending, or how campaigns are performing. Clients ask for reports and the team scrambles to pull numbers together.</p>
+      <div class="divider"></div>
+      <div style="display: flex; gap: 32px;">
+        <div><div class="stat-number amber">11</div><div class="stat-label">Active campaigns to track</div></div>
+        <div><div class="stat-number amber">0</div><div class="stat-label">Automated reports today</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span>Ov Theory</span>
+    <span>2 / 8</span>
+    <span>Confidential</span>
+  </div>
+</div>
+
+<!-- SLIDE 3: Tool 1 — PayMatch -->
+<div class="slide">
+  <div class="logo-area">OV THEORY</div>
+  <div class="tag tag-blue">Tool 1</div>
+  <h2>PayMatch — <span class="accent">Invoice Intelligence</span></h2>
+  <p class="subtitle">AI-powered invoice processing that reads, classifies, and matches documents automatically.</p>
+
+  <div class="glass-card-accent" style="margin-bottom: 28px;">
+    <h4 class="accent" style="margin-bottom: 16px;">How It Works</h4>
+    <div class="flowchart">
+      <div class="flow-box flow-box-blue">📧 Email<br>Arrives</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box-blue">📄 PDF<br>Extracted</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box-purple">🤖 AI Vision<br>Reads Doc</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box-purple">🧠 Multi-Signal<br>Classification</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box-green">✅ Auto-Match<br>to Contract</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box-green">💰 Review<br>& Pay</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="glass-card">
+      <h3 class="bright">🔍 Vision AI Document Processing</h3>
+      <ul>
+        <li>GPT-4.1 Vision reads every page as an image — no OCR failures</li>
+        <li>Handles scanned, faded, handwritten, and messy invoices</li>
+        <li>Extracts vendor, amounts, dates, invoice numbers with 97%+ accuracy</li>
+        <li>Multi-page awareness — processes entire documents</li>
+      </ul>
+    </div>
+    <div class="glass-card">
+      <h3 class="bright">🧠 Multi-Signal Intelligence</h3>
+      <ul>
+        <li>Analyzes email sender, forwarded-from headers, and domain</li>
+        <li>Cross-references existing vendors and contract database</li>
+        <li>Detects forwarded emails — finds original sender automatically</li>
+        <li>Confidence scoring — low-confidence items flagged for review</li>
+        <li>Anomaly detection — unusual amounts or new vendors flagged</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span>Ov Theory</span>
+    <span>3 / 8</span>
+    <span>Confidential</span>
+  </div>
+</div>
+
+<!-- SLIDE 4: PayMatch Features -->
+<div class="slide">
+  <div class="logo-area">OV THEORY</div>
+  <div class="tag tag-blue">Tool 1 — Features</div>
+  <h2>PayMatch <span class="accent">Feature Set</span></h2>
+
+  <div class="grid-3">
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">📧</div>
+      <h3 class="bright" style="font-size: 16px;">Auto Email Sync</h3>
+      <p style="font-size: 14px; color: #94a3b8;">Outlook integration syncs invoices every 5 minutes. Manual sync button for on-demand pulls.</p>
+    </div>
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">📄</div>
+      <h3 class="bright" style="font-size: 16px;">Smart PDF Parsing</h3>
+      <p style="font-size: 14px; color: #94a3b8;">AI vision reads PDFs directly — no more OCR errors on scanned or messy documents.</p>
+    </div>
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">🔗</div>
+      <h3 class="bright" style="font-size: 16px;">Contract Matching</h3>
+      <p style="font-size: 14px; color: #94a3b8;">Auto-matches invoices to contracts using vendor, amount, contract number, and domain.</p>
+    </div>
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">📊</div>
+      <h3 class="bright" style="font-size: 16px;">Utilization Tracking</h3>
+      <p style="font-size: 14px; color: #94a3b8;">See contract utilization in real-time. Color-coded: green, yellow, red based on spend.</p>
+    </div>
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">⏳</div>
+      <h3 class="bright" style="font-size: 16px;">Approval Workflow</h3>
+      <p style="font-size: 14px; color: #94a3b8;">New documents land in pending queue. Review, approve, and match with one click.</p>
+    </div>
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">🔒</div>
+      <h3 class="bright" style="font-size: 16px;">Duplicate Prevention</h3>
+      <p style="font-size: 14px; color: #94a3b8;">Smart deduplication prevents the same invoice from being imported twice.</p>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span>Ov Theory</span>
+    <span>4 / 8</span>
+    <span>Confidential</span>
+  </div>
+</div>
+
+<!-- SLIDE 5: Tool 2 — Campaign Command -->
+<div class="slide">
+  <div class="logo-area">OV THEORY</div>
+  <div class="tag tag-green">Tool 2</div>
+  <h2>Campaign Command — <span class="green">Billboard Manager</span></h2>
+  <p class="subtitle">Your central command center for every billboard campaign — from booking to completion.</p>
+
+  <div class="glass-card-green" style="margin-bottom: 28px;">
+    <h4 class="green" style="margin-bottom: 16px;">Campaign Lifecycle</h4>
+    <div class="flowchart">
+      <div class="flow-box flow-box-green">📋 Create<br>Campaign</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box-blue">📅 Schedule<br>& Assign</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box-purple">🔔 Auto<br>Notifications</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box-green">📊 Track<br>Impressions</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box-amber">📑 Generate<br>Reports</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box-green">🔄 Renew or<br>Complete</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="glass-card">
+      <h3 class="bright">📊 Impression Estimation</h3>
+      <p class="body-text">Automatically estimate campaign reach using traffic data from Department of Transportation (DOT) databases. Each billboard location gets a Daily Effective Circulation (DEC) score.</p>
+      <ul>
+        <li>Auto-calculated impressions per campaign</li>
+        <li>Total reach across all active campaigns</li>
+        <li>Client-ready performance metrics</li>
+      </ul>
+    </div>
+    <div class="glass-card">
+      <h3 class="bright">🔔 Smart Notifications</h3>
+      <p class="body-text">Never miss a deadline. Automated email alerts keep your team ahead of every campaign milestone.</p>
+      <ul>
+        <li>Campaign start/end reminders</li>
+        <li>Renewal deadline alerts</li>
+        <li>Weekly status digest</li>
+        <li>Client report delivery</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span>Ov Theory</span>
+    <span>5 / 8</span>
+    <span>Confidential</span>
+  </div>
+</div>
+
+<!-- SLIDE 6: Campaign Command Features -->
+<div class="slide">
+  <div class="logo-area">OV THEORY</div>
+  <div class="tag tag-green">Tool 2 — Features</div>
+  <h2>Campaign Command <span class="green">Feature Set</span></h2>
+
+  <div class="grid-3">
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">📋</div>
+      <h3 class="bright" style="font-size: 16px;">Campaign Dashboard</h3>
+      <p style="font-size: 14px; color: #94a3b8;">Live overview: Upcoming, Active, Ending Soon, and Completed campaigns at a glance.</p>
+    </div>
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">📈</div>
+      <h3 class="bright" style="font-size: 16px;">Performance Reports</h3>
+      <p style="font-size: 14px; color: #94a3b8;">Generate professional campaign reports with impressions, timeline, and spend data. Export-ready for clients.</p>
+    </div>
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">🔄</div>
+      <h3 class="bright" style="font-size: 16px;">Renewals & Extensions</h3>
+      <p style="font-size: 14px; color: #94a3b8;">One-click campaign extensions and renewals. Never lose a booking due to missed deadlines.</p>
+    </div>
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">📎</div>
+      <h3 class="bright" style="font-size: 16px;">File Attachments</h3>
+      <p style="font-size: 14px; color: #94a3b8;">Attach contracts, creative assets, and vendor docs directly to each campaign.</p>
+    </div>
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">👥</div>
+      <h3 class="bright" style="font-size: 16px;">Team Access</h3>
+      <p style="font-size: 14px; color: #94a3b8;">Secure login for your team. Everyone sees the same real-time campaign data.</p>
+    </div>
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 36px; margin-bottom: 12px;">📝</div>
+      <h3 class="bright" style="font-size: 16px;">Activity Timeline</h3>
+      <p style="font-size: 14px; color: #94a3b8;">Full audit trail of campaign events, changes, and notifications for accountability.</p>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span>Ov Theory</span>
+    <span>6 / 8</span>
+    <span>Confidential</span>
+  </div>
+</div>
+
+<!-- SLIDE 7: Dedicated Portal -->
+<div class="slide">
+  <div class="logo-area">OV THEORY</div>
+  <div class="tag tag-purple">Your Platform</div>
+  <h2>A Dedicated <span class="purple">Custom Portal</span></h2>
+  <p class="subtitle">Both tools live on your own branded subdomains — no shared platforms, no third-party logins.</p>
+
+  <div class="glass-card-purple" style="text-align: center; padding: 40px;">
+    <div style="display: flex; justify-content: center; gap: 60px; align-items: center;">
+      <div>
+        <div style="font-size: 14px; color: #94a3b8; margin-bottom: 8px;">INVOICE MANAGEMENT</div>
+        <div style="font-size: 24px; font-weight: 700; color: #c4b5fd;">invoices.adtimemarketing.com</div>
+      </div>
+      <div style="font-size: 32px; color: #475569;">+</div>
+      <div>
+        <div style="font-size: 14px; color: #94a3b8; margin-bottom: 8px;">CAMPAIGN MANAGEMENT</div>
+        <div style="font-size: 24px; font-weight: 700; color: #c4b5fd;">campaigns.adtimemarketing.com</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="glass-card">
+      <h3 class="bright">🏢 White-Label Branding</h3>
+      <ul>
+        <li>Your logo, your colors, your domain</li>
+        <li>No "Powered by" third-party branding</li>
+        <li>Professional appearance for your team</li>
+        <li>Custom email notifications from your domain</li>
+      </ul>
+    </div>
+    <div class="glass-card">
+      <h3 class="bright">🔐 Enterprise-Grade Infrastructure</h3>
+      <ul>
+        <li>Dedicated PostgreSQL database</li>
+        <li>Autoscaling compute (handles any load)</li>
+        <li>SSL encryption on all connections</li>
+        <li>Daily database backups</li>
+        <li>99.9% uptime guarantee</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span>Ov Theory</span>
+    <span>7 / 8</span>
+    <span>Confidential</span>
+  </div>
+</div>
+
+<!-- SLIDE 8: Investment -->
+<div class="slide" style="justify-content: center; align-items: center;">
+  <div class="logo-area">OV THEORY</div>
+  <div class="tag tag-blue">Investment</div>
+  <h2 style="text-align: center;">Technology Partnership <span class="accent">Investment</span></h2>
+
+  <div class="price-box" style="max-width: 500px; margin: 0 auto 40px;">
+    <div class="dim" style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;">Monthly Retainer</div>
+    <div class="price-amount"><span class="accent">$1,700</span></div>
+    <div class="price-period">/month</div>
+    <div style="margin-top: 16px; font-size: 13px; color: #64748b;">Launch pricing — first 6 months</div>
+  </div>
+
+  <div class="grid-2" style="max-width: 800px; margin: 0 auto;">
+    <div class="glass-card-green">
+      <h4 class="green" style="margin-bottom: 16px;">✅ What's Included</h4>
+      <div class="check-item"><span class="check-icon">✓</span><span class="body-text" style="margin: 0;">PayMatch — AI Invoice Intelligence</span></div>
+      <div class="check-item"><span class="check-icon">✓</span><span class="body-text" style="margin: 0;">Campaign Command — Billboard Manager</span></div>
+      <div class="check-item"><span class="check-icon">✓</span><span class="body-text" style="margin: 0;">Custom portal on your subdomains</span></div>
+      <div class="check-item"><span class="check-icon">✓</span><span class="body-text" style="margin: 0;">Hosting & infrastructure</span></div>
+      <div class="check-item"><span class="check-icon">✓</span><span class="body-text" style="margin: 0;">AI API costs (GPT-4.1 Vision)</span></div>
+      <div class="check-item"><span class="check-icon">✓</span><span class="body-text" style="margin: 0;">Ongoing feature development</span></div>
+      <div class="check-item"><span class="check-icon">✓</span><span class="body-text" style="margin: 0;">Priority support & maintenance</span></div>
+      <div class="check-item"><span class="check-icon">✓</span><span class="body-text" style="margin: 0;">Database management & backups</span></div>
+    </div>
+    <div class="glass-card">
+      <h4 class="dim" style="margin-bottom: 16px;">📊 Cost Comparison</h4>
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 14px; color: #94a3b8;">Custom dev agency</div>
+        <div style="font-size: 24px; font-weight: 700; color: #ef4444; text-decoration: line-through;">$5,000 - $8,000/mo</div>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 14px; color: #94a3b8;">Freelance developer</div>
+        <div style="font-size: 24px; font-weight: 700; color: #ef4444; text-decoration: line-through;">$3,000 - $4,000/mo</div>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 14px; color: #94a3b8;">Off-the-shelf SaaS tools (2+)</div>
+        <div style="font-size: 24px; font-weight: 700; color: #ef4444; text-decoration: line-through;">$500 - $1,200/mo</div>
+        <div style="font-size: 12px; color: #64748b;">No customization. No integration. Generic.</div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div style="font-size: 14px; color: #94a3b8;">Ov Theory partnership</div>
+        <div style="font-size: 28px; font-weight: 700; color: #34d399;">$1,700/mo</div>
+        <div style="font-size: 12px; color: #34d399;">Custom-built. AI-powered. Yours.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 32px;">
+    <p style="font-size: 16px; color: #94a3b8;">Ready to get started? Let's schedule the onboarding.</p>
+    <p style="font-size: 18px; font-weight: 600; margin-top: 8px;"><span class="accent">ov@ovtheory.com</span></p>
+  </div>
+
+  <div class="footer-bar">
+    <span>Ov Theory</span>
+    <span>8 / 8</span>
+    <span>Confidential</span>
+  </div>
+</div>
+
+</body>
+</html>
