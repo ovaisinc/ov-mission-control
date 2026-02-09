@@ -1,0 +1,56 @@
+{
+  "version": "2026-02-09",
+  "lastUpdated": "2026-02-09T17:37:00-06:00",
+  "tasks": [
+    { "id": 1, "title": "Submit Motamid report", "category": "Jamaat", "priority": "high", "due": "Tonight", "done": false },
+    { "id": 2, "title": "Follow up with Jazib & Fahad", "category": "Jamaat", "priority": "high", "due": "Tonight", "done": false },
+    { "id": 3, "title": "Deposit $550K check", "category": "Adtime", "priority": "high", "due": "Today", "done": true },
+    { "id": 4, "title": "Send Tom agent workflow", "category": "FACE", "priority": "high", "due": "Today", "done": false },
+    { "id": 5, "title": "Ross submission - batch 1", "category": "AbbVie", "priority": "medium", "due": "This week", "done": true },
+    { "id": 6, "title": "Ross submission - batch 2", "category": "AbbVie", "priority": "medium", "due": "This week", "done": false },
+    { "id": 7, "title": "Review FACE phase 1 agents", "category": "FACE", "priority": "medium", "due": "Tomorrow", "done": false },
+    { "id": 8, "title": "HIPAA compliance review", "category": "AFT", "priority": "high", "due": "This week", "done": false },
+    { "id": 9, "title": "Chohan service offerings doc", "category": "Chohan", "priority": "medium", "due": "This week", "done": false },
+    { "id": 10, "title": "Call Colin — dentist software connect", "category": "Chohan", "priority": "high", "due": "Tomorrow", "done": false },
+    { "id": 11, "title": "Follow up with Colin — government contracts", "category": "Chohan", "priority": "high", "due": "Tomorrow", "done": false },
+    { "id": 12, "title": "Update invoicing system", "category": "Adtime", "priority": "low", "due": "Next week", "done": false },
+    { "id": 13, "title": "Send AI Automation Retainer Proposal to AdTime Marketing", "category": "Adtime", "priority": "high", "due": "Tonight", "done": false },
+    { "id": 14, "title": "Apply for lead role at AbbVie", "category": "AbbVie", "priority": "high", "due": "Tonight", "done": false }
+  ],
+  "personal": [
+    { "id": 1, "title": "Email Kris from Village back", "category": "Personal", "priority": "high", "done": false, "type": "personal" },
+    { "id": 2, "title": "Order food prep stuff", "category": "Personal", "priority": "medium", "done": false, "type": "personal" },
+    { "id": 3, "title": "Schedule dentist appointment", "category": "Personal", "priority": "high", "done": false, "type": "personal" },
+    { "id": 4, "title": "Take cholesterol test", "category": "Personal", "priority": "high", "done": false, "type": "personal" },
+    { "id": 5, "title": "Pay Schaumburg ticket", "category": "Personal", "priority": "critical", "done": false, "type": "personal" }
+  ],
+  "emergency": [
+    { "id": 1, "item": "3-day water supply (1 gal/person/day)", "category": "Supplies", "priority": "critical", "done": true },
+    { "id": 2, "item": "Water purification tablets", "category": "Supplies", "priority": "high", "done": true },
+    { "id": 3, "item": "30-day non-perishable food", "category": "Supplies", "priority": "critical", "done": false },
+    { "id": 4, "item": "Manual can opener", "category": "Supplies", "priority": "high", "done": true },
+    { "id": 5, "item": "First aid kit + medications", "category": "Supplies", "priority": "critical", "done": true },
+    { "id": 6, "item": "Prescription meds (30-day)", "category": "Supplies", "priority": "critical", "done": false },
+    { "id": 7, "item": "Flashlights + batteries", "category": "Supplies", "priority": "critical", "done": true },
+    { "id": 8, "item": "Battery-powered radio", "category": "Supplies", "priority": "high", "done": true },
+    { "id": 9, "item": "Power bank (fully charged)", "category": "Supplies", "priority": "high", "done": true },
+    { "id": 10, "item": "Solar/crank charger", "category": "Supplies", "priority": "medium", "done": false },
+    { "id": 11, "item": "Cash ($500-1000 small bills)", "category": "Financial", "priority": "critical", "done": false },
+    { "id": 12, "item": "Important docs (copies)", "category": "Documents", "priority": "critical", "done": true },
+    { "id": 13, "item": "Emergency contacts list", "category": "Network", "priority": "critical", "done": true },
+    { "id": 14, "item": "Whistle (3 blasts = help)", "category": "Skills", "priority": "high", "done": true },
+    { "id": 15, "item": "Fire extinguisher", "category": "Supplies", "priority": "critical", "done": true },
+    { "id": 16, "item": "Dust masks", "category": "Supplies", "priority": "medium", "done": false },
+    { "id": 17, "item": "Multi-tool / Swiss Army", "category": "Supplies", "priority": "high", "done": true },
+    { "id": 18, "item": "Duct tape", "category": "Supplies", "priority": "medium", "done": true },
+    { "id": 19, "item": "Plastic sheeting", "category": "Supplies", "priority": "medium", "done": false },
+    { "id": 20, "item": "Sleeping bags/blankets", "category": "Supplies", "priority": "high", "done": true },
+    { "id": 21, "item": "Personal hygiene items", "category": "Supplies", "priority": "medium", "done": true },
+    { "id": 22, "item": "Bleach (sanitization)", "category": "Supplies", "priority": "medium", "done": false },
+    { "id": 23, "item": "Family emergency plan", "category": "Documents", "priority": "critical", "done": false }
+  ],
+  "completed": [
+    { "id": 5, "title": "Ross submission - batch 1", "category": "AbbVie", "priority": "medium", "due": "This week", "done": true, "type": "business", "completedAt": "2026-02-09" },
+    { "id": 3, "title": "Deposit $550K check", "category": "Adtime", "priority": "high", "due": "Today", "done": true, "type": "business", "completedAt": "2026-02-09" }
+  ]
+}

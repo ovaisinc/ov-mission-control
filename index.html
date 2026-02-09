@@ -284,11 +284,16 @@
             },
         ];
         
-        // ALL TASKS
+        // DEFAULTS VERSION - Bump this when updating hardcoded defaults to force refresh
+        const DEFAULTS_VERSION = "2026-02-09-v2";
+        
+        // ALL TASKS - MASTER DEFAULTS
+        // These are ONLY loaded on first visit or when DEFAULTS_VERSION changes.
+        // After that, localStorage is the source of truth.
         const allTasks = [
             { id: 1, title: "Submit Motamid report", category: "Jamaat", priority: "high", due: "Tonight", done: false },
             { id: 2, title: "Follow up with Jazib & Fahad", category: "Jamaat", priority: "high", due: "Tonight", done: false },
-            { id: 3, title: "Deposit $550K check", category: "Adtime", priority: "high", due: "Today", done: false },
+            { id: 3, title: "Deposit $550K check", category: "Adtime", priority: "high", due: "Today", done: true },
             { id: 4, title: "Send Tom agent workflow", category: "FACE", priority: "high", due: "Today", done: false },
             { id: 5, title: "Ross submission - batch 1", category: "AbbVie", priority: "medium", due: "This week", done: true },
             { id: 6, title: "Ross submission - batch 2", category: "AbbVie", priority: "medium", due: "This week", done: false },
@@ -299,6 +304,7 @@
             { id: 11, title: "Follow up with Colin — government contracts", category: "Chohan", priority: "high", due: "Tomorrow", done: false },
             { id: 12, title: "Update invoicing system", category: "Adtime", priority: "low", due: "Next week", done: false },
             { id: 13, title: "Send AI Automation Retainer Proposal to AdTime Marketing", category: "Adtime", priority: "high", due: "Tonight", done: false },
+            { id: 14, title: "Apply for lead role at AbbVie", category: "AbbVie", priority: "high", due: "Tonight", done: false },
         ];
         
         // EMERGENCY PREP (SHTF) LIST
@@ -439,6 +445,15 @@ Deliverables:
         };
         
         const buildInitialTaskState = () => {
+            // VERSION CHECK: If defaults version changed, reset to new defaults
+            const storedVersion = localStorage.getItem("ovmc_defaults_version");
+            const versionChanged = storedVersion !== DEFAULTS_VERSION;
+            
+            if (versionChanged) {
+                console.log("Defaults updated to version:", DEFAULTS_VERSION);
+                localStorage.setItem("ovmc_defaults_version", DEFAULTS_VERSION);
+            }
+            
             // DEFENSIVE: Check if actual data exists in localStorage first
             const existingTasksRaw = localStorage.getItem(STORAGE_KEYS.tasks);
             const existingPersonalRaw = localStorage.getItem(STORAGE_KEYS.personal);
@@ -448,9 +463,9 @@ Deliverables:
             const hasExistingPersonal = Boolean(existingPersonalRaw && existingPersonalRaw !== "[]");
             const hasExistingCompleted = Boolean(existingCompletedRaw && existingCompletedRaw !== "[]");
             
-            // Only load defaults if NO data exists yet (first visit)
-            const shouldLoadDefaultTasks = !hasExistingTasks && !hasExistingCompleted;
-            const shouldLoadDefaultPersonal = !hasExistingPersonal && !hasExistingCompleted;
+            // Load defaults if: first visit OR version changed
+            const shouldLoadDefaultTasks = versionChanged || (!hasExistingTasks && !hasExistingCompleted);
+            const shouldLoadDefaultPersonal = versionChanged || (!hasExistingPersonal && !hasExistingCompleted);
 
             const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, shouldLoadDefaultTasks ? allTasks : []);
             const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, shouldLoadDefaultPersonal ? personalTasks : []);
