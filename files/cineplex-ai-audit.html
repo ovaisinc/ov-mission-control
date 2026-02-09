@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Transformation Audit | Cineplex</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #0a1628; color: #fff; overflow: hidden; }
+        .deck { width: 100vw; height: 100vh; overflow: hidden; position: relative; }
+        .slide { width: 100vw; height: 100vh; display: none; position: relative; padding: 40px 60px; background: linear-gradient(135deg, #0a1628 0%, #1a2d4a 50%, #0d1b2e 100%); overflow: hidden; }
+        .slide::before { content: ''; position: absolute; top: -50%; right: -20%; width: 80%; height: 150%; background: radial-gradient(ellipse, rgba(90,158,217,0.08) 0%, transparent 60%); pointer-events: none; }
+        .slide.active { display: flex; flex-direction: column; }
+        .slide-content { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 1400px; margin: 0 auto; width: 100%; padding-top: 40px; }
+        h1 { font-size: 3.2rem; font-weight: 800; margin-bottom: 20px; background: linear-gradient(135deg, #fff 0%, #5a9ed9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 2.4rem; font-weight: 700; margin-bottom: 15px; color: #fff; }
+        h3 { font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; color: #5a9ed9; margin-bottom: 10px; }
+        p { font-size: 1.1rem; line-height: 1.7; color: rgba(255,255,255,0.85); max-width: 800px; }
+        .hero-content { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; }
+        .hero-stats { display: flex; gap: 60px; margin-top: 50px; }
+        .stat-box { text-align: center; padding: 25px 35px; background: rgba(255,255,255,0.03); border: 1px solid rgba(90,158,217,0.2); border-radius: 16px; }
+        .stat-number { font-size: 2.8rem; font-weight: 800; color: #5a9ed9; display: block; }
+        .stat-label { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-top: 8px; }
+        .opportunity-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px; }
+        .opp-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 25px; transition: all 0.3s ease; }
+        .opp-card:hover { border-color: rgba(90,158,217,0.4); transform: translateY(-3px); }
+        .opp-number { font-size: 2rem; font-weight: 800; color: #5a9ed9; margin-bottom: 10px; }
+        .opp-card h4 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+        .opp-card p { font-size: 0.9rem; color: rgba(255,255,255,0.6); }
+        .opp-roi { display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .opp-roi.high { background: rgba(40,167,69,0.2); color: #28a745; border: 1px solid rgba(40,167,69,0.3); }
+        .opp-roi.medium { background: rgba(255,193,7,0.2); color: #ffc107; border: 1px solid rgba(255,193,7,0.3); }
+        .highlight-box { background: linear-gradient(135deg, rgba(90,158,217,0.15) 0%, rgba(90,158,217,0.05) 100%); border: 1px solid rgba(90,158,217,0.3); border-radius: 12px; padding: 20px 25px; margin-top: 25px; }
+        .highlight-box p { font-size: 1rem; color: rgba(255,255,255,0.9); }
+        .brand-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 30px; }
+        .brand-card { text-align: center; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; }
+        .brand-name { font-size: 1rem; font-weight: 600; margin-bottom: 5px; }
+        .brand-type { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+        .slide-number { position: absolute; bottom: 30px; right: 40px; font-size: 0.85rem; color: rgba(255,255,255,0.4); font-weight: 500; }
+        .progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: linear-gradient(90deg, #5a9ed9, #3d7ab8); transition: width 0.3s ease; z-index: 1000; }
+        .nav-dots { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+        .nav-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.2); cursor: pointer; transition: all 0.3s ease; }
+        .nav-dot.active { background: #5a9ed9; transform: scale(1.3); }
+        .nav-dot:hover { background: rgba(90,158,217,0.6); }
+        .metric-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .metric-row:last-child { border-bottom: none; }
+        .metric-label { font-size: 0.9rem; color: rgba(255,255,255,0.6); }
+        .metric-value { font-size: 1rem; font-weight: 600; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="deck">
+        <div class="progress-bar" id="progress"></div>
+        <div class="nav-dots" id="navDots"></div>
+
+        <!-- Slide 1: Hero -->
+        <div class="slide active">
+            <div class="hero-content">
+                <h3>Cinema & Entertainment</h3>
+                <h1>AI Transformation Audit</h1>
+                <h2 style="font-size: 1.8rem; margin-top: 10px; opacity: 0.9;">Cineplex Inc.</h2>
+                <p style="max-width: 600px; text-align: center; margin-top: 10px;">Canada's largest cinema chain — unlocking automation opportunities across 158 theatres, 13,000+ employees, and 10M+ Scene+ members</p>
+                <div class="hero-stats">
+                    <div class="stat-box"><span class="stat-number">158</span><span class="stat-label">Theatres</span></div>
+                    <div class="stat-box"><span class="stat-number">1,631</span><span class="stat-label">Screens</span></div>
+                    <div class="stat-box"><span class="stat-number">13K+</span><span class="stat-label">Employees</span></div>
+                    <div class="stat-box"><span class="stat-number">$656M</span><span class="stat-label">Annual Revenue</span></div>
+                </div>
+            </div>
+            <div class="slide-number">01 / 05</div>
+        </div>
+
+        <!-- Slide 2: Company Overview -->
+        <div class="slide">
+            <div class="slide-content">
+                <h3>The Company</h3>
+                <h2>Cineplex at a Glance</h2>
+                <p style="margin-bottom: 25px;">Publicly traded (TSX: CGX) with diverse revenue streams beyond traditional movie exhibition.</p>
+                
+                <div class="brand-grid">
+                    <div class="brand-card">
+                        <div class="brand-name">Cineplex Odeon</div>
+                        <div class="brand-type">Flagship Cinemas</div>
+                    </div>
+                    <div class="brand-card">
+                        <div class="brand-name">Galaxy</div>
+                        <div class="brand-type">Value Theatres</div>
+                    </div>
+                    <div class="brand-card">
+                        <div class="brand-name">Famous Players</div>
+                        <div class="brand-type">Historic Brand</div>
+                    </div>
+                    <div class="brand-card">
+                        <div class="brand-name">SilverCity</div>
+                        <div class="brand-type">Multiplex</div>
+                    </div>
+                    <div class="brand-card">
+                        <div class="brand-name">Scotiabank Theatre</div>
+                        <div class="brand-type">Premium Venues</div>
+                    </div>
+                    <div class="brand-card">
+                        <div class="brand-name">Scene+</div>
+                        <div class="brand-type">Loyalty (50% stake)</div>
+                    </div>
+                    <div class="brand-card">
+                        <div class="brand-name">The Rec Room</div>
+                        <div class="brand-type">Entertainment Centers</div>
+                    </div>
+                    <div class="brand-card">
+                        <div class="brand-name">Playdium</div>
+                        <div class="brand-type">Family Arcades</div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>Key Insight:</strong> Cineplex operates as both a cinema exhibitor AND a digital media company (Cineplex Digital Media). This dual identity creates unique AI opportunities across both physical and digital touchpoints.</p>
+                </div>
+            </div>
+            <div class="slide-number">02 / 05</div>
+        </div>
+
+        <!-- Slide 3: Top Opportunities -->
+        <div class="slide">
+            <div class="slide-content">
+                <h3>Automation Opportunities</h3>
+                <h2>7 High-Impact AI Use Cases</h2>
+                
+                <div class="opportunity-grid">
+                    <div class="opp-card">
+                        <div class="opp-number">01</div>
+                        <h4>Scene+ Loyalty Optimization</h4>
+                        <p>AI-powered personalized offers, churn prediction, and dynamic point redemption recommendations for 10M+ members.</p>
+                        <span class="opp-roi high">High ROI</span>
+                    </div>
+                    <div class="opp-card">
+                        <div class="opp-number">02</div>
+                        <h4>Dynamic Pricing Engine</h4>
+                        <p>Demand-based ticket and concession pricing. Optimize revenue per showing based on movie popularity, time, and local events.</p>
+                        <span class="opp-roi high">High ROI</span>
+                    </div>
+                    <div class="opp-card">
+                        <div class="opp-number">03</div>
+                        <h4>Digital Signage Automation</h4>
+                        <p>AI-generated promotional content per location. Auto-update lobby screens, menu boards, and trailer playlists.</p>
+                        <span class="opp-roi medium">Medium ROI</span>
+                    </div>
+                    <div class="opp-card">
+                        <div class="opp-number">04</div>
+                        <h4>Event Cinema Booking</h4>
+                        <p>Automate private screenings, corporate events, and birthday party bookings with AI chatbot and scheduling integration.</p>
+                        <span class="opp-roi high">High ROI</span>
+                    </div>
+                    <div class="opp-card">
+                        <div class="opp-number">05</div>
+                        <h4>Staff Scheduling Optimization</h4>
+                        <p>Predict optimal staffing across 158 locations based on predicted attendance, reducing labor costs while maintaining service.</p>
+                        <span class="opp-roi medium">Medium ROI</span>
+                    </div>
+                    <div class="opp-card">
+                        <div class="opp-number">06</div>
+                        <h4>Predictive Maintenance</h4>
+                        <p>AI monitoring of projection equipment, HVAC, and concession machines to prevent costly downtime during peak hours.</p>
+                        <span class="opp-roi medium">Medium ROI</span>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">03 / 05</div>
+        </div>
+
+        <!-- Slide 4: Business Metrics -->
+        <div class="slide">
+            <div class="slide-content">
+                <h3>Financial Snapshot</h3>
+                <h2>Key Business Metrics</h2>
+                <p style="margin-bottom: 25px;">2021 Financials — demonstrates scale and operational complexity that benefits from AI automation.</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div class="opp-card">
+                        <h4 style="margin-bottom: 15px; color: #5a9ed9;">Revenue & Profitability</h4>
+                        <div class="metric-row">
+                            <span class="metric-label">Annual Revenue</span>
+                            <span class="metric-value">CA$656.66M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Operating Income</span>
+                            <span class="metric-value" style="color: #dc3545;">-CA$84.29M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Total Assets</span>
+                            <span class="metric-value">CA$2.11B</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Market Cap</span>
+                            <span class="metric-value">TSX: CGX</span>
+                        </div>
+                    </div>
+                    <div class="opp-card">
+                        <h4 style="margin-bottom: 15px; color: #5a9ed9;">Operations Scale</h4>
+                        <div class="metric-row">
+                            <span class="metric-label">Theatre Locations</span>
+                            <span class="metric-value">158</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Total Screens</span>
+                            <span class="metric-value">1,631</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Employees</span>
+                            <span class="metric-value">13,000+</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Scene+ Members</span>
+                            <span class="metric-value">10M+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="margin-top: 25px;">
+                    <p><strong>Opportunity:</strong> Operating at a loss (-CA$84M) creates urgency for cost-saving automation. AI implementations in scheduling, pricing, and maintenance could significantly improve margins.</p>
+                </div>
+            </div>
+            <div class="slide-number">04 / 05</div>
+        </div>
+
+        <!-- Slide 5: Next Steps -->
+        <div class="slide">
+            <div class="slide-content">
+                <h3>Recommended Approach</h3>
+                <h2>AI Audit Roadmap</h2>
+                <p style="margin-bottom: 25px;">Phased implementation strategy starting with highest-ROI, lowest-risk opportunities.</p>
+                
+                <div class="brand-grid" style="grid-template-columns: 1fr;">
+                    <div class="opp-card" style="text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #5a9ed9, #3d7ab8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">1</div>
+                            <h4 style="margin: 0;">Phase 1: Quick Wins (30 days)</h4>
+                        </div>
+                        <p>Scene+ email personalization, basic chatbot for event bookings, sentiment monitoring setup. Low complexity, immediate visibility.</p>
+                    </div>
+                    <div class="opp-card" style="text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #5a9ed9, #3d7ab8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
+                            <h4 style="margin: 0;">Phase 2: Revenue Optimization (60 days)</h4>
+                        </div>
+                        <p>Dynamic pricing pilot at 10 locations, digital signage content automation, loyalty churn prediction model.</p>
+                    </div>
+                    <div class="opp-card" style="text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #5a9ed9, #3d7ab8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">3</div>
+                            <h4 style="margin: 0;">Phase 3: Operations (90 days)</h4>
+                        </div>
+                        <p>Staff scheduling optimization across all locations, predictive maintenance rollout, full event cinema booking automation.</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="margin-top: 25px;">
+                    <p><strong>Estimated Impact:</strong> 15-25% reduction in operational costs, 10-20% increase in per-visit revenue through dynamic pricing, 30%+ improvement in Scene+ engagement rates.</p>
+                </div>
+            </div>
+            <div class="slide-number">05 / 05</div>
+        </div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const navDots = document.getElementById('navDots');
+        const progress = document.getElementById('progress');
+        let currentSlide = 0;
+
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+            dot.addEventListener('click', () => goToSlide(i));
+            navDots.appendChild(dot);
+        });
+
+        function updateSlide() {
+            slides.forEach((slide, i) => { slide.classList.toggle('active', i === currentSlide); });
+            document.querySelectorAll('.nav-dot').forEach((dot, i) => { dot.classList.toggle('active', i === currentSlide); });
+            progress.style.width = ((currentSlide + 1) / slides.length * 100) + '%';
+        }
+
+        function goToSlide(n) { currentSlide = Math.max(0, Math.min(n, slides.length - 1)); updateSlide(); }
+        function nextSlide() { goToSlide(currentSlide + 1); }
+        function prevSlide() { goToSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); else if (e.key === 'ArrowLeft') prevSlide(); });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+        document.addEventListener('touchend', e => { const diff = touchStartX - e.changedTouches[0].clientX; if (Math.abs(diff) > 50) diff > 0 ? nextSlide() : prevSlide(); });
+    </script>
+</body>
+</html>
