@@ -217,8 +217,8 @@
   <div class="grid-2">
     <div class="glass-card-accent">
       <h3 class="accent">📧 PayMatch — Invoice Intelligence</h3>
-      <p class="body-text">Invoices come in via email from vendors. Right now, matching them to contracts and tracking payments means manual work and the occasional misread from scanned PDFs.</p>
-      <p class="body-text">PayMatch automates this end-to-end — pulling emails, reading PDFs with AI vision (not traditional OCR), matching to contracts, and queuing everything for review.</p>
+      <p class="body-text">Invoices arrive from dozens of vendors via email — sometimes forwarded, sometimes scanned, sometimes messy PDFs that no standard tool can read properly. Matching them to the right contracts and tracking spend is tedious manual work.</p>
+      <p class="body-text">PayMatch replaces all of that. A custom-built document intelligence engine handles the entire pipeline — ingesting emails, parsing attachments through computer vision, classifying documents, auto-matching to contracts, and learning your vendor ecosystem over time so it keeps getting better without any extra effort from your team.</p>
     </div>
     <div class="glass-card-green">
       <h3 class="green">📊 Campaign Command — Billboard Manager</h3>
@@ -246,9 +246,9 @@
       <div class="flow-arrow">→</div>
       <div class="flow-box flow-box-blue">📄 PDF<br>Extracted</div>
       <div class="flow-arrow">→</div>
-      <div class="flow-box flow-box-purple">🤖 AI Vision<br>Reads Doc</div>
+      <div class="flow-box flow-box-purple">🤖 Computer Vision<br>Document Analysis</div>
       <div class="flow-arrow">→</div>
-      <div class="flow-box flow-box-purple">🧠 Classify &<br>Extract Data</div>
+      <div class="flow-box flow-box-purple">🧠 Multi-Signal<br>Classification Engine</div>
       <div class="flow-arrow">→</div>
       <div class="flow-box flow-box-green">✅ Match to<br>Contract</div>
       <div class="flow-arrow">→</div>
@@ -259,22 +259,23 @@
   <div class="grid-2">
     <div class="glass-card">
       <h3 class="bright">🔍 AI Vision Processing</h3>
-      <p class="body-text">Instead of traditional OCR (which fails on scanned or messy documents), we use GPT-4.1 Vision — it reads each page as an image and understands layout, tables, and handwriting.</p>
+      <p class="body-text">We built a custom computer vision pipeline that renders each document page as an image and passes it through our neural processing layer. Unlike basic OCR, the system understands document layout, table structures, and even handwriting — not just text.</p>
       <ul>
         <li>Handles scanned, faded, and handwritten invoices</li>
-        <li>Extracts vendor, amounts, dates, invoice numbers</li>
-        <li>Multi-page document support</li>
-        <li>~1 cent per invoice processed</li>
+        <li>Extracts vendor, amounts, dates, invoice numbers automatically</li>
+        <li>Multi-page document awareness</li>
+        <li>Self-improving — learns your vendor patterns over time</li>
       </ul>
     </div>
     <div class="glass-card">
       <h3 class="bright">🧠 Context-Aware Classification</h3>
-      <p class="body-text">The system doesn't just read the PDF — it looks at the full picture: who sent the email, the original sender if it was forwarded, the domain, and your existing vendor database.</p>
+      <p class="body-text">Every document goes through a multi-signal intelligence layer that analyzes far more than just the PDF. It parses email headers, traces forwarding chains to find the original sender, cross-references domains against your vendor database, and builds a confidence model before making any classification.</p>
       <ul>
-        <li>Detects forwarded emails — finds the real sender</li>
-        <li>Domain matching across known vendors</li>
-        <li>Confidence scoring on every classification</li>
-        <li>Flags anomalies (unusual amounts, new vendors)</li>
+        <li>Deep email header parsing — traces forwarded chains to the source</li>
+        <li>Domain fingerprinting across your entire vendor history</li>
+        <li>Confidence scoring with automatic escalation on low-certainty items</li>
+        <li>Anomaly detection — flags unusual amounts, unknown vendors, pattern breaks</li>
+        <li>Learns your team's approval patterns — gets smarter with every interaction</li>
       </ul>
     </div>
   </div>
@@ -295,12 +296,12 @@
     <div class="glass-card" style="text-align: center;">
       <div style="font-size: 36px; margin-bottom: 12px;">📧</div>
       <h3 class="bright" style="font-size: 16px;">Auto Email Sync</h3>
-      <p style="font-size: 14px; color: #94a3b8;">Outlook integration pulls invoices automatically every 5 minutes, plus a manual sync button.</p>
+      <p style="font-size: 14px; color: #94a3b8;">Continuous email ingestion with deep header parsing — pulls attachments, traces forwarding chains, and queues for processing.</p>
     </div>
     <div class="glass-card" style="text-align: center;">
       <div style="font-size: 36px; margin-bottom: 12px;">🔗</div>
-      <h3 class="bright" style="font-size: 16px;">Contract Matching</h3>
-      <p style="font-size: 14px; color: #94a3b8;">Invoices auto-match to contracts by vendor, amount, contract number, and email domain.</p>
+      <h3 class="bright" style="font-size: 16px;">Intelligent Matching</h3>
+      <p style="font-size: 14px; color: #94a3b8;">Multi-factor matching engine weighs vendor identity, amount, contract number, domain history, and past patterns to find the right contract.</p>
     </div>
     <div class="glass-card" style="text-align: center;">
       <div style="font-size: 36px; margin-bottom: 12px;">📊</div>
@@ -310,12 +311,12 @@
     <div class="glass-card" style="text-align: center;">
       <div style="font-size: 36px; margin-bottom: 12px;">⏳</div>
       <h3 class="bright" style="font-size: 16px;">Approval Queue</h3>
-      <p style="font-size: 14px; color: #94a3b8;">New documents land in a pending queue for review. Approve and match with one click.</p>
+      <p style="font-size: 14px; color: #94a3b8;">Documents processed with high confidence auto-approve. Low-confidence items surface for human review — the system learns from every decision.</p>
     </div>
     <div class="glass-card" style="text-align: center;">
       <div style="font-size: 36px; margin-bottom: 12px;">🔒</div>
       <h3 class="bright" style="font-size: 16px;">Duplicate Prevention</h3>
-      <p style="font-size: 14px; color: #94a3b8;">Automatic deduplication ensures the same invoice is never imported or processed twice.</p>
+      <p style="font-size: 14px; color: #94a3b8;">Content fingerprinting and source tracking prevents duplicate processing — even if the same PDF arrives from different email threads.</p>
     </div>
     <div class="glass-card" style="text-align: center;">
       <div style="font-size: 36px; margin-bottom: 12px;">📑</div>
@@ -466,7 +467,7 @@
     </div>
     <div class="glass-card" style="margin: 0;">
       <h4 class="accent" style="margin-bottom: 16px;">Ongoing Support</h4>
-      <div class="check-item"><span class="check-icon">✓</span><span style="font-size: 15px; color: #cbd5e1;">AI processing costs (GPT-4.1 Vision)</span></div>
+      <div class="check-item"><span class="check-icon">✓</span><span style="font-size: 15px; color: #cbd5e1;">AI & machine learning processing costs</span></div>
       <div class="check-item"><span class="check-icon">✓</span><span style="font-size: 15px; color: #cbd5e1;">Feature development & improvements</span></div>
       <div class="check-item"><span class="check-icon">✓</span><span style="font-size: 15px; color: #cbd5e1;">Priority support & maintenance</span></div>
       <div class="check-item"><span class="check-icon">✓</span><span style="font-size: 15px; color: #cbd5e1;">Bug fixes & performance updates</span></div>
