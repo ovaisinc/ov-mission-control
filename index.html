@@ -285,7 +285,7 @@
         ];
         
         // DEFAULTS VERSION - Bump this when updating hardcoded defaults to force refresh
-        const DEFAULTS_VERSION = "2026-02-09-v2";
+        const DEFAULTS_VERSION = "2026-02-09-v3";
         
         // ALL TASKS - MASTER DEFAULTS
         // These are ONLY loaded on first visit or when DEFAULTS_VERSION changes.
@@ -467,6 +467,9 @@ Deliverables:
             const shouldLoadDefaultTasks = versionChanged || (!hasExistingTasks && !hasExistingCompleted);
             const shouldLoadDefaultPersonal = versionChanged || (!hasExistingPersonal && !hasExistingCompleted);
 
+            // Load completed tasks FIRST (needed for migration check)
+            const storedCompleted = loadFromStorage(STORAGE_KEYS.completed, []);
+            
             const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, shouldLoadDefaultTasks ? allTasks : []);
             const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, shouldLoadDefaultPersonal ? personalTasks : []);
 
@@ -492,8 +495,6 @@ Deliverables:
             } catch (err) {
                 // Ignore localStorage write failures and continue with in-memory state.
             }
-
-            const storedCompleted = loadFromStorage(STORAGE_KEYS.completed, []);
             const completed = Array.isArray(storedCompleted) ? [...storedCompleted] : [];
 
             const splitActive = (items, type) => {
