@@ -286,7 +286,7 @@
         
         // DEFAULTS VERSION - Bump this when updating hardcoded defaults to force refresh
         const DEFAULTS_VERSION = "2026-02-09-v4";
-        const DEFAULTS_VERSION = "2026-02-09-v5";
+        const DEFAULTS_VERSION = "2026-02-09-v6";
         
         // ALL TASKS - MASTER DEFAULTS
         // These are ONLY loaded on first visit or when DEFAULTS_VERSION changes.
@@ -465,18 +465,19 @@ Deliverables:
             const hasExistingPersonal = Boolean(existingPersonalRaw && existingPersonalRaw !== "[]");
             const hasExistingCompleted = Boolean(existingCompletedRaw && existingCompletedRaw !== "[]");
             
-            // Load defaults if: first visit OR version changed
-            const shouldLoadDefaultTasks = versionChanged || (!hasExistingTasks && !hasExistingCompleted);
-            const shouldLoadDefaultPersonal = versionChanged || (!hasExistingPersonal && !hasExistingCompleted);
+            // CRITICAL: Always preserve user's localStorage data. Only load defaults on first visit.
+            const shouldLoadDefaultTasks = !hasExistingTasks && !hasExistingCompleted;
+            const shouldLoadDefaultPersonal = !hasExistingPersonal && !hasExistingCompleted;
 
             // Load completed tasks FIRST (needed for migration check)
             const storedCompleted = loadFromStorage(STORAGE_KEYS.completed, []);
             
+            // ALWAYS load from localStorage if it exists, never overwrite with defaults
             const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, shouldLoadDefaultTasks ? allTasks : []);
             const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, shouldLoadDefaultPersonal ? personalTasks : []);
 
-            // MIGRATE: Add any new default tasks that aren't in localStorage yet
-            // Check BOTH active tasks AND completed tasks to prevent re-adding completed items
+            // MIGRATE: Add any NEW default tasks (by ID) that aren't in localStorage yet
+            // This runs on every load, not just version changes, to ensure new tasks get added
             const storedCompletedIds = new Set((storedCompleted || []).map(t => t.id));
             const existingIds = new Set(rawTasks.map(t => t.id));
             const newTasks = allTasks.filter(t => !existingIds.has(t.id) && !storedCompletedIds.has(t.id));
