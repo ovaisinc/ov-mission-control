@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Server Development Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-4 text-emerald-400">MCP Server Development Guide</h1>
+        <p class="text-gray-400 mb-8">FACE Amusement | Generated February 2026</p>
+        
+        <div class="space-y-6">
+            <section class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-400">What is MCP?</h2>
+                <p class="text-gray-300">Model Context Protocol (MCP) enables secure, standardized connections between AI agents and your business systems. This guide covers building custom MCP servers for FACE Amusement.</p>
+            </section>
+            
+            <section class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-400">Architecture Overview</h2>
+                <ul class="list-disc list-inside text-gray-300 space-y-2">
+                    <li>MCP Host - The AI agent (Claude, GPT, etc.)</li>
+                    <li>MCP Client - Connection manager</li>
+                    <li>MCP Server - Your custom integration</li>
+                    <li>Business Systems - APIs, databases, services</li>
+                </ul>
+            </section>
+            
+            <section class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-400">MCP Servers Needed for FACE</h2>
+                <ul class="list-disc list-inside text-gray-300 space-y-2">
+                    <li><strong>Booking MCP</strong> - Connect to reservation system</li>
+                    <li><strong>Inventory MCP</strong> - Connect to supply management</li>
+                    <li><strong>Customer MCP</strong> - Connect to CRM</li>
+                    <li><strong>Payment MCP</strong> - Connect to POS system</li>
+                    <li><strong>Analytics MCP</strong> - Connect to data warehouse</li>
+                </ul>
+            </section>
+            
+            <section class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-400">Implementation Steps</h2>
+                <ol class="list-decimal list-inside text-gray-300 space-y-2">
+                    <li>Audit current API endpoints and authentication</li>
+                    <li>Design MCP server schema (tools, resources, prompts)</li>
+                    <li>Build TypeScript/Python MCP server</li>
+                    <li>Test with Claude Desktop or Claude Code</li>
+                    <li>Deploy to production infrastructure</li>
+                    <li>Monitor and iterate based on agent performance</li>
+                </ol>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
