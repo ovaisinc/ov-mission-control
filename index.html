@@ -286,16 +286,16 @@
         
         // DEFAULTS VERSION - Bump this when updating hardcoded defaults to force refresh
         const DEFAULTS_VERSION = "2026-02-09-v4";
+        const DEFAULTS_VERSION = "2026-02-09-v5";
         
         // ALL TASKS - MASTER DEFAULTS
         // These are ONLY loaded on first visit or when DEFAULTS_VERSION changes.
         // After that, localStorage is the source of truth.
+        // NOTE: Completed tasks are REMOVED from this list and only stored in localStorage
         const allTasks = [
             { id: 1, title: "Submit Motamid report", category: "Jamaat", priority: "high", due: "Tonight", done: false },
             { id: 2, title: "Follow up with Jazib & Fahad", category: "Jamaat", priority: "high", due: "Tonight", done: false },
-            { id: 3, title: "Deposit $550K check", category: "Adtime", priority: "high", due: "Today", done: true },
             { id: 4, title: "Send Tom agent workflow", category: "FACE", priority: "high", due: "Today", done: false },
-            { id: 5, title: "Ross submission - batch 1", category: "AbbVie", priority: "medium", due: "This week", done: true },
             { id: 6, title: "Ross submission - batch 2", category: "AbbVie", priority: "medium", due: "This week", done: false },
             { id: 7, title: "Review FACE phase 1 agents", category: "FACE", priority: "medium", due: "Tomorrow", done: false },
             { id: 8, title: "HIPAA compliance review", category: "AFT", priority: "high", due: "This week", done: false },
@@ -305,6 +305,7 @@
             { id: 12, title: "Update invoicing system", category: "Adtime", priority: "low", due: "Next week", done: false },
             { id: 13, title: "Send AI Automation Retainer Proposal to AdTime Marketing", category: "Adtime", priority: "high", due: "Tonight", done: false },
             { id: 14, title: "Apply for lead role at AbbVie", category: "AbbVie", priority: "high", due: "Tonight", done: false },
+            { id: 15, title: "Email Kris from Village back", category: "AbbVie", priority: "high", due: "Today", done: false },
         ];
         
         // EMERGENCY PREP (SHTF) LIST
