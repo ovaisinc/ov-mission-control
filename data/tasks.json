@@ -1,6 +1,6 @@
 {
   "version": "2026-02-11",
-  "lastUpdated": "2026-02-11T16:42:27-06:00",
+  "lastUpdated": "2026-02-11T16:51:37-06:00",
   "tasks": [
     {
       "id": 1,
@@ -280,6 +280,46 @@
       "category": "Personal",
       "priority": "critical",
       "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 38,
+      "title": "Update and make sure LBE is prepared for tomorrow",
+      "category": "AbbVie",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 39,
+      "title": "Ross submission follow-up (if needed)",
+      "category": "AbbVie",
+      "priority": "medium",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 40,
+      "title": "Respond to Jeff from Five Star Parks",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 41,
+      "title": "Work on lead generation ideas with Aiden",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 42,
+      "title": "Get automated thinking page ready (content engine)",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "This week",
       "done": false
     }
   ],
