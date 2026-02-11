@@ -1,6 +1,6 @@
 {
   "version": "2026-02-11",
-  "lastUpdated": "2026-02-11T15:52:55-06:00",
+  "lastUpdated": "2026-02-11T16:42:27-06:00",
   "tasks": [
     {
       "id": 1,
@@ -256,6 +256,30 @@
       "category": "Motamid",
       "priority": "high",
       "due": "This week",
+      "done": false
+    },
+    {
+      "id": 35,
+      "title": "Send Cineplex proposal to Raghu tonight",
+      "category": "Chohan",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 36,
+      "title": "Send Kris Village email tonight",
+      "category": "Personal",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 37,
+      "title": "Download QC report tonight",
+      "category": "Personal",
+      "priority": "critical",
+      "due": "Tonight",
       "done": false
     }
   ],
