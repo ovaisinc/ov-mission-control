@@ -8,7 +8,7 @@
       "category": "Jamaat",
       "priority": "high",
       "due": "Tonight",
-      "done": false
+      "done": true
     },
     {
       "id": 2,
@@ -16,23 +16,23 @@
       "category": "Jamaat",
       "priority": "high",
       "due": "Tonight",
-      "done": false
+      "done": true
     },
     {
       "id": 4,
       "title": "Send Tom agent workflow",
-      "category": "FACE",
+      "category": "Motamid",
       "priority": "high",
       "due": "Today",
-      "done": false
+      "done": true
     },
     {
       "id": 6,
       "title": "Ross submission - batch 2",
-      "category": "AbbVie",
+      "category": "Motamid",
       "priority": "medium",
       "due": "This week",
-      "done": false
+      "done": true
     },
     {
       "id": 7,
@@ -40,7 +40,7 @@
       "category": "FACE",
       "priority": "medium",
       "due": "Tomorrow",
-      "done": false
+      "done": true
     },
     {
       "id": 8,
@@ -96,7 +96,7 @@
       "category": "AbbVie",
       "priority": "high",
       "due": "Tonight",
-      "done": false
+      "done": true
     },
     {
       "id": 15,
@@ -261,7 +261,7 @@
     {
       "id": 35,
       "title": "Send Cineplex proposal to Raghu tonight",
-      "category": "Chohan",
+      "category": "Motamid",
       "priority": "critical",
       "due": "Tonight",
       "done": false
@@ -269,7 +269,7 @@
     {
       "id": 36,
       "title": "Send Kris Village email tonight",
-      "category": "Personal",
+      "category": "Motamid",
       "priority": "critical",
       "due": "Tonight",
       "done": false
@@ -277,7 +277,7 @@
     {
       "id": 37,
       "title": "Download QC report tonight",
-      "category": "Personal",
+      "category": "Motamid",
       "priority": "critical",
       "due": "Tonight",
       "done": false
@@ -285,7 +285,7 @@
     {
       "id": 38,
       "title": "Update and make sure LBE is prepared for tomorrow",
-      "category": "AbbVie",
+      "category": "Motamid",
       "priority": "critical",
       "due": "Tonight",
       "done": false
@@ -375,7 +375,7 @@
     {
       "id": 7,
       "title": "Follow up on iftari payments",
-      "category": "Personal",
+      "category": "Motamid",
       "priority": "high",
       "done": false,
       "type": "personal"
