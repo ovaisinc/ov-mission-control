@@ -329,6 +329,22 @@
       "priority": "medium",
       "due": "Tomorrow",
       "done": false
+    },
+    {
+      "id": 44,
+      "title": "Respond to CPA email about New LLC structure and tax setup",
+      "category": "Chohan",
+      "priority": "critical",
+      "due": "ASAP",
+      "done": false
+    },
+    {
+      "id": 45,
+      "title": "Open new bank account for Chohan",
+      "category": "Chohan",
+      "priority": "critical",
+      "due": "ASAP",
+      "done": false
     }
   ],
   "personal": [
