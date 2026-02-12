@@ -1,6 +1,6 @@
 {
   "version": "2026-02-11",
-  "lastUpdated": "2026-02-11T16:51:37-06:00",
+  "lastUpdated": "2026-02-11T18:33:13-06:00",
   "tasks": [
     {
       "id": 1,
@@ -342,6 +342,14 @@
       "id": 45,
       "title": "Open new bank account for Chohan",
       "category": "Chohan",
+      "priority": "critical",
+      "due": "ASAP",
+      "done": false
+    },
+    {
+      "id": 46,
+      "title": "Send FACE February invoice",
+      "category": "FACE",
       "priority": "critical",
       "due": "ASAP",
       "done": false
