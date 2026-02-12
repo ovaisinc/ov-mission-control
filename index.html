@@ -190,7 +190,7 @@
 <body class="min-h-screen">
     <div id="root"></div>
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect } = React;
         
         // ALL CLIENTS & ROLES
         const clientsData = [
@@ -284,13 +284,10 @@
             },
         ];
         
-        // DEFAULTS VERSION - Bump this when updating hardcoded defaults to force refresh
-        const DEFAULTS_VERSION = "2026-02-09-v9";
-        
-        // ALL TASKS - MASTER DEFAULTS
-        // These are ONLY loaded on first visit or when DEFAULTS_VERSION changes.
-        // After that, localStorage is the source of truth.
-        // NOTE: Completed tasks are REMOVED from this list and only stored in localStorage
+        // Remote source of truth for tasks data
+        const TASKS_DATA_URL = "https://raw.githubusercontent.com/ovaisinc/ov-mission-control/main/data/tasks.json";
+
+        // ALL TASKS - LOCAL FALLBACK DEFAULTS
         const allTasks = [
             { id: 6, title: "Ross submission - batch 2", category: "AbbVie", priority: "medium", due: "This week", done: false },
             { id: 7, title: "Review FACE phase 1 agents", category: "FACE", priority: "medium", due: "Tomorrow", done: false },
@@ -443,58 +440,7 @@ Deliverables:
         };
         
         const buildInitialTaskState = () => {
-            // VERSION CHECK: If defaults version changed, reset to new defaults
-            const storedVersion = localStorage.getItem("ovmc_defaults_version");
-            const versionChanged = storedVersion !== DEFAULTS_VERSION;
-            
-            if (versionChanged) {
-                console.log("Defaults updated to version:", DEFAULTS_VERSION);
-                localStorage.setItem("ovmc_defaults_version", DEFAULTS_VERSION);
-            }
-            
-            // DEFENSIVE: Check if actual data exists in localStorage first
-            const existingTasksRaw = localStorage.getItem(STORAGE_KEYS.tasks);
-            const existingPersonalRaw = localStorage.getItem(STORAGE_KEYS.personal);
-            const existingCompletedRaw = localStorage.getItem(STORAGE_KEYS.completed);
-            
-            const hasExistingTasks = Boolean(existingTasksRaw && existingTasksRaw !== "[]");
-            const hasExistingPersonal = Boolean(existingPersonalRaw && existingPersonalRaw !== "[]");
-            const hasExistingCompleted = Boolean(existingCompletedRaw && existingCompletedRaw !== "[]");
-            
-            // CRITICAL: Always preserve user's localStorage data. Only load defaults on first visit.
-            const shouldLoadDefaultTasks = !hasExistingTasks && !hasExistingCompleted;
-            const shouldLoadDefaultPersonal = !hasExistingPersonal && !hasExistingCompleted;
-
-            // Load completed tasks FIRST (needed for migration check)
-            const storedCompleted = loadFromStorage(STORAGE_KEYS.completed, []);
-            
-            // ALWAYS load from localStorage if it exists, never overwrite with defaults
-            const rawTasks = loadFromStorage(STORAGE_KEYS.tasks, shouldLoadDefaultTasks ? allTasks : []);
-            const rawPersonal = loadFromStorage(STORAGE_KEYS.personal, shouldLoadDefaultPersonal ? personalTasks : []);
-
-            // MIGRATE: Add any NEW default tasks (by ID) that aren't in localStorage yet
-            // This runs on every load, not just version changes, to ensure new tasks get added
-            const storedCompletedIds = new Set((storedCompleted || []).map(t => t.id));
-            const existingIds = new Set(rawTasks.map(t => t.id));
-            const newTasks = allTasks.filter(t => !existingIds.has(t.id) && !storedCompletedIds.has(t.id));
-            if (newTasks.length > 0) {
-                rawTasks.push(...newTasks);
-                // Save back to localStorage
-                try {
-                    localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(rawTasks));
-                } catch (err) {
-                    // Ignore write failures
-                }
-            }
-
-            // Set flags for future reference
-            try {
-                localStorage.setItem("ovmc_initialized", "true");
-                localStorage.setItem("ovmc_personal_initialized", "true");
-            } catch (err) {
-                // Ignore localStorage write failures and continue with in-memory state.
-            }
-            const completed = Array.isArray(storedCompleted) ? [...storedCompleted] : [];
+            const completed = [];
 
             const splitActive = (items, type) => {
                 const active = [];
@@ -509,8 +455,8 @@ Deliverables:
             };
 
             return {
-                activeTasks: splitActive(rawTasks, "business"),
-                activePersonal: splitActive(rawPersonal, "personal"),
+                activeTasks: splitActive(allTasks, "business"),
+                activePersonal: splitActive(personalTasks, "personal"),
                 completed,
             };
         };
@@ -559,11 +505,12 @@ Deliverables:
             const [quickTaskText, setQuickTaskText] = useState("");
             const [personalTaskText, setPersonalTaskText] = useState("");
             const [personalTaskDue, setPersonalTaskDue] = useState("none");
-            const initialTaskState = useMemo(() => buildInitialTaskState(), []);
+            const initialTaskState = buildInitialTaskState();
             const [tasks, setTasks] = useState(initialTaskState.activeTasks);
             const [personal, setPersonal] = useState(initialTaskState.activePersonal);
             const [completedTasks, setCompletedTasks] = useState(initialTaskState.completed);
-            const [emergency, setEmergency] = useState(() => loadFromStorage(STORAGE_KEYS.emergency, emergencyItems));
+            const [emergency, setEmergency] = useState(emergencyItems);
+            const [tasksLastUpdated, setTasksLastUpdated] = useState(null);
             const [searchTerm, setSearchTerm] = useState("");
             const [notes, setNotes] = useState(() => migrateLegacyNotes());
             const [noteDraft, setNoteDraft] = useState(() => loadFromStorage(STORAGE_KEYS.noteDraft, ""));
@@ -629,20 +576,35 @@ Deliverables:
             const [briefFilter, setBriefFilter] = useState("all");
             
             useEffect(() => {
-                localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
-            }, [tasks]);
-            
-            useEffect(() => {
-                localStorage.setItem(STORAGE_KEYS.personal, JSON.stringify(personal));
-            }, [personal]);
-            
-            useEffect(() => {
-                localStorage.setItem(STORAGE_KEYS.emergency, JSON.stringify(emergency));
-            }, [emergency]);
+                const loadTasksFromRemote = async () => {
+                    try {
+                        const response = await fetch(`${TASKS_DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        const data = await response.json();
 
-            useEffect(() => {
-                localStorage.setItem(STORAGE_KEYS.completed, JSON.stringify(completedTasks));
-            }, [completedTasks]);
+                        const remoteTasks = Array.isArray(data.tasks) ? data.tasks : [];
+                        const remotePersonal = Array.isArray(data.personal) ? data.personal : [];
+                        const remoteCompleted = Array.isArray(data.completed) ? data.completed : [];
+                        const remoteEmergency = Array.isArray(data.emergency) ? data.emergency : emergencyItems;
+
+                        setTasks(remoteTasks.filter(t => !t.done));
+                        setPersonal(remotePersonal.filter(t => !t.done));
+
+                        const completedFromLists = [
+                            ...remoteTasks.filter(t => t.done).map(t => ({ ...t, type: "business" })),
+                            ...remotePersonal.filter(t => t.done).map(t => ({ ...t, type: "personal" })),
+                        ];
+                        setCompletedTasks([...remoteCompleted, ...completedFromLists]);
+                        setEmergency(remoteEmergency);
+                        setTasksLastUpdated(data.lastUpdated || new Date().toISOString());
+                    } catch (error) {
+                        console.error("Failed to load remote tasks.json:", error);
+                        setTasksLastUpdated(new Date().toISOString());
+                    }
+                };
+
+                loadTasksFromRemote();
+            }, []);
             
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(notes));
@@ -1644,6 +1606,9 @@ Deliverables:
                     {/* TASKS TAB */}
                     {activeTab === "tasks" && (
                         <>
+                            <div className="text-xs text-gray-500 mb-2">
+                                Last updated: {tasksLastUpdated ? new Date(tasksLastUpdated).toLocaleString() : "Loading..."}
+                            </div>
                             <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-6">
                                 <div className="flex gap-2 flex-wrap">
                                     {[
