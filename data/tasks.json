@@ -1,6 +1,6 @@
 {
   "version": "2026-02-11",
-  "lastUpdated": "2026-02-12T07:27:59-06:00",
+  "lastUpdated": "2026-02-12T17:21:36-06:00",
   "tasks": [
     {
       "id": 1,
@@ -161,7 +161,7 @@
       "category": "AbbVie",
       "priority": "medium",
       "due": "Tomorrow",
-      "done": false
+      "done": true
     },
     {
       "id": 44,
@@ -215,6 +215,14 @@
       "id": 50,
       "title": "Give Emily the FACE dashboard - Mutahir sent it back",
       "category": "FACE",
+      "priority": "high",
+      "due": "Today",
+      "done": false
+    },
+    {
+      "id": 51,
+      "title": "Build PowerBI template for BD workbooks from Nuzhat",
+      "category": "AbbVie",
       "priority": "high",
       "due": "Today",
       "done": false
