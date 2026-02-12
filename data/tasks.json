@@ -1,6 +1,6 @@
 {
   "version": "2026-02-11",
-  "lastUpdated": "2026-02-12T00:41:05-06:00",
+  "lastUpdated": "2026-02-12T07:27:59-06:00",
   "tasks": [
     {
       "id": 1,
@@ -201,6 +201,22 @@
       "category": "AbbVie",
       "priority": "high",
       "due": "Tomorrow morning",
+      "done": false
+    },
+    {
+      "id": 49,
+      "title": "Set up DBA for Chohan (pending Raghu confirming Cineplex deal)",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "Today",
+      "done": false
+    },
+    {
+      "id": 50,
+      "title": "Give Emily the FACE dashboard - Mutahir sent it back",
+      "category": "FACE",
+      "priority": "high",
+      "due": "Today",
       "done": false
     }
   ],
