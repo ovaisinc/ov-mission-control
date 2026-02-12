@@ -1,6 +1,6 @@
 {
   "version": "2026-02-11",
-  "lastUpdated": "2026-02-12T17:21:36-06:00",
+  "lastUpdated": "2026-02-12T17:25:50-06:00",
   "tasks": [
     {
       "id": 1,
@@ -226,6 +226,15 @@
       "priority": "high",
       "due": "Today",
       "done": false
+    },
+    {
+      "id": 52,
+      "title": "Publish PowerBI dashboard at 7:30 PM",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "Today at 7:30 PM",
+      "done": false,
+      "notes": "Reminder to publish the PowerBI dashboard for BD workbooks"
     }
   ],
   "personal": [
