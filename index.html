@@ -508,6 +508,7 @@ Deliverables:
             const initialTaskState = buildInitialTaskState();
             const [tasks, setTasks] = useState(initialTaskState.activeTasks);
             const [personal, setPersonal] = useState(initialTaskState.activePersonal);
+            const [motamid, setMotamid] = useState([]);
             const [completedTasks, setCompletedTasks] = useState(initialTaskState.completed);
             const [emergency, setEmergency] = useState(emergencyItems);
             const [tasksLastUpdated, setTasksLastUpdated] = useState(null);
@@ -584,15 +585,18 @@ Deliverables:
 
                         const remoteTasks = Array.isArray(data.tasks) ? data.tasks : [];
                         const remotePersonal = Array.isArray(data.personal) ? data.personal : [];
+                        const remoteMotamid = Array.isArray(data.motamid) ? data.motamid : [];
                         const remoteCompleted = Array.isArray(data.completed) ? data.completed : [];
                         const remoteEmergency = Array.isArray(data.emergency) ? data.emergency : emergencyItems;
 
                         setTasks(remoteTasks.filter(t => !t.done));
                         setPersonal(remotePersonal.filter(t => !t.done));
+                        setMotamid(remoteMotamid.filter(t => !t.done));
 
                         const completedFromLists = [
                             ...remoteTasks.filter(t => t.done).map(t => ({ ...t, type: "business" })),
                             ...remotePersonal.filter(t => t.done).map(t => ({ ...t, type: "personal" })),
+                            ...remoteMotamid.filter(t => t.done).map(t => ({ ...t, type: "motamid" })),
                         ];
                         setCompletedTasks([...remoteCompleted, ...completedFromLists]);
                         setEmergency(remoteEmergency);
@@ -645,6 +649,8 @@ Deliverables:
             const completeTask = (task, type) => {
                 if (type === "business") {
                     setTasks(prev => prev.filter(t => t.id !== task.id));
+                } else if (type === "motamid") {
+                    setMotamid(prev => prev.filter(t => t.id !== task.id));
                 } else {
                     setPersonal(prev => prev.filter(t => t.id !== task.id));
                 }
@@ -656,6 +662,9 @@ Deliverables:
                 if (task.type === "business") {
                     const { type, ...rest } = task;
                     setTasks(prev => [{ ...rest, done: false }, ...prev]);
+                } else if (task.type === "motamid") {
+                    const { type, ...rest } = task;
+                    setMotamid(prev => [{ ...rest, done: false }, ...prev]);
                 } else {
                     setPersonal(prev => [{ ...task, done: false, type: "personal" }, ...prev]);
                 }
@@ -664,6 +673,7 @@ Deliverables:
             const mergedTasks = [
                 ...tasks.map(t => ({ ...t, type: "business" })),
                 ...personal.map(t => ({ ...t, type: "personal" })),
+                ...motamid.map(t => ({ ...t, type: "motamid" })),
             ];
             
             const matchesSearch = (task) => {
@@ -676,6 +686,7 @@ Deliverables:
             const matchesFilter = (task) => {
                 if (taskFilter === "business") return task.type === "business";
                 if (taskFilter === "personal") return task.type === "personal";
+                if (taskFilter === "motamid") return task.type === "motamid";
                 if (taskFilter === "client") return task.type === "business" && task.category === clientFilter;
                 return true;
             };
@@ -687,7 +698,7 @@ Deliverables:
             
             const totalRev = clientsData.reduce((sum, c) => sum + c.revenue, 0);
             const totalProfit = totalRev * 0.75; // ~75% profit margin
-            const pendingTasks = tasks.filter(t => !t.done).length + personal.filter(t => !t.done).length;
+            const pendingTasks = tasks.filter(t => !t.done).length + personal.filter(t => !t.done).length + motamid.filter(t => !t.done).length;
             const emergencyDone = emergency.filter(e => e.done).length;
             const emergencyProgress = (emergencyDone / emergency.length) * 100;
             const emergencyCategories = [
@@ -966,6 +977,8 @@ Deliverables:
                 };
                 if (editingTaskType === "personal") {
                     setPersonal(prev => prev.map(t => t.id === editingTaskId ? { ...t, ...updates } : t));
+                } else if (editingTaskType === "motamid") {
+                    setMotamid(prev => prev.map(t => t.id === editingTaskId ? { ...t, ...updates } : t));
                 } else {
                     setTasks(prev => prev.map(t => t.id === editingTaskId ? { ...t, ...updates } : t));
                 }
@@ -1000,6 +1013,7 @@ Deliverables:
                 { id: "aiworkforce", label: "AI Workforce" },
                 { id: "briefs", label: "briefs" },
                 { id: "personal", label: "personal" },
+                { id: "motamid", label: "motamid" },
                 { id: "notes", label: "notes" },
                 { id: "emergency", label: "Prep" },
             ];
@@ -1615,6 +1629,7 @@ Deliverables:
                                         { id: "all", label: "All" },
                                         { id: "business", label: "Business" },
                                         { id: "personal", label: "Personal" },
+                                        { id: "motamid", label: "Motamid" },
                                         { id: "client", label: "By Client" },
                                     ].map(filter => (
                                         <button
@@ -1654,7 +1669,7 @@ Deliverables:
                                         <div
                                             key={`${t.type}-${t.id}`}
                                             className={`p-4 flex items-center gap-3 border-l-2 group ${isEditing ? "bg-white/5" : ""}`}
-                                            style={{ borderColor: t.type === "business" ? getClientColor(t.category) : "#f472b6" }}
+                                            style={{ borderColor: t.type === "business" ? getClientColor(t.category) : t.type === "motamid" ? "#f59e0b" : "#f472b6" }}
                                         >
                                             <input 
                                                 type="checkbox" 
@@ -1687,6 +1702,8 @@ Deliverables:
                                                                     clientsData.map(client => (
                                                                         <option key={client.id} value={client.taskCategory}>{client.taskCategory}</option>
                                                                     ))
+                                                                ) : t.type === "motamid" ? (
+                                                                    <option value="Motamid">Motamid</option>
                                                                 ) : (
                                                                     <option value="Personal">Personal</option>
                                                                 )}
@@ -1742,6 +1759,12 @@ Deliverables:
                                                                     <span className={`text-xs ${t.priority === "high" ? "text-red-400" : t.priority === "medium" ? "text-yellow-400" : "text-gray-400"}`}>{t.priority}</span>
                                                                     <span className="text-xs text-gray-500">{t.due}</span>
                                                                 </>
+                                                            ) : t.type === "motamid" ? (
+                                                                <>
+                                                                    <span className="text-xs px-2 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">Motamid</span>
+                                                                    <span className={`text-xs ${t.priority === "critical" ? "text-red-400" : t.priority === "high" ? "text-orange-300" : t.priority === "medium" ? "text-yellow-400" : "text-gray-400"}`}>{t.priority}</span>
+                                                                    <span className="text-xs text-gray-500">{t.due}</span>
+                                                                </>
                                                             ) : (
                                                                 <>
                                                                     <span className="text-xs px-2 py-1 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/40">Personal</span>
@@ -1786,7 +1809,7 @@ Deliverables:
                                         <div
                                             key={`completed-${t.type}-${t.id}`}
                                             className="p-3 flex items-center gap-3 border-l-2 text-sm opacity-70"
-                                            style={{ borderColor: t.type === "business" ? getClientColor(t.category) : "#f472b6" }}
+                                            style={{ borderColor: t.type === "business" ? getClientColor(t.category) : t.type === "motamid" ? "#f59e0b" : "#f472b6" }}
                                         >
                                             <input 
                                                 type="checkbox" 
@@ -1811,6 +1834,11 @@ Deliverables:
                                                             {t.due && (
                                                                 <span className="text-[10px] text-gray-600">{t.due}</span>
                                                             )}
+                                                        </>
+                                                    ) : t.type === "motamid" ? (
+                                                        <>
+                                                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">Motamid</span>
+                                                            <span className="text-[10px] text-gray-600">{t.category}</span>
                                                         </>
                                                     ) : (
                                                         <>
@@ -2349,6 +2377,53 @@ Deliverables:
                         </div>
                     )}
                     
+                    {/* MOTAMID TAB */}
+                    {activeTab === "motamid" && (
+                        <div className="space-y-4">
+                            <div className="glass rounded-2xl p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h2 className="text-2xl font-semibold">Motamid</h2>
+                                        <p className="text-sm text-gray-500">Dedicated Motamid workstream.</p>
+                                    </div>
+                                </div>
+                                <div className="space-y-3">
+                                    {motamid.map(t => {
+                                        const isEditing = editingTaskId === t.id && editingTaskType === "motamid";
+                                        return (
+                                            <div key={t.id} className={`flex items-center gap-3 bg-black/20 rounded-xl p-4 group ${isEditing ? "bg-white/5" : ""}`}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={t.done}
+                                                    disabled={isEditing}
+                                                    onChange={() => completeTask(t, "motamid")}
+                                                    className="w-5 h-5 rounded border-gray-600 bg-gray-800 disabled:opacity-60 ui-checkbox"
+                                                />
+                                                <div className="flex-1">
+                                                    <div className={t.done ? "line-through text-gray-600" : "text-gray-200"}>{t.title}</div>
+                                                    <div className="flex gap-2 mt-1">
+                                                        <span className="text-xs px-2 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">Motamid</span>
+                                                        {t.priority && <span className="text-xs text-gray-400">{t.priority}</span>}
+                                                        {t.due && <span className="text-xs text-gray-500">{t.due}</span>}
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => startEditTask(t, "motamid")}
+                                                    className="text-xs uppercase tracking-wide text-white px-3 py-1.5 rounded-lg bg-amber-500/30 border border-amber-500/50 hover:bg-amber-500/50 transition"
+                                                >
+                                                    Edit
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                    {motamid.length === 0 && (
+                                        <div className="text-gray-500">No Motamid tasks queued.</div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* PERSONAL TAB */}
                     {activeTab === "personal" && (
                         <div className="space-y-6">

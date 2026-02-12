@@ -1,6 +1,6 @@
 {
   "version": "2026-02-11",
-  "lastUpdated": "2026-02-12T00:03:22-06:00",
+  "lastUpdated": "2026-02-12T00:11:33-06:00",
   "tasks": [
     {
       "id": 1,
@@ -16,22 +16,6 @@
       "category": "Jamaat",
       "priority": "high",
       "due": "Tonight",
-      "done": true
-    },
-    {
-      "id": 4,
-      "title": "Send Tom agent workflow",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "Today",
-      "done": true
-    },
-    {
-      "id": 6,
-      "title": "Ross submission - batch 2",
-      "category": "Motamid",
-      "priority": "medium",
-      "due": "This week",
       "done": true
     },
     {
@@ -60,7 +44,7 @@
     },
     {
       "id": 10,
-      "title": "Call Colin \u2014 dentist software connect",
+      "title": "Call Colin — dentist software connect",
       "category": "Chohan",
       "priority": "high",
       "due": "Tomorrow",
@@ -68,7 +52,7 @@
     },
     {
       "id": 11,
-      "title": "Follow up with Colin \u2014 government contracts",
+      "title": "Follow up with Colin — government contracts",
       "category": "Chohan",
       "priority": "high",
       "due": "Tomorrow",
@@ -137,158 +121,6 @@
       "priority": "medium",
       "due": "Next week",
       "done": false
-    },
-    {
-      "id": 20,
-      "title": "Create registration link for ijtema",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "This week",
-      "done": false
-    },
-    {
-      "id": 21,
-      "title": "Reach out to Moon about ijtema needs",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "This week",
-      "done": false
-    },
-    {
-      "id": 22,
-      "title": "Sajeel: Make chat with Moon",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "This week",
-      "done": false
-    },
-    {
-      "id": 23,
-      "title": "Raaif: Make flyer for ijtema",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "March calendar",
-      "done": false
-    },
-    {
-      "id": 24,
-      "title": "Ask Danyal for blueprint",
-      "category": "Motamid",
-      "priority": "medium",
-      "due": "Reasonable time for Raaif March calendar",
-      "done": false
-    },
-    {
-      "id": 25,
-      "title": "Sajeel: Talk to sadr sahiba about ijtema dates - need confirmation to stream",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "This week",
-      "done": false
-    },
-    {
-      "id": 26,
-      "title": "Organize all ijtema info to send back to qaid Saab",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "After dates confirmed",
-      "done": false
-    },
-    {
-      "id": 27,
-      "title": "Send general meeting and Amila dates for Ramadan - WAIT for confirmation dates (3/7, 3/14)",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "After confirmation",
-      "done": false
-    },
-    {
-      "id": 28,
-      "title": "Figure out iftari food and collect payments",
-      "category": "Motamid",
-      "priority": "critical",
-      "due": "Tonight",
-      "done": false
-    },
-    {
-      "id": 29,
-      "title": "Check Pita Pita availability for iftari",
-      "category": "Motamid",
-      "priority": "critical",
-      "due": "Tonight",
-      "done": false
-    },
-    {
-      "id": 30,
-      "title": "Pizza for kids and desserts - include in iftari planning",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "Tonight",
-      "done": false
-    },
-    {
-      "id": 31,
-      "title": "Work with Kareem and Sahil and Mamoon - get them using muntazim, event dates for all halqa",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "This week",
-      "done": false
-    },
-    {
-      "id": 32,
-      "title": "DM Kareem, Sahil, Mamoon about halqa dates",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "This week",
-      "done": false
-    },
-    {
-      "id": 33,
-      "title": "Message Kareem in 1 week about March book club dates",
-      "category": "Motamid",
-      "priority": "medium",
-      "due": "1 week",
-      "done": false
-    },
-    {
-      "id": 34,
-      "title": "Jazib replacement",
-      "category": "Motamid",
-      "priority": "high",
-      "due": "This week",
-      "done": false
-    },
-    {
-      "id": 35,
-      "title": "Send Cineplex proposal to Raghu tonight",
-      "category": "Motamid",
-      "priority": "critical",
-      "due": "Tonight",
-      "done": true
-    },
-    {
-      "id": 36,
-      "title": "Send Kris Village email tonight",
-      "category": "Motamid",
-      "priority": "critical",
-      "due": "Tonight",
-      "done": true
-    },
-    {
-      "id": 37,
-      "title": "Download QC report tonight",
-      "category": "Motamid",
-      "priority": "critical",
-      "due": "Tonight",
-      "done": true
-    },
-    {
-      "id": 38,
-      "title": "Update and make sure LBE is prepared for tomorrow",
-      "category": "Motamid",
-      "priority": "critical",
-      "due": "Tonight",
-      "done": true
     },
     {
       "id": 39,
@@ -378,7 +210,7 @@
       "title": "Email Kris from Village back",
       "category": "Personal",
       "priority": "high",
-      "done": false,
+      "done": true,
       "type": "personal"
     },
     {
@@ -613,6 +445,176 @@
       "done": true,
       "type": "business",
       "completedAt": "2026-02-09"
+    }
+  ],
+  "motamid": [
+    {
+      "id": 4,
+      "title": "Send Tom agent workflow",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "Today",
+      "done": true
+    },
+    {
+      "id": 6,
+      "title": "Ross submission - batch 2",
+      "category": "Motamid",
+      "priority": "medium",
+      "due": "This week",
+      "done": true
+    },
+    {
+      "id": 20,
+      "title": "Create registration link for ijtema",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 21,
+      "title": "Reach out to Moon about ijtema needs",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 22,
+      "title": "Sajeel: Make chat with Moon",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 23,
+      "title": "Raaif: Make flyer for ijtema",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "March calendar",
+      "done": false
+    },
+    {
+      "id": 24,
+      "title": "Ask Danyal for blueprint",
+      "category": "Motamid",
+      "priority": "medium",
+      "due": "Reasonable time for Raaif March calendar",
+      "done": false
+    },
+    {
+      "id": 25,
+      "title": "Sajeel: Talk to sadr sahiba about ijtema dates - need confirmation to stream",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 26,
+      "title": "Organize all ijtema info to send back to qaid Saab",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "After dates confirmed",
+      "done": false
+    },
+    {
+      "id": 27,
+      "title": "Send general meeting and Amila dates for Ramadan - WAIT for confirmation dates (3/7, 3/14)",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "After confirmation",
+      "done": false
+    },
+    {
+      "id": 28,
+      "title": "Figure out iftari food and collect payments",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 29,
+      "title": "Check Pita Pita availability for iftari",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 30,
+      "title": "Pizza for kids and desserts - include in iftari planning",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 31,
+      "title": "Work with Kareem and Sahil and Mamoon - get them using muntazim, event dates for all halqa",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 32,
+      "title": "DM Kareem, Sahil, Mamoon about halqa dates",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 33,
+      "title": "Message Kareem in 1 week about March book club dates",
+      "category": "Motamid",
+      "priority": "medium",
+      "due": "1 week",
+      "done": false
+    },
+    {
+      "id": 34,
+      "title": "Jazib replacement",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 35,
+      "title": "Send Cineplex proposal to Raghu tonight",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true
+    },
+    {
+      "id": 36,
+      "title": "Send Kris Village email tonight",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true
+    },
+    {
+      "id": 37,
+      "title": "Download QC report tonight",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true
+    },
+    {
+      "id": 38,
+      "title": "Update and make sure LBE is prepared for tomorrow",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true
     }
   ]
 }
