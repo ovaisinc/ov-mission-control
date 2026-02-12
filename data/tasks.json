@@ -350,8 +350,8 @@
       "id": 46,
       "title": "Send FACE February invoice",
       "category": "FACE",
-      "priority": "critical",
-      "due": "ASAP",
+      "priority": "medium",
+      "due": "February 19th",
       "done": false
     },
     {
