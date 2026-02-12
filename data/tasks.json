@@ -1,6 +1,6 @@
 {
   "version": "2026-02-11",
-  "lastUpdated": "2026-02-11T18:33:13-06:00",
+  "lastUpdated": "2026-02-11T20:50:31-06:00",
   "tasks": [
     {
       "id": 1,
@@ -352,6 +352,14 @@
       "category": "FACE",
       "priority": "critical",
       "due": "ASAP",
+      "done": false
+    },
+    {
+      "id": 47,
+      "title": "Refresh AbbVie dashboard and pull notes from Excel workbook for planned studies",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "Tonight",
       "done": false
     }
   ],
