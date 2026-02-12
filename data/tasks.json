@@ -272,7 +272,7 @@
       "category": "Motamid",
       "priority": "critical",
       "due": "Tonight",
-      "done": false
+      "done": true
     },
     {
       "id": 37,
