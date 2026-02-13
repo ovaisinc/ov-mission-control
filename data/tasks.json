@@ -1,56 +1,661 @@
 {
-  "version": "2026-02-09",
-  "lastUpdated": "2026-02-09T17:37:00-06:00",
+  "version": "2026-02-11",
+  "lastUpdated": "2026-02-12T17:29:29-06:00",
   "tasks": [
-    { "id": 1, "title": "Submit Motamid report", "category": "Jamaat", "priority": "high", "due": "Tonight", "done": false },
-    { "id": 2, "title": "Follow up with Jazib & Fahad", "category": "Jamaat", "priority": "high", "due": "Tonight", "done": false },
-    { "id": 3, "title": "Deposit $550K check", "category": "Adtime", "priority": "high", "due": "Today", "done": true },
-    { "id": 4, "title": "Send Tom agent workflow", "category": "FACE", "priority": "high", "due": "Today", "done": false },
-    { "id": 5, "title": "Ross submission - batch 1", "category": "AbbVie", "priority": "medium", "due": "This week", "done": true },
-    { "id": 6, "title": "Ross submission - batch 2", "category": "AbbVie", "priority": "medium", "due": "This week", "done": false },
-    { "id": 7, "title": "Review FACE phase 1 agents", "category": "FACE", "priority": "medium", "due": "Tomorrow", "done": false },
-    { "id": 8, "title": "HIPAA compliance review", "category": "AFT", "priority": "high", "due": "This week", "done": false },
-    { "id": 9, "title": "Chohan service offerings doc", "category": "Chohan", "priority": "medium", "due": "This week", "done": false },
-    { "id": 10, "title": "Call Colin — dentist software connect", "category": "Chohan", "priority": "high", "due": "Tomorrow", "done": false },
-    { "id": 11, "title": "Follow up with Colin — government contracts", "category": "Chohan", "priority": "high", "due": "Tomorrow", "done": false },
-    { "id": 12, "title": "Update invoicing system", "category": "Adtime", "priority": "low", "due": "Next week", "done": false },
-    { "id": 13, "title": "Send AI Automation Retainer Proposal to AdTime Marketing", "category": "Adtime", "priority": "high", "due": "Tonight", "done": false },
-    { "id": 14, "title": "Apply for lead role at AbbVie", "category": "AbbVie", "priority": "high", "due": "Tonight", "done": false }
+    {
+      "id": 1,
+      "title": "Submit Motamid report",
+      "category": "Jamaat",
+      "priority": "high",
+      "due": "Tonight",
+      "done": true
+    },
+    {
+      "id": 2,
+      "title": "Follow up with Jazib & Fahad",
+      "category": "Jamaat",
+      "priority": "high",
+      "due": "Tonight",
+      "done": true
+    },
+    {
+      "id": 7,
+      "title": "Review FACE phase 1 agents",
+      "category": "FACE",
+      "priority": "medium",
+      "due": "Tomorrow",
+      "done": true
+    },
+    {
+      "id": 8,
+      "title": "HIPAA compliance review",
+      "category": "AFT",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 9,
+      "title": "Chohan service offerings doc",
+      "category": "Chohan",
+      "priority": "medium",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 10,
+      "title": "Call Colin — dentist software connect",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "Tomorrow",
+      "done": false
+    },
+    {
+      "id": 11,
+      "title": "Follow up with Colin — government contracts",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "Tomorrow",
+      "done": false
+    },
+    {
+      "id": 12,
+      "title": "Update invoicing system",
+      "category": "Adtime",
+      "priority": "low",
+      "due": "Next week",
+      "done": false
+    },
+    {
+      "id": 13,
+      "title": "Send AI Automation Retainer Proposal to AdTime Marketing",
+      "category": "Adtime",
+      "priority": "high",
+      "due": "Tomorrow",
+      "done": false
+    },
+    {
+      "id": 14,
+      "title": "Apply for lead role at AbbVie",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "Tonight",
+      "done": true
+    },
+    {
+      "id": 15,
+      "title": "Set up Apollo.io account",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 16,
+      "title": "Set up LinkedIn Sales Navigator",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 17,
+      "title": "Set up Calendly booking link",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 18,
+      "title": "Build water conditioning target list (50 companies)",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 19,
+      "title": "Send first 5 test emails",
+      "category": "Chohan",
+      "priority": "medium",
+      "due": "Next week",
+      "done": false
+    },
+    {
+      "id": 39,
+      "title": "Ross submission follow-up (if needed)",
+      "category": "AbbVie",
+      "priority": "medium",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 40,
+      "title": "Respond to Jeff from Five Star Parks",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "Tomorrow",
+      "done": false,
+      "notes": "Consult Kash first before responding."
+    },
+    {
+      "id": 41,
+      "title": "Work on lead generation ideas with Aiden",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 42,
+      "title": "Get automated thinking page ready (content engine)",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 43,
+      "title": "Remind Nuzhat to send BD workbooks",
+      "category": "AbbVie",
+      "priority": "medium",
+      "due": "Tomorrow",
+      "done": true
+    },
+    {
+      "id": 44,
+      "title": "Respond to CPA email about New LLC structure and tax setup",
+      "category": "Chohan",
+      "priority": "critical",
+      "due": "ASAP",
+      "done": false
+    },
+    {
+      "id": 45,
+      "title": "Open new bank account for Chohan",
+      "category": "Chohan",
+      "priority": "critical",
+      "due": "ASAP",
+      "done": false
+    },
+    {
+      "id": 46,
+      "title": "Send FACE February invoice",
+      "category": "FACE",
+      "priority": "medium",
+      "due": "February 19th",
+      "done": false
+    },
+    {
+      "id": 47,
+      "title": "Refresh AbbVie dashboard and pull notes from Excel workbook for planned studies",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "Tonight",
+      "done": true
+    },
+    {
+      "id": 48,
+      "title": "Touch up LBE prep in the AM",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "Tomorrow morning",
+      "done": false
+    },
+    {
+      "id": 49,
+      "title": "Set up DBA for Chohan (pending Raghu confirming Cineplex deal)",
+      "category": "Chohan",
+      "priority": "high",
+      "due": "Today",
+      "done": false
+    },
+    {
+      "id": 50,
+      "title": "Give Emily the FACE dashboard - Mutahir sent it back",
+      "category": "FACE",
+      "priority": "high",
+      "due": "Today",
+      "done": false
+    },
+    {
+      "id": 51,
+      "title": "Build PowerBI template for BD workbooks from Nuzhat",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "Today",
+      "done": false
+    },
+    {
+      "id": 52,
+      "title": "Publish PowerBI dashboard at 7:30 PM",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "Today at 7:30 PM",
+      "done": false,
+      "notes": "Reminder to publish the PowerBI dashboard for BD workbooks"
+    },
+    {
+      "id": 53,
+      "title": "Create ABL app for the draft",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "Today",
+      "done": false
+    }
   ],
   "personal": [
-    { "id": 1, "title": "Email Kris from Village back", "category": "Personal", "priority": "high", "done": false, "type": "personal" },
-    { "id": 2, "title": "Order food prep stuff", "category": "Personal", "priority": "medium", "done": false, "type": "personal" },
-    { "id": 3, "title": "Schedule dentist appointment", "category": "Personal", "priority": "high", "done": false, "type": "personal" },
-    { "id": 4, "title": "Take cholesterol test", "category": "Personal", "priority": "high", "done": false, "type": "personal" },
-    { "id": 5, "title": "Pay Schaumburg ticket", "category": "Personal", "priority": "critical", "done": false, "type": "personal" }
+    {
+      "id": 1,
+      "title": "Email Kris from Village back",
+      "category": "Personal",
+      "priority": "high",
+      "done": true,
+      "type": "personal"
+    },
+    {
+      "id": 2,
+      "title": "Order food prep stuff",
+      "category": "Personal",
+      "priority": "medium",
+      "done": false,
+      "type": "personal"
+    },
+    {
+      "id": 3,
+      "title": "Schedule dentist appointment",
+      "category": "Personal",
+      "priority": "high",
+      "done": false,
+      "type": "personal"
+    },
+    {
+      "id": 4,
+      "title": "Take cholesterol test",
+      "category": "Personal",
+      "priority": "high",
+      "done": false,
+      "type": "personal"
+    },
+    {
+      "id": 5,
+      "title": "Pay Schaumburg ticket",
+      "category": "Personal",
+      "priority": "critical",
+      "done": false,
+      "type": "personal"
+    },
+    {
+      "id": 6,
+      "title": "Coordinate with Kareem, Sahil, Mamoon on halqa events",
+      "category": "Personal",
+      "priority": "high",
+      "done": false,
+      "type": "personal"
+    },
+    {
+      "id": 7,
+      "title": "Follow up on iftari payments",
+      "category": "Motamid",
+      "priority": "high",
+      "done": false,
+      "type": "personal"
+    }
   ],
   "emergency": [
-    { "id": 1, "item": "3-day water supply (1 gal/person/day)", "category": "Supplies", "priority": "critical", "done": true },
-    { "id": 2, "item": "Water purification tablets", "category": "Supplies", "priority": "high", "done": true },
-    { "id": 3, "item": "30-day non-perishable food", "category": "Supplies", "priority": "critical", "done": false },
-    { "id": 4, "item": "Manual can opener", "category": "Supplies", "priority": "high", "done": true },
-    { "id": 5, "item": "First aid kit + medications", "category": "Supplies", "priority": "critical", "done": true },
-    { "id": 6, "item": "Prescription meds (30-day)", "category": "Supplies", "priority": "critical", "done": false },
-    { "id": 7, "item": "Flashlights + batteries", "category": "Supplies", "priority": "critical", "done": true },
-    { "id": 8, "item": "Battery-powered radio", "category": "Supplies", "priority": "high", "done": true },
-    { "id": 9, "item": "Power bank (fully charged)", "category": "Supplies", "priority": "high", "done": true },
-    { "id": 10, "item": "Solar/crank charger", "category": "Supplies", "priority": "medium", "done": false },
-    { "id": 11, "item": "Cash ($500-1000 small bills)", "category": "Financial", "priority": "critical", "done": false },
-    { "id": 12, "item": "Important docs (copies)", "category": "Documents", "priority": "critical", "done": true },
-    { "id": 13, "item": "Emergency contacts list", "category": "Network", "priority": "critical", "done": true },
-    { "id": 14, "item": "Whistle (3 blasts = help)", "category": "Skills", "priority": "high", "done": true },
-    { "id": 15, "item": "Fire extinguisher", "category": "Supplies", "priority": "critical", "done": true },
-    { "id": 16, "item": "Dust masks", "category": "Supplies", "priority": "medium", "done": false },
-    { "id": 17, "item": "Multi-tool / Swiss Army", "category": "Supplies", "priority": "high", "done": true },
-    { "id": 18, "item": "Duct tape", "category": "Supplies", "priority": "medium", "done": true },
-    { "id": 19, "item": "Plastic sheeting", "category": "Supplies", "priority": "medium", "done": false },
-    { "id": 20, "item": "Sleeping bags/blankets", "category": "Supplies", "priority": "high", "done": true },
-    { "id": 21, "item": "Personal hygiene items", "category": "Supplies", "priority": "medium", "done": true },
-    { "id": 22, "item": "Bleach (sanitization)", "category": "Supplies", "priority": "medium", "done": false },
-    { "id": 23, "item": "Family emergency plan", "category": "Documents", "priority": "critical", "done": false }
+    {
+      "id": 1,
+      "item": "3-day water supply (1 gal/person/day)",
+      "category": "Supplies",
+      "priority": "critical",
+      "done": true
+    },
+    {
+      "id": 2,
+      "item": "Water purification tablets",
+      "category": "Supplies",
+      "priority": "high",
+      "done": true
+    },
+    {
+      "id": 3,
+      "item": "30-day non-perishable food",
+      "category": "Supplies",
+      "priority": "critical",
+      "done": false
+    },
+    {
+      "id": 4,
+      "item": "Manual can opener",
+      "category": "Supplies",
+      "priority": "high",
+      "done": true
+    },
+    {
+      "id": 5,
+      "item": "First aid kit + medications",
+      "category": "Supplies",
+      "priority": "critical",
+      "done": true
+    },
+    {
+      "id": 6,
+      "item": "Prescription meds (30-day)",
+      "category": "Supplies",
+      "priority": "critical",
+      "done": false
+    },
+    {
+      "id": 7,
+      "item": "Flashlights + batteries",
+      "category": "Supplies",
+      "priority": "critical",
+      "done": true
+    },
+    {
+      "id": 8,
+      "item": "Battery-powered radio",
+      "category": "Supplies",
+      "priority": "high",
+      "done": true
+    },
+    {
+      "id": 9,
+      "item": "Power bank (fully charged)",
+      "category": "Supplies",
+      "priority": "high",
+      "done": true
+    },
+    {
+      "id": 10,
+      "item": "Solar/crank charger",
+      "category": "Supplies",
+      "priority": "medium",
+      "done": false
+    },
+    {
+      "id": 11,
+      "item": "Cash ($500-1000 small bills)",
+      "category": "Financial",
+      "priority": "critical",
+      "done": false
+    },
+    {
+      "id": 12,
+      "item": "Important docs (copies)",
+      "category": "Documents",
+      "priority": "critical",
+      "done": true
+    },
+    {
+      "id": 13,
+      "item": "Emergency contacts list",
+      "category": "Network",
+      "priority": "critical",
+      "done": true
+    },
+    {
+      "id": 14,
+      "item": "Whistle (3 blasts = help)",
+      "category": "Skills",
+      "priority": "high",
+      "done": true
+    },
+    {
+      "id": 15,
+      "item": "Fire extinguisher",
+      "category": "Supplies",
+      "priority": "critical",
+      "done": true
+    },
+    {
+      "id": 16,
+      "item": "Dust masks",
+      "category": "Supplies",
+      "priority": "medium",
+      "done": false
+    },
+    {
+      "id": 17,
+      "item": "Multi-tool / Swiss Army",
+      "category": "Supplies",
+      "priority": "high",
+      "done": true
+    },
+    {
+      "id": 18,
+      "item": "Duct tape",
+      "category": "Supplies",
+      "priority": "medium",
+      "done": true
+    },
+    {
+      "id": 19,
+      "item": "Plastic sheeting",
+      "category": "Supplies",
+      "priority": "medium",
+      "done": false
+    },
+    {
+      "id": 20,
+      "item": "Sleeping bags/blankets",
+      "category": "Supplies",
+      "priority": "high",
+      "done": true
+    },
+    {
+      "id": 21,
+      "item": "Personal hygiene items",
+      "category": "Supplies",
+      "priority": "medium",
+      "done": true
+    },
+    {
+      "id": 22,
+      "item": "Bleach (sanitization)",
+      "category": "Supplies",
+      "priority": "medium",
+      "done": false
+    },
+    {
+      "id": 23,
+      "item": "Family emergency plan",
+      "category": "Documents",
+      "priority": "critical",
+      "done": false
+    }
   ],
   "completed": [
-    { "id": 5, "title": "Ross submission - batch 1", "category": "AbbVie", "priority": "medium", "due": "This week", "done": true, "type": "business", "completedAt": "2026-02-09" },
-    { "id": 3, "title": "Deposit $550K check", "category": "Adtime", "priority": "high", "due": "Today", "done": true, "type": "business", "completedAt": "2026-02-09" }
+    {
+      "id": 5,
+      "title": "Ross submission - batch 1",
+      "category": "AbbVie",
+      "priority": "medium",
+      "due": "This week",
+      "done": true,
+      "type": "business",
+      "completedAt": "2026-02-09"
+    },
+    {
+      "id": 3,
+      "title": "Deposit $550K check",
+      "category": "Adtime",
+      "priority": "high",
+      "due": "Today",
+      "done": true,
+      "type": "business",
+      "completedAt": "2026-02-09"
+    }
+  ],
+  "motamid": [
+    {
+      "id": 4,
+      "title": "Send Tom agent workflow",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "Today",
+      "done": true
+    },
+    {
+      "id": 6,
+      "title": "Ross submission - batch 2",
+      "category": "Motamid",
+      "priority": "medium",
+      "due": "This week",
+      "done": true
+    },
+    {
+      "id": 20,
+      "title": "Create registration link for ijtema",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 21,
+      "title": "Reach out to Moon about ijtema needs",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 22,
+      "title": "Sajeel: Make chat with Moon",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 23,
+      "title": "Raaif: Make flyer for ijtema",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "March calendar",
+      "done": false
+    },
+    {
+      "id": 24,
+      "title": "Ask Danyal for blueprint",
+      "category": "Motamid",
+      "priority": "medium",
+      "due": "Reasonable time for Raaif March calendar",
+      "done": false
+    },
+    {
+      "id": 25,
+      "title": "Sajeel: Talk to sadr sahiba about ijtema dates - need confirmation to stream",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 26,
+      "title": "Organize all ijtema info to send back to qaid Saab",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "After dates confirmed",
+      "done": false
+    },
+    {
+      "id": 27,
+      "title": "Send general meeting and Amila dates for Ramadan - WAIT for confirmation dates (3/7, 3/14)",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "After confirmation",
+      "done": false
+    },
+    {
+      "id": 28,
+      "title": "Figure out iftari food and collect payments",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 29,
+      "title": "Check Pita Pita availability for iftari",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 30,
+      "title": "Pizza for kids and desserts - include in iftari planning",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "Tonight",
+      "done": false
+    },
+    {
+      "id": 31,
+      "title": "Work with Kareem and Sahil and Mamoon - get them using muntazim, event dates for all halqa",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 32,
+      "title": "DM Kareem, Sahil, Mamoon about halqa dates",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 33,
+      "title": "Message Kareem in 1 week about March book club dates",
+      "category": "Motamid",
+      "priority": "medium",
+      "due": "1 week",
+      "done": false
+    },
+    {
+      "id": 34,
+      "title": "Jazib replacement",
+      "category": "Motamid",
+      "priority": "high",
+      "due": "This week",
+      "done": false
+    },
+    {
+      "id": 35,
+      "title": "Send Cineplex proposal to Raghu tonight",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true
+    },
+    {
+      "id": 36,
+      "title": "Send Kris Village email tonight",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true
+    },
+    {
+      "id": 37,
+      "title": "Download QC report tonight",
+      "category": "AbbVie",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true
+    },
+    {
+      "id": 38,
+      "title": "Update and make sure LBE is prepared for tomorrow",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true
+    }
   ]
 }
