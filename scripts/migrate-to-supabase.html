@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migrate Tasks to Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #0a0b10; color: #e6e8f0; }
+        h1 { font-size: 1.4rem; }
+        label { display: block; margin-top: 16px; font-size: 0.9rem; color: #9aa0b3; }
+        input, textarea { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #333; border-radius: 6px; background: #151827; color: #e6e8f0; font-family: monospace; box-sizing: border-box; }
+        textarea { height: 200px; font-size: 0.8rem; }
+        button { margin-top: 20px; padding: 12px 24px; background: #7c6bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #6b5be6; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #log { margin-top: 20px; padding: 16px; background: #151827; border-radius: 6px; font-family: monospace; font-size: 0.85rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+        .success { color: #34d399; }
+        .error { color: #f472b6; }
+        .info { color: #53d3ff; }
+    </style>
+</head>
+<body>
+    <h1>Migrate tasks.json to Supabase</h1>
+    <p style="color: #9aa0b3; font-size: 0.9rem;">One-time migration tool. Reads your cleaned tasks.json and inserts all records into Supabase.</p>
+
+    <label>Supabase Project URL</label>
+    <input type="text" id="url" placeholder="https://xxxxx.supabase.co">
+
+    <label>Supabase Anon Key</label>
+    <input type="text" id="key" placeholder="eyJhbGciOiJIUzI1NiIs...">
+
+    <label>tasks.json content (paste below)</label>
+    <textarea id="json" placeholder='Paste the contents of data/tasks.json here...'></textarea>
+
+    <button id="migrate" onclick="runMigration()">Run Migration</button>
+
+    <div id="log"></div>
+
+    <script>
+        const logEl = document.getElementById('log');
+
+        function log(msg, cls) {
+            const span = document.createElement('span');
+            span.className = cls || '';
+            span.textContent = msg + '\n';
+            logEl.appendChild(span);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        async function runMigration() {
+            const url = document.getElementById('url').value.trim();
+            const key = document.getElementById('key').value.trim();
+            const jsonText = document.getElementById('json').value.trim();
+            const btn = document.getElementById('migrate');
+
+            if (!url || !key || !jsonText) {
+                log('Please fill in all fields.', 'error');
+                return;
+            }
+
+            let data;
+            try {
+                data = JSON.parse(jsonText);
+            } catch (e) {
+                log('Invalid JSON: ' + e.message, 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            log('Connecting to Supabase...', 'info');
+
+            const { createClient } = supabase;
+            const sb = createClient(url, key);
+
+            // Migrate tasks (business type)
+            const tasks = (data.tasks || []).map(t => ({
+                title: t.title,
+                category: t.category || null,
+                priority: t.priority || 'medium',
+                due: t.due || null,
+                done: t.done || false,
+                type: 'business',
+                notes: t.notes || null,
+                completed_at: null,
+            }));
+
+            // Migrate personal tasks
+            const personal = (data.personal || []).map(t => ({
+                title: t.title,
+                category: t.category || null,
+                priority: t.priority || 'medium',
+                due: t.due || null,
+                done: t.done || false,
+                type: 'personal',
+                notes: t.notes || null,
+                completed_at: null,
+            }));
+
+            // Migrate motamid tasks
+            const motamid = (data.motamid || []).map(t => ({
+                title: t.title,
+                category: t.category || null,
+                priority: t.priority || 'medium',
+                due: t.due || null,
+                done: t.done || false,
+                type: 'motamid',
+                notes: t.notes || null,
+                completed_at: null,
+            }));
+
+            // Migrate completed tasks
+            const completed = (data.completed || []).map(t => ({
+                title: t.title,
+                category: t.category || null,
+                priority: t.priority || 'medium',
+                due: t.due || null,
+                done: true,
+                type: t.type || 'business',
+                notes: t.notes || null,
+                completed_at: t.completedAt ? new Date(t.completedAt).toISOString() : new Date().toISOString(),
+            }));
+
+            // Migrate emergency items
+            const emergency = (data.emergency || []).map(t => ({
+                item: t.item,
+                category: t.category || null,
+                priority: t.priority || 'medium',
+                done: t.done || false,
+            }));
+
+            const allTasks = [...tasks, ...personal, ...motamid, ...completed];
+
+            log(`Found ${tasks.length} business tasks`, 'info');
+            log(`Found ${personal.length} personal tasks`, 'info');
+            log(`Found ${motamid.length} motamid tasks`, 'info');
+            log(`Found ${completed.length} completed tasks`, 'info');
+            log(`Found ${emergency.length} emergency items`, 'info');
+            log('');
+
+            // Insert tasks
+            if (allTasks.length > 0) {
+                log(`Inserting ${allTasks.length} tasks...`, 'info');
+                const { data: inserted, error } = await sb.from('tasks').insert(allTasks).select();
+                if (error) {
+                    log('Error inserting tasks: ' + error.message, 'error');
+                    btn.disabled = false;
+                    return;
+                }
+                log(`Inserted ${inserted.length} tasks into tasks table.`, 'success');
+            }
+
+            // Insert emergency items
+            if (emergency.length > 0) {
+                log(`Inserting ${emergency.length} emergency items...`, 'info');
+                const { data: inserted, error } = await sb.from('emergency_items').insert(emergency).select();
+                if (error) {
+                    log('Error inserting emergency items: ' + error.message, 'error');
+                    btn.disabled = false;
+                    return;
+                }
+                log(`Inserted ${inserted.length} items into emergency_items table.`, 'success');
+            }
+
+            log('');
+            log('Migration complete!', 'success');
+            log('You can now update SUPABASE_URL and SUPABASE_ANON_KEY in index.html.', 'info');
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>

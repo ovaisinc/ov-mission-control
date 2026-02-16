@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -284,8 +285,10 @@
             },
         ];
         
-        // Remote source of truth for tasks data
-        const TASKS_DATA_URL = "https://raw.githubusercontent.com/ovaisinc/ov-mission-control/main/data/tasks.json";
+        // Supabase configuration — replace with your project credentials
+        const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+        const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ALL TASKS - LOCAL FALLBACK DEFAULTS
         const allTasks = [
@@ -576,37 +579,29 @@ Deliverables:
             const [briefFilter, setBriefFilter] = useState("all");
             
             useEffect(() => {
-                const loadTasksFromRemote = async () => {
+                const loadTasks = async () => {
                     try {
-                        const response = await fetch(`${TASKS_DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                        const data = await response.json();
+                        const [bizRes, persRes, motRes, compRes, emergRes] = await Promise.all([
+                            sb.from('tasks').select('*').eq('type', 'business').eq('done', false),
+                            sb.from('tasks').select('*').eq('type', 'personal').eq('done', false),
+                            sb.from('tasks').select('*').eq('type', 'motamid').eq('done', false),
+                            sb.from('tasks').select('*').eq('done', true).order('completed_at', { ascending: false }),
+                            sb.from('emergency_items').select('*'),
+                        ]);
 
-                        const remoteTasks = Array.isArray(data.tasks) ? data.tasks : [];
-                        const remotePersonal = Array.isArray(data.personal) ? data.personal : [];
-                        const remoteMotamid = Array.isArray(data.motamid) ? data.motamid : [];
-                        const remoteCompleted = Array.isArray(data.completed) ? data.completed : [];
-                        const remoteEmergency = Array.isArray(data.emergency) ? data.emergency : emergencyItems;
-
-                        setTasks(remoteTasks.filter(t => !t.done));
-                        setPersonal(remotePersonal.filter(t => !t.done));
-                        setMotamid(remoteMotamid.filter(t => !t.done));
-
-                        const completedFromLists = [
-                            ...remoteTasks.filter(t => t.done).map(t => ({ ...t, type: "business" })),
-                            ...remotePersonal.filter(t => t.done).map(t => ({ ...t, type: "personal" })),
-                            ...remoteMotamid.filter(t => t.done).map(t => ({ ...t, type: "motamid" })),
-                        ];
-                        setCompletedTasks([...remoteCompleted, ...completedFromLists]);
-                        setEmergency(remoteEmergency);
-                        setTasksLastUpdated(data.lastUpdated || new Date().toISOString());
+                        setTasks(bizRes.data || []);
+                        setPersonal(persRes.data || []);
+                        setMotamid(motRes.data || []);
+                        setCompletedTasks(compRes.data || []);
+                        setEmergency(emergRes.data || emergencyItems);
+                        setTasksLastUpdated(new Date().toISOString());
                     } catch (error) {
-                        console.error("Failed to load remote tasks.json:", error);
+                        console.error("Failed to load from Supabase:", error);
                         setTasksLastUpdated(new Date().toISOString());
                     }
                 };
 
-                loadTasksFromRemote();
+                loadTasks();
             }, []);
             
             useEffect(() => {
@@ -641,11 +636,13 @@ Deliverables:
                 localStorage.setItem(STORAGE_KEYS.briefsRead, JSON.stringify(readBriefIds));
             }, [readBriefIds]);
             
-            const toggleTask = (id, list, setList) => {
+            const toggleTask = async (id, list, setList) => {
+                const task = list.find(t => t.id === id);
                 setList(list.map(t => t.id === id ? { ...t, done: !t.done } : t));
+                await sb.from('emergency_items').update({ done: !task.done }).eq('id', id);
             };
 
-            const completeTask = (task, type) => {
+            const completeTask = async (task, type) => {
                 if (type === "business") {
                     setTasks(prev => prev.filter(t => t.id !== task.id));
                 } else if (type === "motamid") {
@@ -653,10 +650,12 @@ Deliverables:
                 } else {
                     setPersonal(prev => prev.filter(t => t.id !== task.id));
                 }
-                setCompletedTasks(prev => [{ ...task, done: true, type }, ...prev]);
+                const completedAt = new Date().toISOString();
+                setCompletedTasks(prev => [{ ...task, done: true, type, completed_at: completedAt }, ...prev]);
+                await sb.from('tasks').update({ done: true, completed_at: completedAt }).eq('id', task.id);
             };
 
-            const restoreTask = (task) => {
+            const restoreTask = async (task) => {
                 setCompletedTasks(prev => prev.filter(t => !(t.id === task.id && t.type === task.type)));
                 if (task.type === "business") {
                     const { type, ...rest } = task;
@@ -667,6 +666,7 @@ Deliverables:
                 } else {
                     setPersonal(prev => [{ ...task, done: false, type: "personal" }, ...prev]);
                 }
+                await sb.from('tasks').update({ done: false, completed_at: null }).eq('id', task.id);
             };
             
             const mergedTasks = [
@@ -731,36 +731,39 @@ Deliverables:
                 setDetailTab("overview");
             };
 
-            const addQuickTask = () => {
+            const addQuickTask = async () => {
                 if (!selectedClient) return;
                 const title = quickTaskText.trim();
                 if (!title) return;
-                const newTask = {
-                    id: Date.now(),
+                const { data, error } = await sb.from('tasks').insert({
                     title,
                     category: selectedClient.taskCategory,
                     priority: "medium",
                     due: "This week",
                     done: false,
-                };
-                setTasks(prev => [newTask, ...prev]);
+                    type: "business",
+                }).select().single();
+                if (!error && data) {
+                    setTasks(prev => [data, ...prev]);
+                }
                 setQuickTaskText("");
             };
 
-            const addPersonalTask = () => {
+            const addPersonalTask = async () => {
                 const title = personalTaskText.trim();
                 if (!title) return;
                 const dueLabel = personalTaskDue === "today" ? "Today" : personalTaskDue === "tonight" ? "Tonight" : "";
-                const newTask = {
-                    id: Date.now(),
+                const { data, error } = await sb.from('tasks').insert({
                     title,
                     category: "Personal",
                     priority: "medium",
                     due: dueLabel,
                     done: false,
                     type: "personal",
-                };
-                setPersonal(prev => [newTask, ...prev]);
+                }).select().single();
+                if (!error && data) {
+                    setPersonal(prev => [data, ...prev]);
+                }
                 setPersonalTaskText("");
                 setPersonalTaskDue("none");
             };
@@ -908,7 +911,13 @@ Deliverables:
                 });
             };
 
-            const clearCompleted = () => setCompletedTasks([]);
+            const clearCompleted = async () => {
+                const ids = completedTasks.map(t => t.id);
+                setCompletedTasks([]);
+                if (ids.length > 0) {
+                    await sb.from('tasks').delete().in('id', ids);
+                }
+            };
 
             // BRIEFS HELPERS
             const isBriefRead = (briefId) => readBriefIds.includes(briefId);
@@ -962,7 +971,7 @@ Deliverables:
                 setEditError("");
             };
 
-            const saveEditTask = () => {
+            const saveEditTask = async () => {
                 const trimmedTitle = editForm.title.trim();
                 if (!trimmedTitle) {
                     setEditError("Title cannot be empty.");
@@ -974,14 +983,16 @@ Deliverables:
                     priority: editForm.priority,
                     due: editForm.due,
                 };
+                const taskId = editingTaskId;
                 if (editingTaskType === "personal") {
-                    setPersonal(prev => prev.map(t => t.id === editingTaskId ? { ...t, ...updates } : t));
+                    setPersonal(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
                 } else if (editingTaskType === "motamid") {
-                    setMotamid(prev => prev.map(t => t.id === editingTaskId ? { ...t, ...updates } : t));
+                    setMotamid(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
                 } else {
-                    setTasks(prev => prev.map(t => t.id === editingTaskId ? { ...t, ...updates } : t));
+                    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
                 }
                 cancelEditTask();
+                await sb.from('tasks').update(updates).eq('id', taskId);
             };
 
             const handleEditKeyDown = (event) => {
