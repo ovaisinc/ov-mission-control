@@ -681,6 +681,30 @@
       "priority": "high",
       "due": "This week",
       "done": false
+    },
+    {
+      "id": 35,
+      "title": "Pam's ROSS submission",
+      "category": "AbbVie",
+      "priority": "critical",
+      "due": "Feb 13 (OVERDUE)",
+      "done": false
+    },
+    {
+      "id": 36,
+      "title": "Dashboard: Add asset view (Demitrius request)",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "ASAP",
+      "done": false
+    },
+    {
+      "id": 37,
+      "title": "Dashboard: Add project view (Anna request)",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "ASAP",
+      "done": false
     }
   ]
 }
