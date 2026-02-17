@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migrate Tasks to Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; background: #0a0b10; color: #e6e8f0; }
+        h1 { font-size: 1.4rem; }
+        label { display: block; margin-top: 16px; font-size: 0.9rem; color: #9aa0b3; }
+        input, textarea, select { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #333; border-radius: 6px; background: #151827; color: #e6e8f0; font-family: monospace; box-sizing: border-box; }
+        textarea { height: 200px; font-size: 0.8rem; }
+        button { margin-top: 20px; margin-right: 8px; padding: 12px 20px; background: #7c6bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.95rem; }
+        button:hover { background: #6b5be6; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #log { margin-top: 20px; padding: 16px; background: #151827; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85rem; white-space: pre-wrap; max-height: 460px; overflow-y: auto; }
+        .success { color: #34d399; }
+        .error { color: #f472b6; }
+        .info { color: #53d3ff; }
+        .warn { color: #fbbf24; }
+        .inline { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+        .inline input[type="checkbox"] { width: auto; margin: 0; }
+    </style>
+</head>
+<body>
+    <h1>Migrate tasks.json to Supabase</h1>
+    <p style="color: #9aa0b3; font-size: 0.9rem;">Safe migration tool. Idempotent upsert by <code>id</code>, dry-run support, and per-record success/failure reporting.</p>
+
+    <label>Supabase Project URL</label>
+    <input type="text" id="url" placeholder="https://xxxxx.supabase.co">
+
+    <label>Supabase Anon Key</label>
+    <input type="text" id="key" placeholder="eyJhbGciOiJIUzI1NiIs...">
+
+    <label>User ID scope</label>
+    <input type="text" id="userId" value="ov" placeholder="ov">
+
+    <label>tasks.json content (paste below)</label>
+    <textarea id="json" placeholder='Paste the contents of data/tasks.json here...'></textarea>
+
+    <div class="inline">
+        <input type="checkbox" id="dryRun" checked>
+        <label for="dryRun" style="margin: 0;">Dry run (preview only, no writes)</label>
+    </div>
+
+    <button id="migrate" onclick="runMigration()">Run Migration</button>
+    <button id="resetLog" onclick="resetLog()" style="background:#394055;">Clear Log</button>
+
+    <div id="log"></div>
+
+    <script>
+        const logEl = document.getElementById('log');
+        let migrationInProgress = false;
+
+        function log(msg, cls) {
+            const span = document.createElement('span');
+            span.className = cls || '';
+            span.textContent = msg + '\n';
+            logEl.appendChild(span);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function resetLog() {
+            logEl.textContent = '';
+        }
+
+        function normalizeTask(task, type, userId, completedDefault = false) {
+            const completedAt = task.completedAt || task.completed_at;
+            return {
+                id: task.id,
+                title: task.title,
+                category: task.category || null,
+                priority: task.priority || 'medium',
+                due: task.due || null,
+                done: completedDefault ? true : !!task.done,
+                type,
+                notes: task.notes || null,
+                completed_at: completedAt ? new Date(completedAt).toISOString() : (completedDefault ? new Date().toISOString() : null),
+                user_id: userId,
+            };
+        }
+
+        function normalizeEmergency(item) {
+            return {
+                id: item.id,
+                item: item.item,
+                category: item.category || null,
+                priority: item.priority || 'medium',
+                done: !!item.done,
+            };
+        }
+
+        async function upsertPerRecord(sb, table, rows, conflictColumn) {
+            const summary = { success: 0, failed: 0, failures: [] };
+            for (const row of rows) {
+                const { error } = await sb.from(table).upsert(row, { onConflict: conflictColumn });
+                if (error) {
+                    summary.failed += 1;
+                    summary.failures.push({ id: row.id, message: error.message });
+                    log(`✗ ${table} id=${row.id}: ${error.message}`, 'error');
+                } else {
+                    summary.success += 1;
+                    log(`✓ ${table} id=${row.id}`, 'success');
+                }
+            }
+            return summary;
+        }
+
+        async function runMigration() {
+            if (migrationInProgress) {
+                log('Migration already in progress. Wait for completion to avoid duplicate runs.', 'warn');
+                return;
+            }
+
+            const url = document.getElementById('url').value.trim();
+            const key = document.getElementById('key').value.trim();
+            const jsonText = document.getElementById('json').value.trim();
+            const userId = document.getElementById('userId').value.trim() || 'ov';
+            const dryRun = document.getElementById('dryRun').checked;
+            const btn = document.getElementById('migrate');
+
+            if (!url || !key || !jsonText) {
+                log('Please fill in all fields.', 'error');
+                return;
+            }
+
+            let data;
+            try {
+                data = JSON.parse(jsonText);
+            } catch (e) {
+                log('Invalid JSON: ' + e.message, 'error');
+                return;
+            }
+
+            migrationInProgress = true;
+            btn.disabled = true;
+
+            try {
+                const { createClient } = supabase;
+                const sb = createClient(url, key);
+
+                const business = (data.tasks || []).map(t => normalizeTask(t, 'business', userId));
+                const personal = (data.personal || []).map(t => normalizeTask(t, 'personal', userId));
+                const motamid = (data.motamid || []).map(t => normalizeTask(t, 'motamid', userId));
+                const completed = (data.completed || []).map(t => normalizeTask(t, t.type || 'business', userId, true));
+                const emergency = (data.emergency || []).map(normalizeEmergency);
+
+                const allTasks = [...business, ...personal, ...motamid, ...completed].filter(t => t.id !== undefined && t.id !== null);
+                const uniqueTasks = Array.from(new Map(allTasks.map(t => [t.id, t])).values());
+                const uniqueEmergency = Array.from(new Map(emergency.filter(e => e.id !== undefined && e.id !== null).map(e => [e.id, e])).values());
+
+                log(`Mode: ${dryRun ? 'DRY RUN' : 'LIVE MIGRATION'}`, dryRun ? 'warn' : 'info');
+                log(`User scope: ${userId}`, 'info');
+                log(`Business: ${business.length} | Personal: ${personal.length} | Motamid: ${motamid.length} | Completed: ${completed.length}`, 'info');
+                log(`Tasks total (deduped by id): ${uniqueTasks.length}`, 'info');
+                log(`Emergency total (deduped by id): ${uniqueEmergency.length}`, 'info');
+
+                if (dryRun) {
+                    log('Dry run complete. No data was written.', 'success');
+                    return;
+                }
+
+                log('Starting idempotent upsert by id...', 'info');
+                const taskSummary = await upsertPerRecord(sb, 'tasks', uniqueTasks, 'id');
+                const emergencySummary = await upsertPerRecord(sb, 'emergency_items', uniqueEmergency, 'id');
+
+                log('', 'info');
+                log(`Tasks: ${taskSummary.success} success, ${taskSummary.failed} failed`, taskSummary.failed ? 'warn' : 'success');
+                log(`Emergency: ${emergencySummary.success} success, ${emergencySummary.failed} failed`, emergencySummary.failed ? 'warn' : 'success');
+
+                if (taskSummary.failed || emergencySummary.failed) {
+                    log('Migration finished with partial failures. Re-run after fixing issues (safe/idempotent).', 'warn');
+                } else {
+                    log('Migration complete. Safe to run again; no duplicates from repeated runs.', 'success');
+                }
+            } catch (err) {
+                log('Migration failed unexpectedly: ' + (err?.message || err), 'error');
+            } finally {
+                btn.disabled = false;
+                migrationInProgress = false;
+            }
+        }
+    </script>
+</body>
+</html>

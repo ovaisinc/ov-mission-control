@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -284,8 +285,12 @@
             },
         ];
         
-        // Remote source of truth for tasks data
-        const TASKS_DATA_URL = "https://raw.githubusercontent.com/ovaisinc/ov-mission-control/main/data/tasks.json";
+        // Supabase configuration — replace with your project credentials
+        const SUPABASE_URL = "https://rcncmynkiigpjtodqohp.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjbmNteW5raWlncGp0b2Rxb2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTQ4ODUsImV4cCI6MjA4Njc3MDg4NX0.2fmhHAoDi6lCN18PawnRn7y6r5MxofizFInsIPxyALc";
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const DEFAULT_USER_ID = "ov"; // Replace with auth.uid() when auth is implemented
+        const COMPLETED_TASKS_PAGE_SIZE = 50;
 
         // ALL TASKS - LOCAL FALLBACK DEFAULTS
         const allTasks = [
@@ -511,6 +516,10 @@ Deliverables:
             const [completedTasks, setCompletedTasks] = useState(initialTaskState.completed);
             const [emergency, setEmergency] = useState(emergencyItems);
             const [tasksLastUpdated, setTasksLastUpdated] = useState(null);
+            const [currentUserId, setCurrentUserId] = useState(DEFAULT_USER_ID);
+            const [uiError, setUiError] = useState("");
+            const [completedOffset, setCompletedOffset] = useState(0);
+            const [hasMoreCompleted, setHasMoreCompleted] = useState(false);
             const [searchTerm, setSearchTerm] = useState("");
             const [notes, setNotes] = useState(() => migrateLegacyNotes());
             const [noteDraft, setNoteDraft] = useState(() => loadFromStorage(STORAGE_KEYS.noteDraft, ""));
@@ -575,39 +584,74 @@ Deliverables:
             const [activeBriefModal, setActiveBriefModal] = useState(null);
             const [briefFilter, setBriefFilter] = useState("all");
             
+            const showErrorToast = (message) => {
+                setUiError(message);
+                window.setTimeout(() => setUiError(""), 4500);
+            };
+
             useEffect(() => {
-                const loadTasksFromRemote = async () => {
-                    try {
-                        const response = await fetch(`${TASKS_DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                        const data = await response.json();
+                let isMounted = true;
 
-                        const remoteTasks = Array.isArray(data.tasks) ? data.tasks : [];
-                        const remotePersonal = Array.isArray(data.personal) ? data.personal : [];
-                        const remoteMotamid = Array.isArray(data.motamid) ? data.motamid : [];
-                        const remoteCompleted = Array.isArray(data.completed) ? data.completed : [];
-                        const remoteEmergency = Array.isArray(data.emergency) ? data.emergency : emergencyItems;
-
-                        setTasks(remoteTasks.filter(t => !t.done));
-                        setPersonal(remotePersonal.filter(t => !t.done));
-                        setMotamid(remoteMotamid.filter(t => !t.done));
-
-                        const completedFromLists = [
-                            ...remoteTasks.filter(t => t.done).map(t => ({ ...t, type: "business" })),
-                            ...remotePersonal.filter(t => t.done).map(t => ({ ...t, type: "personal" })),
-                            ...remoteMotamid.filter(t => t.done).map(t => ({ ...t, type: "motamid" })),
-                        ];
-                        setCompletedTasks([...remoteCompleted, ...completedFromLists]);
-                        setEmergency(remoteEmergency);
-                        setTasksLastUpdated(data.lastUpdated || new Date().toISOString());
-                    } catch (error) {
-                        console.error("Failed to load remote tasks.json:", error);
-                        setTasksLastUpdated(new Date().toISOString());
+                const hydrateUser = async () => {
+                    const { data, error } = await sb.auth.getSession();
+                    if (error) {
+                        console.error('Failed to read auth session:', error);
+                        showErrorToast('Unable to verify auth session. Using local user scope.');
+                        return;
                     }
+                    const nextUserId = data?.session?.user?.id || DEFAULT_USER_ID;
+                    if (isMounted) setCurrentUserId(nextUserId);
                 };
 
-                loadTasksFromRemote();
+                hydrateUser();
+                const { data: authSub } = sb.auth.onAuthStateChange((_event, session) => {
+                    const nextUserId = session?.user?.id || DEFAULT_USER_ID;
+                    setCurrentUserId(nextUserId);
+                });
+
+                return () => {
+                    isMounted = false;
+                    authSub?.subscription?.unsubscribe?.();
+                };
             }, []);
+
+            useEffect(() => {
+                const loadTasks = async () => {
+                    const [activeRes, compRes, emergRes] = await Promise.all([
+                        sb.from('tasks')
+                            .select('*')
+                            .eq('user_id', currentUserId)
+                            .eq('done', false)
+                            .in('type', ['business', 'personal', 'motamid']),
+                        sb.from('tasks')
+                            .select('*')
+                            .eq('user_id', currentUserId)
+                            .eq('done', true)
+                            .order('completed_at', { ascending: false })
+                            .range(0, COMPLETED_TASKS_PAGE_SIZE - 1),
+                        sb.from('emergency_items').select('*'),
+                    ]);
+
+                    if (activeRes.error || compRes.error || emergRes.error) {
+                        console.error('Failed to load from Supabase:', { activeRes, compRes, emergRes });
+                        showErrorToast('Failed to sync tasks from Supabase. Showing last known state.');
+                        setTasksLastUpdated(new Date().toISOString());
+                        return;
+                    }
+
+                    const activeRows = activeRes.data || [];
+                    setTasks(activeRows.filter(t => t.type === 'business'));
+                    setPersonal(activeRows.filter(t => t.type === 'personal'));
+                    setMotamid(activeRows.filter(t => t.type === 'motamid'));
+                    setCompletedTasks(compRes.data || []);
+                    setCompletedOffset(compRes.data?.length || 0);
+                    setHasMoreCompleted((compRes.data || []).length === COMPLETED_TASKS_PAGE_SIZE);
+                    setEmergency(emergRes.data || emergencyItems);
+                    setTasksLastUpdated(new Date().toISOString());
+                };
+
+                loadTasks();
+            }, [currentUserId]);
             
             useEffect(() => {
                 localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(notes));
@@ -641,11 +685,25 @@ Deliverables:
                 localStorage.setItem(STORAGE_KEYS.briefsRead, JSON.stringify(readBriefIds));
             }, [readBriefIds]);
             
-            const toggleTask = (id, list, setList) => {
-                setList(list.map(t => t.id === id ? { ...t, done: !t.done } : t));
+            const toggleTask = async (id, list, setList) => {
+                const task = list.find(t => t.id === id);
+                if (!task) return;
+                const updatedList = list.map(t => t.id === id ? { ...t, done: !t.done } : t);
+                setList(updatedList);
+                const { error } = await sb.from('emergency_items').update({ done: !task.done }).eq('id', id);
+                if (error) {
+                    console.error('Failed to update emergency task:', error);
+                    setList(list);
+                    showErrorToast('Failed to save emergency item. Please retry.');
+                }
             };
 
-            const completeTask = (task, type) => {
+            const completeTask = async (task, type) => {
+                const prevTasks = tasks;
+                const prevPersonal = personal;
+                const prevMotamid = motamid;
+                const prevCompleted = completedTasks;
+
                 if (type === "business") {
                     setTasks(prev => prev.filter(t => t.id !== task.id));
                 } else if (type === "motamid") {
@@ -653,10 +711,32 @@ Deliverables:
                 } else {
                     setPersonal(prev => prev.filter(t => t.id !== task.id));
                 }
-                setCompletedTasks(prev => [{ ...task, done: true, type }, ...prev]);
+                const completedAt = new Date().toISOString();
+                setCompletedTasks(prev => [{ ...task, done: true, type, completed_at: completedAt }, ...prev]);
+
+                const { error } = await sb.from('tasks')
+                    .update({ done: true, completed_at: completedAt })
+                    .eq('id', task.id)
+                    .eq('user_id', currentUserId);
+
+                if (error) {
+                    console.error('Failed to complete task:', error);
+                    setTasks(prevTasks);
+                    setPersonal(prevPersonal);
+                    setMotamid(prevMotamid);
+                    setCompletedTasks(prevCompleted);
+                    showErrorToast('Failed to save completion. Please try again.');
+                    return;
+                }
+                setTasksLastUpdated(new Date().toISOString());
             };
 
-            const restoreTask = (task) => {
+            const restoreTask = async (task) => {
+                const prevTasks = tasks;
+                const prevPersonal = personal;
+                const prevMotamid = motamid;
+                const prevCompleted = completedTasks;
+
                 setCompletedTasks(prev => prev.filter(t => !(t.id === task.id && t.type === task.type)));
                 if (task.type === "business") {
                     const { type, ...rest } = task;
@@ -667,6 +747,21 @@ Deliverables:
                 } else {
                     setPersonal(prev => [{ ...task, done: false, type: "personal" }, ...prev]);
                 }
+
+                const { error } = await sb.from('tasks')
+                    .update({ done: false, completed_at: null })
+                    .eq('id', task.id)
+                    .eq('user_id', currentUserId);
+                if (error) {
+                    console.error('Failed to restore task:', error);
+                    setTasks(prevTasks);
+                    setPersonal(prevPersonal);
+                    setMotamid(prevMotamid);
+                    setCompletedTasks(prevCompleted);
+                    showErrorToast('Failed to restore task. Please try again.');
+                    return;
+                }
+                setTasksLastUpdated(new Date().toISOString());
             };
             
             const mergedTasks = [
@@ -731,36 +826,49 @@ Deliverables:
                 setDetailTab("overview");
             };
 
-            const addQuickTask = () => {
+            const addQuickTask = async () => {
                 if (!selectedClient) return;
                 const title = quickTaskText.trim();
                 if (!title) return;
-                const newTask = {
-                    id: Date.now(),
+                const { data, error } = await sb.from('tasks').insert({
                     title,
                     category: selectedClient.taskCategory,
                     priority: "medium",
                     due: "This week",
                     done: false,
-                };
-                setTasks(prev => [newTask, ...prev]);
+                    type: "business",
+                    user_id: currentUserId,
+                }).select().single();
+                if (error) {
+                    console.error('Failed to add quick task:', error);
+                    showErrorToast('Unable to add task. Please try again.');
+                } else if (data) {
+                    setTasks(prev => [data, ...prev]);
+                    setTasksLastUpdated(new Date().toISOString());
+                }
                 setQuickTaskText("");
             };
 
-            const addPersonalTask = () => {
+            const addPersonalTask = async () => {
                 const title = personalTaskText.trim();
                 if (!title) return;
                 const dueLabel = personalTaskDue === "today" ? "Today" : personalTaskDue === "tonight" ? "Tonight" : "";
-                const newTask = {
-                    id: Date.now(),
+                const { data, error } = await sb.from('tasks').insert({
                     title,
                     category: "Personal",
                     priority: "medium",
                     due: dueLabel,
                     done: false,
                     type: "personal",
-                };
-                setPersonal(prev => [newTask, ...prev]);
+                    user_id: currentUserId,
+                }).select().single();
+                if (error) {
+                    console.error('Failed to add personal task:', error);
+                    showErrorToast('Unable to add personal task. Please try again.');
+                } else if (data) {
+                    setPersonal(prev => [data, ...prev]);
+                    setTasksLastUpdated(new Date().toISOString());
+                }
                 setPersonalTaskText("");
                 setPersonalTaskDue("none");
             };
@@ -908,7 +1016,43 @@ Deliverables:
                 });
             };
 
-            const clearCompleted = () => setCompletedTasks([]);
+            const clearCompleted = async () => {
+                const ids = completedTasks.map(t => t.id);
+                const prevCompleted = completedTasks;
+                setCompletedTasks([]);
+                if (ids.length > 0) {
+                    const { error } = await sb.from('tasks').delete().in('id', ids).eq('user_id', currentUserId);
+                    if (error) {
+                        console.error('Failed to clear completed tasks:', error);
+                        setCompletedTasks(prevCompleted);
+                        showErrorToast('Unable to clear completed tasks.');
+                        return;
+                    }
+                    setTasksLastUpdated(new Date().toISOString());
+                }
+            };
+
+            const loadMoreCompleted = async () => {
+                const start = completedOffset;
+                const end = completedOffset + COMPLETED_TASKS_PAGE_SIZE - 1;
+                const { data, error } = await sb.from('tasks')
+                    .select('*')
+                    .eq('user_id', currentUserId)
+                    .eq('done', true)
+                    .order('completed_at', { ascending: false })
+                    .range(start, end);
+
+                if (error) {
+                    console.error('Failed to load more completed tasks:', error);
+                    showErrorToast('Could not load more completed tasks.');
+                    return;
+                }
+
+                const rows = data || [];
+                setCompletedTasks(prev => [...prev, ...rows]);
+                setCompletedOffset(prev => prev + rows.length);
+                setHasMoreCompleted(rows.length === COMPLETED_TASKS_PAGE_SIZE);
+            };
 
             // BRIEFS HELPERS
             const isBriefRead = (briefId) => readBriefIds.includes(briefId);
@@ -962,7 +1106,7 @@ Deliverables:
                 setEditError("");
             };
 
-            const saveEditTask = () => {
+            const saveEditTask = async () => {
                 const trimmedTitle = editForm.title.trim();
                 if (!trimmedTitle) {
                     setEditError("Title cannot be empty.");
@@ -974,14 +1118,29 @@ Deliverables:
                     priority: editForm.priority,
                     due: editForm.due,
                 };
+                const taskId = editingTaskId;
+                const prevTasks = tasks;
+                const prevPersonal = personal;
+                const prevMotamid = motamid;
+
                 if (editingTaskType === "personal") {
-                    setPersonal(prev => prev.map(t => t.id === editingTaskId ? { ...t, ...updates } : t));
+                    setPersonal(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
                 } else if (editingTaskType === "motamid") {
-                    setMotamid(prev => prev.map(t => t.id === editingTaskId ? { ...t, ...updates } : t));
+                    setMotamid(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
                 } else {
-                    setTasks(prev => prev.map(t => t.id === editingTaskId ? { ...t, ...updates } : t));
+                    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
                 }
                 cancelEditTask();
+                const { error } = await sb.from('tasks').update(updates).eq('id', taskId).eq('user_id', currentUserId);
+                if (error) {
+                    console.error('Failed to update task:', error);
+                    setTasks(prevTasks);
+                    setPersonal(prevPersonal);
+                    setMotamid(prevMotamid);
+                    showErrorToast('Task update failed. Please refresh and retry.');
+                } else {
+                    setTasksLastUpdated(new Date().toISOString());
+                }
             };
 
             const handleEditKeyDown = (event) => {
@@ -1620,8 +1779,11 @@ Deliverables:
                     {activeTab === "tasks" && (
                         <>
                             <div className="text-xs text-gray-500 mb-2">
-                                Last updated: {tasksLastUpdated ? new Date(tasksLastUpdated).toLocaleString() : "Loading..."}
+                                Last updated: {tasksLastUpdated ? new Date(tasksLastUpdated).toLocaleString() : "Loading..."} · User scope: {currentUserId}
                             </div>
+                            {uiError && (
+                                <div className="mb-3 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{uiError}</div>
+                            )}
                             <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-6">
                                 <div className="flex gap-2 flex-wrap">
                                     {[
@@ -1851,6 +2013,16 @@ Deliverables:
                                     ))}
                                     {filteredCompleted.length === 0 && (
                                         <div className="p-4 text-gray-500 text-sm">No completed tasks in this view.</div>
+                                    )}
+                                    {hasMoreCompleted && (
+                                        <div className="p-3 border-t border-gray-800 flex justify-center">
+                                            <button
+                                                onClick={loadMoreCompleted}
+                                                className="text-xs uppercase tracking-wide border border-gray-700 text-gray-300 hover:text-white px-3 py-1 rounded-full"
+                                            >
+                                                Load More Completed
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
                             )}

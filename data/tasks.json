@@ -1,31 +1,7 @@
 {
-  "version": "2026-02-11",
-  "lastUpdated": "2026-02-12T17:29:29-06:00",
+  "version": "2026-02-16",
+  "lastUpdated": "2026-02-16T00:00:00-06:00",
   "tasks": [
-    {
-      "id": 1,
-      "title": "Submit Motamid report",
-      "category": "Jamaat",
-      "priority": "high",
-      "due": "Tonight",
-      "done": true
-    },
-    {
-      "id": 2,
-      "title": "Follow up with Jazib & Fahad",
-      "category": "Jamaat",
-      "priority": "high",
-      "due": "Tonight",
-      "done": true
-    },
-    {
-      "id": 7,
-      "title": "Review FACE phase 1 agents",
-      "category": "FACE",
-      "priority": "medium",
-      "due": "Tomorrow",
-      "done": true
-    },
     {
       "id": 8,
       "title": "HIPAA compliance review",
@@ -73,14 +49,6 @@
       "priority": "high",
       "due": "Tomorrow",
       "done": false
-    },
-    {
-      "id": 14,
-      "title": "Apply for lead role at AbbVie",
-      "category": "AbbVie",
-      "priority": "high",
-      "due": "Tonight",
-      "done": true
     },
     {
       "id": 15,
@@ -156,14 +124,6 @@
       "done": false
     },
     {
-      "id": 43,
-      "title": "Remind Nuzhat to send BD workbooks",
-      "category": "AbbVie",
-      "priority": "medium",
-      "due": "Tomorrow",
-      "done": true
-    },
-    {
       "id": 44,
       "title": "Respond to CPA email about New LLC structure and tax setup",
       "category": "Chohan",
@@ -186,14 +146,6 @@
       "priority": "medium",
       "due": "February 19th",
       "done": false
-    },
-    {
-      "id": 47,
-      "title": "Refresh AbbVie dashboard and pull notes from Excel workbook for planned studies",
-      "category": "AbbVie",
-      "priority": "high",
-      "due": "Tonight",
-      "done": true
     },
     {
       "id": 48,
@@ -246,14 +198,6 @@
     }
   ],
   "personal": [
-    {
-      "id": 1,
-      "title": "Email Kris from Village back",
-      "category": "Personal",
-      "priority": "high",
-      "done": true,
-      "type": "personal"
-    },
     {
       "id": 2,
       "title": "Order food prep stuff",
@@ -486,16 +430,85 @@
       "done": true,
       "type": "business",
       "completedAt": "2026-02-09"
-    }
-  ],
-  "motamid": [
+    },
+    {
+      "id": 1,
+      "title": "Submit Motamid report",
+      "category": "Jamaat",
+      "priority": "high",
+      "due": "Tonight",
+      "done": true,
+      "type": "business",
+      "completedAt": "2026-02-16"
+    },
+    {
+      "id": 2,
+      "title": "Follow up with Jazib & Fahad",
+      "category": "Jamaat",
+      "priority": "high",
+      "due": "Tonight",
+      "done": true,
+      "type": "business",
+      "completedAt": "2026-02-16"
+    },
+    {
+      "id": 7,
+      "title": "Review FACE phase 1 agents",
+      "category": "FACE",
+      "priority": "medium",
+      "due": "Tomorrow",
+      "done": true,
+      "type": "business",
+      "completedAt": "2026-02-16"
+    },
+    {
+      "id": 14,
+      "title": "Apply for lead role at AbbVie",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "Tonight",
+      "done": true,
+      "type": "business",
+      "completedAt": "2026-02-16"
+    },
+    {
+      "id": 43,
+      "title": "Remind Nuzhat to send BD workbooks",
+      "category": "AbbVie",
+      "priority": "medium",
+      "due": "Tomorrow",
+      "done": true,
+      "type": "business",
+      "completedAt": "2026-02-16"
+    },
+    {
+      "id": 47,
+      "title": "Refresh AbbVie dashboard and pull notes from Excel workbook for planned studies",
+      "category": "AbbVie",
+      "priority": "high",
+      "due": "Tonight",
+      "done": true,
+      "type": "business",
+      "completedAt": "2026-02-16"
+    },
+    {
+      "id": 1,
+      "title": "Email Kris from Village back",
+      "category": "Personal",
+      "priority": "high",
+      "done": true,
+      "type": "personal",
+      "completedAt": "2026-02-16"
+    },
     {
       "id": 4,
       "title": "Send Tom agent workflow",
       "category": "Motamid",
       "priority": "high",
       "due": "Today",
-      "done": true
+      "done": true,
+      "type": "motamid",
+      "completedAt": "2026-02-16"
     },
     {
       "id": 6,
@@ -503,8 +516,52 @@
       "category": "Motamid",
       "priority": "medium",
       "due": "This week",
-      "done": true
+      "done": true,
+      "type": "motamid",
+      "completedAt": "2026-02-16"
     },
+    {
+      "id": 35,
+      "title": "Send Cineplex proposal to Raghu tonight",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true,
+      "type": "motamid",
+      "completedAt": "2026-02-16"
+    },
+    {
+      "id": 36,
+      "title": "Send Kris Village email tonight",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true,
+      "type": "motamid",
+      "completedAt": "2026-02-16"
+    },
+    {
+      "id": 37,
+      "title": "Download QC report tonight",
+      "category": "AbbVie",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true,
+      "type": "motamid",
+      "completedAt": "2026-02-16"
+    },
+    {
+      "id": 38,
+      "title": "Update and make sure LBE is prepared for tomorrow",
+      "category": "Motamid",
+      "priority": "critical",
+      "due": "Tonight",
+      "done": true,
+      "type": "motamid",
+      "completedAt": "2026-02-16"
+    }
+  ],
+  "motamid": [
     {
       "id": 20,
       "title": "Create registration link for ijtema",
@@ -623,62 +680,6 @@
       "category": "Motamid",
       "priority": "high",
       "due": "This week",
-      "done": false
-    },
-    {
-      "id": 35,
-      "title": "Send Cineplex proposal to Raghu tonight",
-      "category": "Motamid",
-      "priority": "critical",
-      "due": "Tonight",
-      "done": true
-    },
-    {
-      "id": 36,
-      "title": "Send Kris Village email tonight",
-      "category": "Motamid",
-      "priority": "critical",
-      "due": "Tonight",
-      "done": true
-    },
-    {
-      "id": 37,
-      "title": "Download QC report tonight",
-      "category": "AbbVie",
-      "priority": "critical",
-      "due": "Tonight",
-      "done": true
-    },
-    {
-      "id": 38,
-      "title": "Update and make sure LBE is prepared for tomorrow",
-      "category": "Motamid",
-      "priority": "critical",
-      "due": "Tonight",
-      "done": true
-    },
-    {
-      "id": 39,
-      "title": "Pam's ROSS submission",
-      "category": "AbbVie",
-      "priority": "critical",
-      "due": "Feb 13 (OVERDUE)",
-      "done": false
-    },
-    {
-      "id": 40,
-      "title": "Dashboard: Add asset view (Demitrius request)",
-      "category": "AbbVie",
-      "priority": "high",
-      "due": "ASAP",
-      "done": false
-    },
-    {
-      "id": 41,
-      "title": "Dashboard: Add project view (Anna request)",
-      "category": "AbbVie",
-      "priority": "high",
-      "due": "ASAP",
       "done": false
     }
   ]
